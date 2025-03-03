@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('layaway_payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('layway_id')->index();
+            $table->unsignedBigInteger('layaway_id')->index();
             $table->unsignedBigInteger('customer_id')->index();
             $table->decimal('balance', 15, 2);
             $table->decimal('amount_paid', 15, 2)->default(0);
             $table->date('payment_date')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('layaway_id')->references('id')->on('layaways')->onDelete('cascade');
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
         });
     }
 
