@@ -1,50 +1,42 @@
 @extends('layouts.app')
 
+@section('title', 'Edit a Purchase Order')
+@section('header-button')
+    <a href="{{ route('purchase-orders.index') }}" class="btn btn-primary"><i class="bx bx-arrow-back"></i> Back to purchase
+        orders</a>
+@endsection
+
 @section('content')
     <div class="page-content">
         <div class="container-fluid">
-
-            <!-- start page title -->
             <div class="row">
                 <div class="col-12">
-                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 class="mb-sm-0 font-size-18">Role Edit</h4>
-                        <div class="page-title-right">
-                            <a href="{{ route('roles-and-permissions.role-list') }}" class="btn btn-primary">Back to roles</a>
+                    @error('products')
+                        <div class="alert alert-danger">
+                            {{ $message }}
                         </div>
-                    </div>
-                </div>
-            </div>
-            <!-- end page title -->
+                    @enderror
 
-            <div class="row">
-                <div class="col-12">
-                    <x-error-message :message="session('message')" />
+                    <x-error-message :message="$errors->first('message')" />
                     <x-success-message :message="session('success')" />
 
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('roles-and-permissions.update',$role->id) }}" method="POST">
+                            <form action="{{ route('purchase-orders.store') }}" method="post"
+                                enctype="multipart/form-data">
                                 @csrf
-                                @method('PUT')
-                                <div class="row mb-2">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <x-form-input name="role" value="{{ $role->name }}" label="Role Name" placeholder="Enter role name"  required="true" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row mb-2">
-                                    <div class="col-lg-6 mb-2">
-                                        <button type="submit" class="btn btn-primary w-md">Submit</button>
-                                    </div>
+
+                                @include('purchase-orders.form')
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-success">Submit</button>
                                 </div>
                             </form>
                         </div>
                     </div>
-                </div> <!-- end col -->
-            </div> <!-- end row -->
-
-        </div> <!-- container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
+    <x-include-plugins :plugins="['select2', 'datePicker', 'jQueryValidate']"></x-include-plugins>
+    @include('purchase-orders.create-order-script')
 @endsection
