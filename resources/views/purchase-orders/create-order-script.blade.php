@@ -97,7 +97,7 @@
         }
 
         $(function() {
-            $('#supplier, #color, #buy_x_products, [name="products[0][product_type]"], [name="products[0][min_size]"], [name="products[0][max_size]"], [name="products[0][name]')
+            $('#supplier, #color, #buy_x_products, [name="products[0][product_type]"], .min-size-dropdown, .max-size-dropdown, [name="products[0][name]')
             .each(function() {
                 var $this = $(this);
 
@@ -191,6 +191,16 @@
 
             return sizeRange;
         }
+
+        $(document).ready(function() {
+            $('.product-field-group').each(function(index) {
+                let minSize = $(this).find(`[name="products[${index}][min_size]"]`).val();
+                let maxSize = $(this).find(`[name="products[${index}][max_size]"]`).val();
+                if (minSize && maxSize) {
+                    updateProductDependButtonsAttr(index);
+                }
+            });
+        });
 
         function updateProductDependButtonsAttr(productIndex) {
             let minSize = $(`[name="products[${productIndex}][min_size]"]`).val();

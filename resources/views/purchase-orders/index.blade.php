@@ -33,7 +33,7 @@
                                         <td>{{ $purchaseOrder->supplier->supplier_name}}</td>
                                         <td>{{ $purchaseOrder->supplier_order_date }}</td>
                                         <td>{{ $purchaseOrder->delivery_date }}</td>
-                                        <td><a href="{{ route('colors.edit', $purchaseOrder->id) }}" class="btn btn-primary btn-sm edit py-0 px-1"><i class="fas fa-pencil-alt"></i></a>
+                                        <td><a href="{{ route('purchase-orders.edit', $purchaseOrder->id) }}" class="btn btn-primary btn-sm edit py-0 px-1"><i class="fas fa-pencil-alt"></i></a>
                                             <button data-source="Color" data-endpoint="{{ route('colors.destroy', $purchaseOrder->id) }}" class="delete-btn btn btn-danger btn-sm edit py-0 px-1"><i class="fas fa-trash-alt"></i>
                                             </button>
                                         </td>
