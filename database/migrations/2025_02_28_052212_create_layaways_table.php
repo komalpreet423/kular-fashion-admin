@@ -13,16 +13,18 @@ return new class extends Migration
     {
         Schema::create('layaways', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50);
+            $table->string('code', 25);
             $table->unsignedBigInteger('customer_id')->index();
             $table->unsignedBigInteger('order_id')->nullable()->index();
             $table->decimal('total_amount', 10, 2)->nullable(); 
             $table->decimal('amount_paid', 10, 2)->default(0);
             $table->decimal('balance', 10, 2)->nullable();
-            $table->date('due_date');
             $table->tinyInteger('status')->default(0);
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });
     }
 

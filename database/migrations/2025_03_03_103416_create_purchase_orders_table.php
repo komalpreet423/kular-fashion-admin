@@ -17,8 +17,9 @@ return new class extends Migration
             $table->string('order_no');
             $table->date('supplier_order_date');
             $table->date('delivery_date')->nullable();
-
+            $table->softDeletes();
             $table->timestamps();
+
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
         });
     }
