@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('layaways', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 50);
+            $table->string('code', 25);
             $table->unsignedBigInteger('customer_id')->index();
             $table->unsignedBigInteger('order_id')->nullable()->index();
             $table->decimal('total_amount', 10, 2)->nullable(); 
