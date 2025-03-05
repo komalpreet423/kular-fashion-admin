@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('phone_number', 17)->nullable();
             $table->string('company_name', 75)->nullable();
             $table->string('address')->nullable();
+            $table->decimal('balance', 10, 2)->default(0)->nullable();
+            $table->string('note')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
