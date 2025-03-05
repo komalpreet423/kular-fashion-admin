@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('total_payable_amount')->nullable();
             $table->decimal('paid_amount')->nullable();
             $table->string('note')->nullable();
-            $table->tinyInteger('source')->default(0)->index();
+            $table->tinyInteger('source')->default(1)->index();
             $table->unsignedBigInteger('sales_person_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
