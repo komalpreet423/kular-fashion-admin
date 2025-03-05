@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id')->index();
             $table->unsignedBigInteger('order_id')->nullable()->index();
             $table->decimal('total_amount', 10, 2)->nullable(); 
-            $table->decimal('amount_paid', 10, 2)->default(0);
+            $table->decimal('paid_amount', 10, 2)->default(0);
             $table->decimal('balance', 10, 2)->nullable();
             $table->tinyInteger('status')->default(0);
             $table->unsignedBigInteger('sales_person_id')->nullable();
