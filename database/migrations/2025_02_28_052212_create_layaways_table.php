@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('balance', 10, 2)->nullable();
             $table->tinyInteger('status')->default(0);
             $table->unsignedBigInteger('sales_person_id')->nullable();
+            $table->string('note')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
