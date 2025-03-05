@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('layaway_id')->index();
             $table->unsignedBigInteger('customer_id')->index();
             $table->decimal('balance', 15, 2);
-            $table->decimal('amount_paid', 15, 2)->default(0);
+            $table->decimal('paid_amount', 15, 2)->default(0);
             $table->date('payment_date')->nullable();
             $table->unsignedBigInteger('sales_person_id')->nullable();
             $table->softDeletes();
