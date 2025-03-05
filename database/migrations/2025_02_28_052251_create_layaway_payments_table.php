@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('method', 25);
             $table->decimal('amount', 15, 2)->default(0);
             $table->decimal('original_amount', 15, 2)->nullable(); // For Euro
-            $table->decimal('balance', 15, 2)->default(0);
             $table->date('payment_date')->nullable();
             $table->unsignedBigInteger('sales_person_id')->nullable();
             $table->softDeletes();
