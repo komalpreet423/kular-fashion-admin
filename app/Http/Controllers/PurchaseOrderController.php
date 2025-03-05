@@ -9,7 +9,7 @@ use App\Models\SizeScale;
 use App\Models\Size;
 use App\Models\productType;
 use App\Models\ProductDetail;
-use App\Models\ProductVariantDetail;
+use App\Models\PurchaseOrderProduct;
 use Illuminate\Http\Request;
 
 class PurchaseOrderController extends Controller
@@ -123,7 +123,7 @@ class PurchaseOrderController extends Controller
                 ]);
     
                 foreach ($productData['variants'] as $variantData) {
-                    ProductVariantDetail::create([
+                    PurchaseOrderProduct::create([
                         'supplier_color_code' => $variantData['supplier_color_code'],
                         'supplier_color_name' => $variantData['supplier_color_name'],
                         'color_id' => $variantData['color_id'],
@@ -250,8 +250,8 @@ class PurchaseOrderController extends Controller
                 ]);
     
                 foreach ($productData['variants'] as $variantData) {
-                    ProductVariantDetail::where('id', $purchaseOrder->id)->delete();
-                    ProductVariantDetail::create([
+                    PurchaseOrderProduct::where('id', $purchaseOrder->id)->delete();
+                    PurchaseOrderProduct::create([
                         'supplier_color_code' => $variantData['supplier_color_code'],
                         'supplier_color_name' => $variantData['supplier_color_name'],
                         'color_id' => $variantData['color_id'],

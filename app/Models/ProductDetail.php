@@ -10,6 +10,6 @@ class ProductDetail extends Model
 
     public function variants()
     {
-        return $this->hasMany(ProductVariantDetail::class);
+        return $this->hasMany(PurchaseOrderProduct::class);
     }
 }
