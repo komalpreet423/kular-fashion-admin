@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-sm-6 col-md-2 mb-3">
                             <label for="size_scale-${index}">Size Scale<span class="text-danger">*</span></label>
-                            <select name="products[${index}][name]" id="size_scale-${index}" class="form-control size-scale-dropdown ${getErrorMessage(`products.${index}.name`) ? 'is-invalid' : ''}">
+                            <select name="products[${index}][size_scale]" id="size_scale-${index}" class="form-control size-scale-dropdown ${getErrorMessage(`products.${index}.name`) ? 'is-invalid' : ''}">
                                 <option value="" disabled selected>Select size scale</option>
                                 @foreach ($sizeScales as $sizeScale)
                                     <option value="{{ $sizeScale->id }}" @selected(old('size_scale_id', $product->size_scale_id ?? '') == $sizeScale->id)>
@@ -35,7 +35,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                            ${getErrorMessage(`products.${index}.name`) ? `<span class="invalid-feedback" style="display: block;">${getErrorMessage(`products.${index}.name`)}</span>` : ''}
+                            ${getErrorMessage(`products.${index}.size_scale`) ? `<span class="invalid-feedback" style="display: block;">${getErrorMessage(`products.${index}.name`)}</span>` : ''}
                         </div>
 
                         <div class="col-sm-6 col-md-2 mb-3">
@@ -173,9 +173,9 @@
         });
 
         function getSizes(productIndex) {
+            
             let minSize = $(`[name="products[${productIndex}][min_size]"]`).val();
             let maxSize = $(`[name="products[${productIndex}][max_size]"]`).val();
-
 
             let sizeRange = [];
             for (let i = parseInt(minSize); i <= parseInt(maxSize); i++) {
@@ -208,8 +208,9 @@
 
             if (minSize && maxSize) {
                 let sizesColumn = ``;
-
+                    
                 getSizes(productIndex).forEach(function(sizeObj) {
+                    console.log(sizeObj);
                     sizesColumn += `<th>${sizeObj.size}</th>`;
                 });
 
@@ -220,7 +221,9 @@
                             ${sizesColumn}
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+
+                    </tbody>
                 </table>`);
 
                 $(`[data-product-index="${productIndex}"] .add-product-variant`).removeAttr('disabled');

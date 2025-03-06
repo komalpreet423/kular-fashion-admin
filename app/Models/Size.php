@@ -14,4 +14,7 @@ class Size extends Model
     {
         return $this->belongsTo(SizeScale::class);
     }
+    public function sizedata(){
+        return $this->belongsTo(PurchaseOrderVariantSize::class,'id','size_id');
+    }
 }
