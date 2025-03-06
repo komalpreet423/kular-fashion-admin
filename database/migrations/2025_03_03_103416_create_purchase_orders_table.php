@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supplier_id');
-            $table->string('order_no');
-            $table->date('supplier_order_date');
+            $table->unsignedBigInteger('supplier_id')->index();
+            $table->string('order_no', 75);
+            $table->date('supplier_order_date')->nullable();
             $table->date('delivery_date')->nullable();
             $table->softDeletes();
             $table->timestamps();
