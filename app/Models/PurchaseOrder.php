@@ -8,13 +8,15 @@ class PurchaseOrder extends Model
 {
     protected $guarded =[];
 
-    public function productDetails()
+    public function purchaseOrderProduct()
     {
-        return $this->hasMany(ProductDetail::class);
+        return $this->hasMany(PurchaseOrderProduct::class,'purchase_order_id')->with('variants');
     }
 
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
     }
+
+
 }

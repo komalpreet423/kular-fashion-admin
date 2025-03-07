@@ -11,18 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_variant_details', function (Blueprint $table) {
+        Schema::create('purchase_order_variants', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('purchase_order_id');
-            $table->unsignedBigInteger('product_detail_id');
+            $table->unsignedBigInteger('purchase_product_id')->index();
             $table->string('supplier_color_code');
             $table->string('supplier_color_name');
-            $table->unsignedBigInteger('color_id');
-            $table->json('size');
-
+            $table->unsignedBigInteger('color_id')->index();
             $table->timestamps();
-            $table->foreign('purchase_order_id')->references('id')->on('purchase_orders')->onDelete('cascade');
-            $table->foreign('product_detail_id')->references('id')->on('product_details')->onDelete('cascade');
+            $table->foreign('purchase_product_id')->references('id')->on('purchase_order_products')->onDelete('cascade');
             $table->foreign('color_id')->references('id')->on('colors')->onDelete('cascade');
         });
     }
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_variant_details');
+        Schema::dropIfExists('purchase_order_variants');
     }
 };

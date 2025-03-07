@@ -27,7 +27,7 @@
 </div>
 
 <div id="product-fields-container">
-    @forelse($purchaseOrder->productDetails ?? [] as $index => $product)
+    @forelse($purchaseOrder->purchaseOrderProduct ?? [] as $index => $product)
     <div class="product-field-group mb-3 border p-3" data-product-index="{{$index}}">
         <div class="row">
             <div class="col-sm-6 col-md-2 mb-3">
@@ -129,7 +129,7 @@
                 ])>
                     <option value="" disabled selected>Select Product Type</option>
                     @foreach ($productTypes as $productType)
-                        <option value="{{ $productType->id }}">
+                        <option value="{{ $productType->id }}" @selected(old('products.0.product_type', $product->product_type ?? '') == $productType->id)>
                             {{ $productType->name }}</option>
                     @endforeach
                 </select>
@@ -140,13 +140,13 @@
             </div>
             <div class="col-sm-6 col-md-2 mb-3">
                 <label for="size_scale">Size Scale<span class="text-danger">*</span></label>
-                <select name="products[0][name]" id="size_scale" @class([
+                <select name="products[0][size_scale]" id="size_scale" @class([
                     'form-control size-scale-dropdown',
-                    'is-invalid' => $errors->has('products.0.name'),
+                    'is-invalid' => $errors->has('products.0.size_scale'),
                 ])>
                     <option value="" disabled selected>Select size scale</option>
                     @foreach ($sizeScales as $sizeScale)
-                        <option value="{{ $sizeScale->id }}" @selected(old('products.0.name', $product->size_scale_id ?? '') == $sizeScale->id)>
+                        <option value="{{ $sizeScale->id }}" @selected(old('products.0.size_scale', $product->size_scale_id ?? '') == $sizeScale->id)>
                             {{ $sizeScale->name }}
 
                             @if (isset($sizeScale->sizes))
@@ -157,7 +157,7 @@
                     @endforeach
                 </select>
 
-                @error('products.0.name')
+                @error('products.0.size_scale')
                     <span class="invalid-feedback">{{ $message }}</span>
                 @enderror
             </div>

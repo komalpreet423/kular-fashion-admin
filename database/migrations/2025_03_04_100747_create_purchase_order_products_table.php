@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_details', function (Blueprint $table) {
+        Schema::create('purchase_order_products', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('purchase_order_id');
+            $table->unsignedBigInteger('purchase_order_id')->index();
             $table->string('product_code');
-            $table->unsignedBigInteger('product_type_id');
-            $table->unsignedBigInteger('size_scale_id');
-            $table->unsignedBigInteger('min_size_id');
-            $table->unsignedBigInteger('max_size_id');
+            $table->unsignedBigInteger('product_type_id')->index();
+            $table->unsignedBigInteger('size_scale_id')->index();
+            $table->unsignedBigInteger('min_size_id')->index();
+            $table->unsignedBigInteger('max_size_id')->index();
             $table->date('delivery_date');
             $table->decimal('price');
             $table->text('short_description')->nullable();
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_details');
+        Schema::dropIfExists('purchase_order_products');
     }
 };

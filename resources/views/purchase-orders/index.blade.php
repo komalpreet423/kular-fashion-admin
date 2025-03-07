@@ -28,6 +28,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($purchaseOrders as $key => $purchaseOrder)
+                                    <tr>
                                         <td>{{ $key+1 }}</td>
                                         <td>{{ $purchaseOrder->order_no }}</td>
                                         <td>{{ $purchaseOrder->supplier->supplier_name}}</td>
@@ -37,6 +38,7 @@
                                             <button data-source="Color" data-endpoint="{{ route('colors.destroy', $purchaseOrder->id) }}" class="delete-btn btn btn-danger btn-sm edit py-0 px-1"><i class="fas fa-trash-alt"></i>
                                             </button>
                                         </td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
