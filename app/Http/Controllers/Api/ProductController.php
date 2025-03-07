@@ -85,7 +85,7 @@ class ProductController extends Controller
             // Return the paginated results as JSON
             return response()->json([
                 'success' => true,
-                'products' => $productCollection,
+                'data' => $productCollection,
                 'pagination' => [
                     'current_page' => $paginatedProducts->currentPage(),
                     'per_page' => $paginatedProducts->perPage(),
