@@ -13,15 +13,10 @@ class ProductListCollection extends ResourceCollection
      *
      * @return array<int|string, mixed>
      */
-        public function toArray(Request $request): array
+        public function toArray(Request $request)
         {
 
-            return [
-                'success' => true,
-                'draw' => $request->input('draw') ?? 0,
-                'recordsTotal' => $this->resource->total(),
-                'recordsFiltered' => $this->resource->total(),
-                'products' => $this->collection->map(function ($product) {
+            return $this->collection->map(function ($product) {
                     return [
                         'id' => $product->id,
                         'slug' => $product->slug,
@@ -104,9 +99,7 @@ class ProductListCollection extends ResourceCollection
                         }),
                     
                     ];
-                }),
-                
-            ];
+                });
         }
 
     public function paginationInformation($request, $paginated, $default)
