@@ -5,19 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductListCollection;
 use App\Http\Resources\ProductResource;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\ProductSize;
-use App\Models\ProductQuantity;
-use App\Models\Brand;
-use App\Models\Color;
-use App\Models\Department;
-use App\Models\Coupon;
-use Illuminate\Support\Carbon;
-use App\Models\ProductType;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -84,8 +73,10 @@ class ProductController extends Controller
 
             // Fetch all distinct brands and product types
             $brands = Product::whereIn('id', $products->pluck('id'))
-                ->with('brand')->get()->pluck('brand')
-                ->unique('id')->map(function ($brand) {
+                ->with('brand')->get()
+                ->pluck('brand')->filter()
+                ->unique('id')->values()->take(8)
+                ->map(function ($brand) {
                     return [
                         'id' => $brand->id,
                         'name' => $brand->name,
@@ -93,8 +84,8 @@ class ProductController extends Controller
                 });
 
             $productTypes = Product::whereIn('id', $products->pluck('id'))
-                ->with('productType')->get()
-                ->pluck('productType')->unique('id')->map(function ($brand) {
+                ->with('productType')->get()->take(8)
+                ->pluck('productType')->unique('id')->flatten()->map(function ($brand) {
                     return [
                         'id' => $brand->id,
                         'name' => $brand->name,
@@ -103,25 +94,21 @@ class ProductController extends Controller
 
 
             $colors = Product::whereIn('id', $products->pluck('id'))
-                ->with('colors.colorDetail')
-                ->get()
-                ->pluck('colors')
-                ->flatten()
-                ->unique('id') // Ensure uniqueness by color id
+                ->with('colors.colorDetail')->get()
+                ->pluck('colors')->flatten()
+                ->unique(function ($color) {
+                    return $color->colorDetail ? $color->colorDetail->id : null;
+                })->values()->take(9)
                 ->map(function ($color) {
                     return [
                         'id' => $color->id,
-                        'name' => $color->colorDetail->name, // Assuming 'colorDetail' has the 'name'
+                        'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                        'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
                     ];
                 });
 
-
             $sizes = Product::whereIn('id', $products->pluck('id'))
-                ->with('sizes.sizeDetail')
-                ->get()
-                ->pluck('sizes')
-                ->flatten()
-                ->unique('id') // Ensure uniqueness by size id
+                ->with('sizes.sizeDetail')->get()->pluck('sizes')->flatten()->unique('id')->take(10)
                 ->map(function ($size) {
                     return [
                         'id' => $size->id,
