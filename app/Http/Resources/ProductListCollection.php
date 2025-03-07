@@ -90,8 +90,8 @@ class ProductListCollection extends ResourceCollection
                             return [
                                 'id' => $size->id,
                                 'size_id' => $size->size_id,
-                                'web_price' => $size->web_price,
-                                'web_sale_price' => $size->web_sale_price,
+                                'price' => $size->web_price,
+                                'sale_price' => $size->web_sale_price,
                                 'detail' => [
                                     'id' => optional($size->sizeDetail)->id,
                                     'size' => optional($size->sizeDetail)->size,
