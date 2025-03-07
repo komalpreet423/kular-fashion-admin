@@ -148,7 +148,7 @@ class ProductController extends Controller
                     'total' => $paginatedProducts->total(),
                     'last_page' => $paginatedProducts->lastPage(),
                 ],
-                'filter' => [
+                'filters' => [
                     'brands' => $brands,
                     'product_types' => $productTypes,
                     'colors' => $colors,
