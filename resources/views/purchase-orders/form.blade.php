@@ -104,14 +104,58 @@
             </div>
 
             <div class="col-sm-6 col-md-3 mt-4">
-                <button type="button" class="btn btn-primary add-product-variant" disabled data-toggle="modal" data-target="#variantModal">
+                <button type="button" class="btn btn-primary add-product-variant"  data-toggle="modal" data-target="#variantModal">
                     <i class="fas fa-plus"></i> Variant
                 </button>
-                <button type="button" class="btn btn-secondary copy-product" disabled><i class="fas fa-copy"></i></button>
+                {{--<button type="button" class="btn btn-secondary copy-product" disabled><i class="fas fa-copy"></i></button>--}}
                 <button type="button" class="btn btn-danger remove-product-field"><i class="fas fa-trash-alt"></i></button>
             </div>
         </div>
-        <div class="variants-container"></div>
+        <div class="variants-container">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Size</th>
+                        @php
+                            $sizes = collect();
+                            foreach($purchaseOrder->purchaseOrderProduct as $purchaseOrderProduct) {
+                                foreach($purchaseOrderProduct->variants as $variants) {
+                                    foreach($variants->sizes as $size) {
+                                        $sizes->push($size->sizeDetail->size);
+                                    }
+                                }
+                            }
+                            $sizes = $sizes->unique()->values();
+                        @endphp
+                    
+                        @foreach($sizes as $size)
+                            <th>{{ $size }}</th>
+                        @endforeach
+                    </tr>
+                </thead>
+                <tbody>    
+                    @foreach($purchaseOrder->purchaseOrderProduct as $proKey => $purchaseOrderProduct)
+                        @foreach($purchaseOrderProduct->variants as $vKey => $variants)
+                        <tr>
+                            <td>{{$variants->colors->name}}</td>
+                            <td class="color-code" hidden="">
+                                <input type="hidden" name="products[{{$proKey}}][variants][{{$vKey}}][supplier_color_code]" value="{{$variants->supplier_color_code}}">
+                            </td>
+                            <td class="color-name" hidden="">
+                                <input type="hidden" name="products[{{$proKey}}][variants][{{$vKey}}][supplier_color_name]" value="{{$variants->supplier_color_name}}">
+                            </td>
+                            <td class="color-id" hidden="">
+                                <input type="hidden" name="products[{{$proKey}}][variants][{{$vKey}}][color_id]" value="{{$variants->color_id}}">
+                            </td>
+                            @foreach($variants->sizes as $sizes)
+                                <td><input type="number" name="products[{{$proKey}}][variants][{{$vKey}}][size][{{$sizes->size_id}}]" value="{{$sizes->quantity}}" class="form-control"></td>
+                            @endforeach
+                        </tr>
+                        @endforeach
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
     @empty
     <!-- Empty product form for adding new products -->
@@ -203,13 +247,14 @@
                 <button type="button" class="btn btn-primary add-product-variant" disabled data-toggle="modal"
                     data-target="#variantModal"><i class="fas fa-plus"></i>
                     Variant</button>
-                <button type="button" class="btn btn-secondary copy-product" disabled><i class="fas fa-copy"></i></button>
+                {{--<button type="button" class="btn btn-secondary copy-product" disabled><i class="fas fa-copy"></i></button>--}}
                 <button type="button" class="btn btn-danger remove-product-field"><i
                         class="fas fa-trash-alt"></i></button>
             </div>
         </div>
 
-        <div class="variants-container"></div>
+        <div class="variants-container">
+        </div>
     </div>
     @endforelse
 </div>

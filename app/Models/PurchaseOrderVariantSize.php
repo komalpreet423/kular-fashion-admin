@@ -10,6 +10,6 @@ class PurchaseOrderVariantSize extends Model
     protected $guarded =[];
 
     public function sizeDetail(){
-        return $this->hasMany(Size::class,'id','size_id');
+        return $this->hasOne(Size::class,'id','size_id');
     }
 }

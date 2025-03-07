@@ -66,7 +66,6 @@
                         </div>
                         <div class="col-sm-6 col-md-3 mt-4">
                             <button type="button" class="btn btn-primary add-product-variant" disabled data-toggle="modal" data-target="#variantModal"><i class="fas fa-plus"></i> Variant</button>
-                            <button type="button" class="btn btn-secondary copy-product" disabled><i class="fas fa-copy"></i></button>
                             <button type="button" class="btn btn-danger remove-product-field"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>
@@ -197,7 +196,7 @@
                 let minSize = $(this).find(`[name="products[${index}][min_size]"]`).val();
                 let maxSize = $(this).find(`[name="products[${index}][max_size]"]`).val();
                 if (minSize && maxSize) {
-                    updateProductDependButtonsAttr(index);
+                    //updateProductDependButtonsAttr(index);
                 }
             });
         });
@@ -210,7 +209,6 @@
                 let sizesColumn = ``;
                     
                 getSizes(productIndex).forEach(function(sizeObj) {
-                    console.log(sizeObj);
                     sizesColumn += `<th>${sizeObj.size}</th>`;
                 });
 
