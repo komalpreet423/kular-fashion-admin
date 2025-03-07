@@ -141,8 +141,8 @@ class ProductController extends Controller
                     'colors' => $colors,
                     'sizes' => $sizes,
                     'price' => [
-                        'min' => $minPrice,
-                        'max' => $maxPrice,
+                        'min' => (float)$minPrice,
+                        'max' => (float)$maxPrice,
                     ]
                 ]
             ]);
