@@ -26,8 +26,8 @@ class ProductListCollection extends ResourceCollection
                         'brand_id' => $product->brand_id,
                         'department_id' => $product->department_id,
                         'product_type_id' => $product->product_type_id,
-                        'price'     => $product->price,
-                        'sale_price' => $product->sale_price,
+                        'price'     => number_format($product->price, 2),
+                        'sale_price' => number_format($product->sale_price, 2),
                         'sale_start' => $product->sale_start,
                         'sale_end' => $product->sale_end,
                         'season' => $product->season,
@@ -90,8 +90,8 @@ class ProductListCollection extends ResourceCollection
                             return [
                                 'id' => $size->id,
                                 'size_id' => $size->size_id,
-                                'price' => $size->web_price,
-                                'sale_price' => $size->web_sale_price,
+                                'price' => number_format($size->web_price, 2),
+                                'sale_price' => number_format($size->web_sale_price, 2),
                                 'detail' => [
                                     'id' => optional($size->sizeDetail)->id,
                                     'size' => optional($size->sizeDetail)->size,

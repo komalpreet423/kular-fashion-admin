@@ -82,6 +82,62 @@ class ProductController extends Controller
 
             $productCollection = new ProductListCollection($paginatedProducts);
 
+            // Fetch all distinct brands and product types
+            $brands = Product::whereIn('id', $products->pluck('id'))
+                ->with('brand')->get()->pluck('brand')
+                ->unique('id')->map(function ($brand) {
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                    ];
+                });
+
+            $productTypes = Product::whereIn('id', $products->pluck('id'))
+                ->with('productType')->get()
+                ->pluck('productType')->unique('id')->map(function ($brand) {
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                    ];
+                });
+
+
+            $colors = Product::whereIn('id', $products->pluck('id'))
+                ->with('colors.colorDetail')
+                ->get()
+                ->pluck('colors')
+                ->flatten()
+                ->unique('id') // Ensure uniqueness by color id
+                ->map(function ($color) {
+                    return [
+                        'id' => $color->id,
+                        'name' => $color->colorDetail->name, // Assuming 'colorDetail' has the 'name'
+                    ];
+                });
+
+
+            $sizes = Product::whereIn('id', $products->pluck('id'))
+                ->with('sizes.sizeDetail')
+                ->get()
+                ->pluck('sizes')
+                ->flatten()
+                ->unique('id') // Ensure uniqueness by size id
+                ->map(function ($size) {
+                    return [
+                        'id' => $size->id,
+                        'name' => $size->sizeDetail->size, // Assuming 'sizeDetail' has the 'name'
+                    ];
+                });
+
+
+            $minPrice = $products->min(function ($product) {
+                return $product->sizes->min('web_price');
+            });
+
+            $maxPrice = $products->max(function ($product) {
+                return $product->sizes->max('web_price');
+            });
+
             // Return the paginated results as JSON
             return response()->json([
                 'success' => true,
@@ -92,6 +148,16 @@ class ProductController extends Controller
                     'total' => $paginatedProducts->total(),
                     'last_page' => $paginatedProducts->lastPage(),
                 ],
+                'filter' => [
+                    'brands' => $brands,
+                    'product_types' => $productTypes,
+                    'colors' => $colors,
+                    'sizes' => $sizes,
+                    'price' => [
+                        'min' => $minPrice,
+                        'max' => $maxPrice,
+                    ]
+                ]
             ]);
         } catch (Exception $e) {
             return response()->json([
