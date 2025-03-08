@@ -16,7 +16,6 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         try {
-            // Base query with eager loading
             $query = Product::with([
                 'brand',
                 'department',
@@ -29,7 +28,6 @@ class ProductController extends Controller
                 'webInfo'
             ]);
 
-            // Filter products based on conditions
             $query->where(function ($q) {
                 // Include products where `web_info.status` is 1
                 $q->whereHas('webInfo', function ($q) {
@@ -54,7 +52,7 @@ class ProductController extends Controller
             // Sort by a specific field (if provided)
             if ($request->has('sort_by')) {
                 $sortField = $request->input('sort_by');
-                $sortDirection = $request->input('sort_dir', 'asc'); // Default to 'asc' if not provided
+                $sortDirection = $request->input('sort_dir', 'asc');
                 $query->orderBy($sortField, $sortDirection);
             }
 
@@ -118,7 +116,7 @@ class ProductController extends Controller
 
 
             $minPrice = $products->min(function ($product) {
-                return $product->sizes->min('web_price');
+                return $product->sizes->min('web_sale_price');
             });
 
             $maxPrice = $products->max(function ($product) {
@@ -170,7 +168,7 @@ class ProductController extends Controller
                 // Repeat the product for each color
                 foreach ($product->colors as $color) {
                     $clonedProduct = clone $product;
-                    $clonedProduct->color = $color; // Attach the specific color
+                    $clonedProduct->color = $color;
                     $transformed->push($clonedProduct);
                 }
             } else {
