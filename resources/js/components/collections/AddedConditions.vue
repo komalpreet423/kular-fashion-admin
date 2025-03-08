@@ -5,7 +5,7 @@
                 <div :class="addedCondition.subFields?.length > 0 ? 'col-md-5' : 'col-md-10'">
                     <div class="form-group">
                         <label class="mb-0" :for="`${conditionType}_${addedCondition.name}`">{{ addedCondition.label
-                        }}</label>
+                            }}</label>
 
                         <select class="form-control" :class="{ multiSelect: addedCondition.multiple }"
                             :id="`${conditionType}_${addedCondition.name}`" :multiple="addedCondition.multiple"
@@ -65,7 +65,8 @@
 
                             <input :name="`${conditionType}[${subField.name}]`" v-on="changeSubField(subField)"
                                 :type="subField.type === 'date' ? 'text' : subField.type" :value="subField.value"
-                                class="form-control" :class="{ 'date-range-picker': subField.type === 'date' }" :placeholder="`Enter ${subField.label}`">
+                                class="form-control" :class="{ 'date-range-picker': subField.type === 'date' }"
+                                :placeholder="`Enter ${subField.label}`">
                         </div>
                     </div>
                 </div>
@@ -113,9 +114,13 @@ export default {
         sliderStyle() {
             const minPercentage = (this.minPrice / 10000) * 100;
             const maxPercentage = (this.maxPrice / 10000) * 100;
+
+            const left = Math.min(minPercentage, maxPercentage);
+            const right = 100 - Math.max(minPercentage, maxPercentage);
+
             return {
-                left: `${minPercentage}%`,
-                right: `${100 - maxPercentage}%`
+                left: `${left}%`,
+                right: `${right}%`
             };
         }
     },
@@ -167,9 +172,6 @@ export default {
             }
             if (this.maxPrice > 10000) {
                 this.maxPrice = 10000;
-            }
-            if (Number(this.maxPrice) < Number(this.minPrice)) {
-                this.maxPrice = this.minPrice;
             }
         }
     }
