@@ -34,7 +34,7 @@ class ProductListCollection extends ResourceCollection
                         'size_scale_id' => $product->size_scale_id,
                         'min_size_id' => $product->min_size_id,
                         'max_size_id' => $product->max_size_id,
-                        'default_image' => setting('default_product_image'),
+                        'default_image' => setting('default_product_image') && file_exists(setting('default_product_image')) ? setting('default_product_image') : null,
                         'brand' => [
                             'id' => optional($product->brand)->id,
                             'name' => optional($product->brand)->name,
@@ -60,14 +60,6 @@ class ProductListCollection extends ResourceCollection
                                 "path"=> $image->path,
                                 "alt"=> $image->alt,
                                 "is_default"=> $image->is_default,
-                            ];
-                        }),
-                        'specifications' => $product->specifications->map(function($specification){
-                            return [
-                                "id" => $specification->id,
-                                "product_id"=> $specification->product_id,
-                                "key"=> $specification->key,
-                                "value"=> $specification->value,
                             ];
                         }),
                         'colors' => $product->colors->map(function ($color) {

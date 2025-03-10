@@ -16,20 +16,17 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         try {
-            // Base query with eager loading
             $query = Product::with([
                 'brand',
                 'department',
                 'productType',
                 'webImage',
-                'specifications',
                 'quantities',
                 'colors.colorDetail',
                 'sizes.sizeDetail',
                 'webInfo'
             ]);
 
-            // Filter products based on conditions
             $query->where(function ($q) {
                 // Include products where `web_info.status` is 1
                 $q->whereHas('webInfo', function ($q) {
@@ -46,15 +43,45 @@ class ProductController extends Controller
                 });
             });
 
-            // Filter by brand_id (if provided)
-            if ($request->has('brand_id')) {
-                $query->where('brand_id', $request->input('brand_id'));
+            if ($request->has('brands')) {
+                $brands = explode(',', $request->input('brands'));
+                $query->whereIn('brand_id', $brands);
+            }
+
+            /* if ($request->has('categories')) {
+                $categories = explode(',', $request->input('categories'));
+                $query->whereHas('productType', function ($q) use ($categories) {
+                    $q->whereIn('id', $categories);
+                });
+            } */
+
+            /* if ($request->has('sizes')) {
+                $sizes = explode(',', $request->input('sizes'));
+                $query->whereHas('sizes', function ($q) use ($sizes) {
+                    $q->whereIn('id', $sizes);
+                });
+            }
+
+
+            if ($request->has('colors')) {
+                $colors = explode(',', $request->input('colors'));
+                $query->whereHas('colors', function ($q) use ($colors) {
+                    $q->whereIn('id', $colors);
+                });
+            } */
+            
+            if ($request->has('min_price') && $request->has('max_price')) {
+                $minPrice = $request->input('min_price');
+                $maxPrice = $request->input('max_price');
+                $query->whereHas('sizes', function ($q) use ($minPrice, $maxPrice) {
+                    $q->whereBetween('web_price', [$minPrice, $maxPrice]);
+                });
             }
 
             // Sort by a specific field (if provided)
             if ($request->has('sort_by')) {
                 $sortField = $request->input('sort_by');
-                $sortDirection = $request->input('sort_dir', 'asc'); // Default to 'asc' if not provided
+                $sortDirection = $request->input('sort_dir', 'asc');
                 $query->orderBy($sortField, $sortDirection);
             }
 
@@ -118,7 +145,7 @@ class ProductController extends Controller
 
 
             $minPrice = $products->min(function ($product) {
-                return $product->sizes->min('web_price');
+                return $product->sizes->min('web_sale_price');
             });
 
             $maxPrice = $products->max(function ($product) {
@@ -170,7 +197,7 @@ class ProductController extends Controller
                 // Repeat the product for each color
                 foreach ($product->colors as $color) {
                     $clonedProduct = clone $product;
-                    $clonedProduct->color = $color; // Attach the specific color
+                    $clonedProduct->color = $color;
                     $transformed->push($clonedProduct);
                 }
             } else {
