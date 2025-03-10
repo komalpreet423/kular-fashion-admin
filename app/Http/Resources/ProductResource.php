@@ -73,9 +73,7 @@ class ProductResource extends JsonResource
             }),
             'specifications' => $this->specifications->map(function ($specification) {
                 return [
-                    "id" => $specification->id,
-                    "product_id" => $specification->product_id,
-                    "key" => $specification->key,
+                    "label" => $specification->key,
                     "value" => $specification->value,
                 ];
             }),
