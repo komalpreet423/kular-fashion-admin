@@ -5,7 +5,7 @@
 
         <div class="row">
             <div class="col-md-4 mb-2">
-                <x-form-input name="name" value="{{ $product->name ?? '' }}" label="Product Name"
+                <x-form-input name="name" value='{{ $product->name ?? "" }}' label="Product Name"
                     placeholder="Enter Product Name" required="true" />
             </div>
             <div class="col-md-2 mb-2">
