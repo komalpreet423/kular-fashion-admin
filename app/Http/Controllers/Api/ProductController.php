@@ -41,6 +41,8 @@ class ProductController extends Controller
                         ->groupBy('product_id')
                         ->havingRaw('SUM(quantity) > 0');
                 });
+
+                $q->orWhereDoesntHave('webInfo');
             });
 
             if ($request->has('brands')) {
@@ -230,17 +232,21 @@ class ProductController extends Controller
         return $paginator;
     }
 
-    public function show(Request $request, $slug)
+    public function showProduct(Request $request, $product)
     {
         try {
 
             $product = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
-                ->where('slug', $slug)->first();
+                ->where('id', $product)->first();
             if (!$product) {
-                return response()->json(['success'=> false, 'error' => 'Product not found'], 404);
+                return response()->json(['success' => false, 'data' => (object)[]]);
             }
 
-            return response()->json(['success'=> true, 'data' => new ProductResource($product)]);
+            $sizes = $product->sizes()->with('sizeDetail')->paginate($request->input('sizes_length', 10)) ?? collect([]);
+
+            $colors = $product->colors()->with('colorDetail')->paginate($request->input('colors_length', 10)) ?? collect([]);
+
+            return new ProductResource($product, $sizes, $colors);
         } catch (Exception  $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage(), 'data' => (object)[]]);
         }
