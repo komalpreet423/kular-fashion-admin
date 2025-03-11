@@ -26,6 +26,8 @@
     </div>
 </div>
 
+
+
 <div id="product-fields-container">
     @forelse($purchaseOrder->purchaseOrderProduct ?? [] as $index => $product)
     <div class="product-field-group mb-3 border p-3" data-product-index="{{$index}}">
@@ -111,25 +113,18 @@
                 <button type="button" class="btn btn-danger remove-product-field"><i class="fas fa-trash-alt"></i></button>
             </div>
         </div>
+        
         <div class="variants-container">
             <table class="table table-sm">
                 <thead>
                     <tr>
-                        <th>Size</th>
-                        @php
-                            $sizes = collect();
-                            foreach($purchaseOrder->purchaseOrderProduct as $purchaseOrderProduct) {
-                                foreach($purchaseOrderProduct->variants as $variants) {
-                                    foreach($variants->sizes as $size) {
-                                        $sizes->push($size->sizeDetail->size);
-                                    }
-                                }
-                            }
-                            $sizes = $sizes->unique()->values();
-                        @endphp
-                    
-                        @foreach($sizes as $size)
-                            <th>{{ $size }}</th>
+                        
+                            <th>Size</th>
+                        @dd($product->variants)
+                        @foreach($product->variants as $variants) 
+                            @foreach($variants->sizes as $size)
+                                <th>{{ $size->sizeDetail->size }}</th>
+                            @endforeach
                         @endforeach
                     </tr>
                 </thead>

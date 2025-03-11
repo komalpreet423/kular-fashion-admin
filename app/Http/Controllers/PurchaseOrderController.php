@@ -239,8 +239,8 @@ class PurchaseOrderController extends Controller
 
         $purchaseOrder->update([
             'order_no' => $request->supplier_order_no,
-            'supplier_order_date' => $request->supplier_order_date,
-            'delivery_date' => $request->delivery_date,
+            'supplier_order_date' => date('Y-m-d', strtotime($request->supplier_order_date)),
+            'delivery_date' => date('Y-m-d', strtotime($request->delivery_date)),
             'supplier_id' => $request->supplier,
         ]);
     
@@ -255,7 +255,7 @@ class PurchaseOrderController extends Controller
                     'size_scale_id' => $productData['size_scale'],
                     'min_size_id' => $productData['min_size'],
                     'max_size_id' => $productData['max_size'],
-                    'delivery_date' => $productData['delivery_date'],
+                    'delivery_date' => date('Y-m-d', strtotime($productData['delivery_date'])),
                     'price' => $productData['price'],
                     'short_description' => $productData['short_description'],
                 ]

@@ -75,7 +75,7 @@
             `;
             $('#product-fields-container').append(newField);
 
-            $('.product-type-dropdown, .size-scale-dropdown, .size-scale-dropdown, .min-size-dropdown, .max-size-dropdown')
+            $('select.product-type-dropdown, select.size-scale-dropdown, select.min-size-dropdown, select.max-size-dropdown')
             .each(function() {
                 var $this = $(this);
 
@@ -130,7 +130,7 @@
             });
         });
 
-        $(document).on('change', '.size-scale-dropdown', function() {
+        $(document).on('change', 'select.size-scale-dropdown', function() {
             var selectedSizeScaleId = $(this).val();
             var parent = $(this).closest('.product-field-group');
 
@@ -141,8 +141,8 @@
                     size_scale_id: selectedSizeScaleId
                 },
                 success: function(response) {
-                    var minSizeDropdown = parent.find('.min-size-dropdown');
-                    var maxSizeDropdown = parent.find('.max-size-dropdown');
+                    var minSizeDropdown = parent.find('select.min-size-dropdown');
+                    var maxSizeDropdown = parent.find('select.max-size-dropdown');
 
                     minSizeDropdown.empty();
                     maxSizeDropdown.empty();
@@ -234,7 +234,7 @@
         }
 
         $(function() {
-            $(document).on('change', '.min-size-dropdown', function() {
+            $(document).on('change', 'select.min-size-dropdown', function() {
                 let productIndex = $(this).parents('[data-product-index]').attr('data-product-index');
                 updateProductDependButtonsAttr();
 
@@ -267,12 +267,12 @@
                 }
             });
 
-            $(document).on('change', '.max-size-dropdown', function() {
+            $(document).on('change', 'select.max-size-dropdown', function() {
                 updateProductDependButtonsAttr($(this).parents('[data-product-index]').attr(
                     'data-product-index'));
             });
 
-            $(document).on('click', '.add-product-variant', function() {
+            $(document).on('click', 'button.add-product-variant', function() {
                 $('#selected_product_index').val($(this).parents('[data-product-index]').attr(
                     'data-product-index'));
             });
@@ -340,6 +340,8 @@
                     let quantityInputCell = ``;
                     let variantIndex = $(`[data-product-index="${productIndex}"] .variants-container tbody tr`).length;
 
+                    console.log(getSizes(productIndex));
+
                     // Generate the size input cells
                     getSizes(productIndex).forEach(function(sizeObj) {
                         quantityInputCell += `<td><input type="text" name="products[${productIndex}][variants][${variantIndex}][size][${sizeObj.id}]"></td>`;
@@ -371,7 +373,7 @@
                     $('#color-name').val('');
                 }
             });
-        })
+        });
     </script>
 @endpush
 
