@@ -56,21 +56,21 @@ class ProductController extends Controller
                     $q->whereIn('id', $categories);
                 });
             } */
-
-            /* if ($request->has('sizes')) {
+            
+            if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
                 $sizes = explode(',', $request->input('sizes'));
                 $query->whereHas('sizes', function ($q) use ($sizes) {
-                    $q->whereIn('id', $sizes);
+                    $q->whereIn('size_id', $sizes);
                 });
             }
 
 
-            if ($request->has('colors')) {
+            if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
                 $colors = explode(',', $request->input('colors'));
                 $query->whereHas('colors', function ($q) use ($colors) {
-                    $q->whereIn('id', $colors);
+                    $q->whereIn('color_id', $colors);
                 });
-            } */
+            }
             
             if ($request->has('min_price') && $request->has('max_price')) {
                 $minPrice = $request->input('min_price');
@@ -89,7 +89,7 @@ class ProductController extends Controller
 
             // Get all products (without pagination)
             $products = $query->get();
-
+            
             // Transform products to handle `is_splitted_with_colors`
             $transformedProducts = $this->transformProducts($products);
 
@@ -127,23 +127,29 @@ class ProductController extends Controller
                 ->pluck('colors')->flatten()
                 ->unique(function ($color) {
                     return $color->colorDetail ? $color->colorDetail->id : null;
-                })->values()->take(9)
+                })->values()
                 ->map(function ($color) {
                     return [
-                        'id' => $color->id,
+                        'id' => $color->color_id,
                         'name' => $color->colorDetail ? $color->colorDetail->name : null,
                         'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
                     ];
                 });
 
             $sizes = Product::whereIn('id', $products->pluck('id'))
-                ->with('sizes.sizeDetail')->get()->pluck('sizes')->flatten()->unique('id')->take(10)
+                ->with('sizes.sizeDetail')
+                ->get()
+                ->pluck('sizes')
+                ->flatten()
+                ->unique(fn($size) => $size->sizeDetail->size) // Ensure uniqueness by size name
                 ->map(function ($size) {
                     return [
-                        'id' => $size->id,
-                        'name' => $size->sizeDetail->size, // Assuming 'sizeDetail' has the 'name'
+                        'id' => $size->size_id,
+                        'name' => $size->sizeDetail->size, // Assuming 'sizeDetail' has the 'size' attribute
                     ];
-                });
+                })
+                ->values(); // Reset array keys
+            
 
 
             $minPrice = $products->min(function ($product) {
