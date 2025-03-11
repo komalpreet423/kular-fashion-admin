@@ -25,10 +25,9 @@
                     <div class="row d-block d-md-none">
                         <div class="col-md-3 mt-2">
                             @if (isset($brand) && $brand->image)
-                                <img src="{{ asset($brand->image) }}" id="preview-brand"
-                                    class="img-preview img-fluid w-50">
+                            <img src="{{ asset($brand->image) }}" id="preview-brand" class="img-preview img-fluid w-50">
                             @else
-                                <img src="" id="preview-brand" class="img-fluid w-50;" name="image" hidden>
+                            <img src="" id="preview-brand" class="img-fluid w-50;" name="image" hidden>
                             @endif
                         </div>
                     </div>
@@ -63,9 +62,9 @@
 
             <div class="col-md-4 d-none d-md-block">
                 @if (isset($brand) && $brand->image)
-                    <img src="{{ asset($brand->image) }}" id="previewBrand" class="img-preview img-fluid w-50">
+                <img src="{{ asset($brand->image) }}" id="previewBrand" class="img-preview img-fluid w-50">
                 @else
-                    <img src="" id="previewBrand" class="img-fluid w-50" name="image" hidden>
+                <img src="" id="previewBrand" class="img-fluid w-50" name="image" hidden>
                 @endif
             </div>
         </div>
@@ -80,7 +79,8 @@
         </div>
         <div class="mt-3">
             <h4 class="card-title">Description</h4>
-            <textarea name="description" id="description" class="editor" rows="2">{{ $brand->description ?? '' }}</textarea>
+            <textarea name="description" id="description" class="editor"
+                rows="2">{{ $brand->description ?? '' }}</textarea>
         </div>
     </div>
 </div>
@@ -90,20 +90,19 @@
         <h4 class="card-title">SEO</h4>
         <div class="row">
             <div class="col-sm-10 mb-2">
-                <x-form-input name="heading" label="Heading" required="true"
-                value="{{ $brand->heading ?? '' }}" placeholder="Heading" />
+                <x-form-input name="heading" label="Heading" value="{{ $brand->heading ?? '' }}"
+                    placeholder="Heading" />
             </div>
         </div>
         <div class="row">
             <div class="col-sm-4">
                 <div class="mb-2">
-                    <x-form-input name="meta_title" label="Meta title" required="true"
-                        value="{{ $brand->meta_title ?? '' }}" placeholder="Meta title" />
+                    <x-form-input name="meta_title" label="Meta title" value="{{ $brand->meta_title ?? '' }}"
+                        placeholder="Meta title" />
                 </div>
                 <div class="mb-2">
-                    <x-form-input name="meta_keywords" label="Meta Keywords"
-                        value="{{ $brand->meta_keywords ?? '' }}" placeholder="Meta Keywords"
-                        required="true" />
+                    <x-form-input name="meta_keywords" label="Meta Keywords" value="{{ $brand->meta_keywords ?? '' }}"
+                        placeholder="Meta Keywords" />
                 </div>
             </div>
             <div class="col-sm-6">

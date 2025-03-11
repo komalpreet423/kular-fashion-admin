@@ -6,14 +6,15 @@
             <div class="col-sm-6 col-md-3">
                 <div class="mb-3">
                     <label for="department_id">Department <span class="text-danger">*</span></label>
-                    <select name="department_id[]" id="department_id"
-                        @class(['form-control', 'is-invalid' => $errors->has('department_id')]) multiple>
+                    <select name="department_id[]" id="department_id" @class(['form-control', 'is-invalid'=>
+                        $errors->has('department_id')]) multiple>
                         @foreach ($departments as $department)
-                          <option value="{{$department->id}}" @selected(in_array($department->id, old('department_id', $selectedDeparments ?? [])))>{{$department->name}}</option>
+                        <option value="{{$department->id}}" @selected(in_array($department->id, old('department_id',
+                            $selectedDeparments ?? [])))>{{$department->name}}</option>
                         @endforeach
                     </select>
                     @error('department_id')
-                        <span class="invalid-feedback">{{ $message }}</span>
+                    <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
             </div>
@@ -32,17 +33,15 @@
             <div class="col-sm-6 col-md-3">
                 <div class="mb-3">
                     <label class="form-label">Image</label>
-                    <input type="file" name="image" id="add-productType-image" class="form-control"
-                        accept="image/*">
+                    <input type="file" name="image" id="add-productType-image" class="form-control" accept="image/*">
 
                     <div class="row d-block d-md-none">
                         <div class="col-md-3 mt-2">
                             @if (isset($productType) && $productType->image)
-                                <img src="{{ asset($productType->image) }}" id="preview-productType"
-                                    class="img-preview img-fluid w-50">
+                            <img src="{{ asset($productType->image) }}" id="preview-productType"
+                                class="img-preview img-fluid w-50">
                             @else
-                                <img src="" id="preview-productType" class="img-fluid w-50;" name="image"
-                                    hidden>
+                            <img src="" id="preview-productType" class="img-fluid w-50;" name="image" hidden>
                             @endif
                         </div>
                     </div>
@@ -59,11 +58,10 @@
             <div class="col-sm-6 col-md-3"></div>
             <div class="col-sm-6 col-md-3 d-none d-md-block">
                 @if (isset($productType) && $productType->image)
-                    <img src="{{ asset($productType->image) }}" id="preview-product-type"
-                        class="img-preview img-fluid w-50">
+                <img src="{{ asset($productType->image) }}" id="preview-product-type"
+                    class="img-preview img-fluid w-50">
                 @else
-                    <img src="" id="preview-product-type" class="img-preview img-fluid w-50" name="image"
-                        hidden>
+                <img src="" id="preview-product-type" class="img-preview img-fluid w-50" name="image" hidden>
                 @endif
             </div>
         </div>
@@ -79,7 +77,8 @@
         </div>
         <div class="mt-3">
             <h4 class="card-title">Description</h4>
-            <textarea name="description" id="description" class="editor" rows="2">{{ $productType->description ?? '' }}</textarea>
+            <textarea name="description" id="description" class="editor"
+                rows="2">{{ $productType->description ?? '' }}</textarea>
         </div>
     </div>
 </div>
@@ -89,19 +88,19 @@
         <h4 class="card-title">SEO</h4>
         <div class="row">
             <div class="col-sm-10 mb-2">
-                <x-form-input name="heading" label="Heading" required="true" value="{{ $productType->heading ?? '' }}"
+                <x-form-input name="heading" label="Heading" value="{{ $productType->heading ?? '' }}"
                     placeholder="Heading" />
             </div>
         </div>
         <div class="row">
             <div class="col-sm-4">
                 <div class="mb-2">
-                    <x-form-input name="meta_title" label="Meta title" required="true"
-                        value="{{ $productType->meta_title ?? '' }}" placeholder="Meta title" />
+                    <x-form-input name="meta_title" label="Meta title" value="{{ $productType->meta_title ?? '' }}"
+                        placeholder="Meta title" />
                 </div>
                 <div class="mb-2">
                     <x-form-input name="meta_keywords" label="Meta Keywords"
-                        value="{{ $productType->meta_keywords ?? '' }}" placeholder="Meta Keywords" required="true" />
+                        value="{{ $productType->meta_keywords ?? '' }}" placeholder="Meta Keywords" />
                 </div>
             </div>
             <div class="col-sm-6">

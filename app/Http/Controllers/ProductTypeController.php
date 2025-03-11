@@ -36,14 +36,11 @@ class ProductTypeController extends Controller
         if(!Gate::allows('create product types')) {
             abort(403);
         }
+
         $request->validate([
            'department_id'       => 'required',
            'short_name'          => 'required',
-           'name'   => 'required|unique:product_types,name',
-           'heading' => 'required', 
-           'meta_title' => 'required',
-           'meta_keywords' => 'required',
-           'meta_description' => 'required'
+           'name'               => 'required|unique:product_types,name',
         ]);
 
         $imageName = uploadFile($request->file('image'), 'uploads/product-types/');
@@ -92,14 +89,11 @@ class ProductTypeController extends Controller
         if(!Gate::allows('edit product types')) {
             abort(403);
         }
+
         $request->validate([
             'department_id'     => 'required',
             'short_name'        => 'required',
             'name'              => 'required|unique:product_types,name,' . $id,
-            'heading' => 'required', 
-            'meta_title' => 'required',
-            'meta_keywords' => 'required',
-            'meta_description' => 'required'
         ]);
 
         $productType = ProductType::where('id', $id)->first();

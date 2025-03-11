@@ -177,6 +177,12 @@
 
                             @can('edit products')
                                 actions +=
+                                    `<a href="{{ route('products.edit.web-configuration', ':id') }}" class="btn btn-success btn-sm edit py-0 px-1">`
+                                    .replace(/:id/g, row.id);
+                                actions += `<i class="fas fa-image"></i>`;
+                                actions += `</a>`;
+
+                                actions +=
                                     `<a href="{{ route('products.edit', ':id') }}" class="btn btn-primary btn-sm edit py-0 px-1">`
                                     .replace(/:id/g, row.id);
                                 actions += `<i class="fas fa-pencil-alt"></i>`;

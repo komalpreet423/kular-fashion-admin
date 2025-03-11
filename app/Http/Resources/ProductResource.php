@@ -51,7 +51,6 @@ class ProductResource extends JsonResource
             ],
             'webInfo' =>  [
                 "id" => optional($this->webInfo)->id,
-                "product_id" => optional($this->webInfo)->product_id,
                 "summary" => optional($this->webInfo)->summary,
                 "description" => optional($this->webInfo)->description,
                 "is_splitted_with_colors" => optional($this->webInfo)->is_splitted_with_colors,
@@ -64,7 +63,6 @@ class ProductResource extends JsonResource
             'images' => $this->webImage->map(function ($image) {
                 return [
                     "id" => $image->id,
-                    "product_id" => $image->product_id,
                     "product_color_id" => $image->product_color_id,
                     "path" => $image->path,
                     "alt" => $image->alt,
