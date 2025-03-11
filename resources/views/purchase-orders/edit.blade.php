@@ -22,8 +22,9 @@
 
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('purchase-orders.store') }}" method="post"
+                            <form action="{{ route('purchase-orders.update',$purchaseOrder->id) }}" method="post"
                                 enctype="multipart/form-data">
+                                @method('PUT')
                                 @csrf
 
                                 @include('purchase-orders.form')
