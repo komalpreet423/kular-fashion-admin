@@ -28,7 +28,7 @@ class ColorSeeder extends Seeder
             ],
             [
                 'name' => 'BLACK/WHITE',
-                'short_name' => 'BLACK/WHITE',
+                'short_name' => 'B/W',
                 'code' => '108',
                 'ui_color_code' => '#000000',
             ],
