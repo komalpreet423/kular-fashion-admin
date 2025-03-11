@@ -46,7 +46,6 @@ class ProductListCollection extends ResourceCollection
                     'slug' => optional($product->department)->slug,
                     'image' => optional($product->department)->image,
                 ],
-
                 'productType' => [
                     'id' => optional($product->productType)->id,
                     'name' => optional($product->productType)->name,
@@ -89,7 +88,6 @@ class ProductListCollection extends ResourceCollection
                         ]
                     ];
                 }),
-
             ];
         });
     }

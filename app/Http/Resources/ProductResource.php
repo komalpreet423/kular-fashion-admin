@@ -7,6 +7,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
 {
+    protected $relatedProducts;
+
+    public function __construct($resource, $relatedProducts = [])
+    {
+        parent::__construct($resource);
+        $this->relatedProducts = (object) $relatedProducts;
+    }
+
     public function toArray(Request $request): array
     {
         return [
@@ -96,7 +104,6 @@ class ProductResource extends JsonResource
             'colors' => $this->colors->map(function ($color) {
                 return [
                     'id' => $color->id,
-                    'product_id' => $color->product_id,
                     'color_id' => $color->color_id,
                     'supplier_color_code' => $color->supplier_color_code,
                     'supplier_color_name' => $color->supplier_color_name,
@@ -108,8 +115,30 @@ class ProductResource extends JsonResource
                         "short_name" => $color->colorDetail->short_name,
                         "code" => $color->colorDetail->code,
                         "ui_color_code" => $color->colorDetail->ui_color_code,
-                        "status" => $color->colorDetail->status,
                     ] : null,
+                ];
+            }),
+            'relatedProducts' => $this->relatedProducts->map(function ($relatedProduct) {
+                return [
+                    'id' => $relatedProduct->id,
+                    'slug' => $relatedProduct->slug,
+                    'name' => $relatedProduct->name,
+                    'price'     => number_format($relatedProduct->price, 2),
+                    'sale_price' => number_format($relatedProduct->sale_price, 2),
+                    'sale_start' => $relatedProduct->sale_start,
+                    'sale_end' => $relatedProduct->sale_end,
+                    'sizes' => $relatedProduct->sizes->map(function ($size) {
+                        return [
+                            'id' => $size->id,
+                            'size_id' => $size->size_id,
+                            'price' => number_format($size->web_price, 2),
+                            'sale_price' => number_format($size->web_sale_price, 2),
+                            'detail' => [
+                                'id' => optional($size->sizeDetail)->id,
+                                'size' => optional($size->sizeDetail)->size,
+                            ]
+                        ];
+                    }),
                 ];
             }),
         ];

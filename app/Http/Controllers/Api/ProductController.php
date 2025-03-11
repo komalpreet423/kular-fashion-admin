@@ -56,7 +56,7 @@ class ProductController extends Controller
                     $q->whereIn('id', $categories);
                 });
             } */
-            
+
             if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
                 $sizes = explode(',', $request->input('sizes'));
                 $query->whereHas('sizes', function ($q) use ($sizes) {
@@ -71,7 +71,7 @@ class ProductController extends Controller
                     $q->whereIn('color_id', $colors);
                 });
             }
-            
+
             if ($request->has('min_price') && $request->has('max_price')) {
                 $minPrice = $request->input('min_price');
                 $maxPrice = $request->input('max_price');
@@ -89,7 +89,7 @@ class ProductController extends Controller
 
             // Get all products (without pagination)
             $products = $query->get();
-            
+
             // Transform products to handle `is_splitted_with_colors`
             $transformedProducts = $this->transformProducts($products);
 
@@ -149,8 +149,6 @@ class ProductController extends Controller
                     ];
                 })
                 ->values(); // Reset array keys
-            
-
 
             $minPrice = $products->min(function ($product) {
                 return $product->sizes->min('web_sale_price');
@@ -241,14 +239,19 @@ class ProductController extends Controller
     public function show(Request $request, $slug)
     {
         try {
-
             $product = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
                 ->where('slug', $slug)->first();
             if (!$product) {
-                return response()->json(['success'=> false, 'error' => 'Product not found'], 404);
+                return response()->json(['success' => false, 'error' => 'Product not found'], 404);
             }
 
-            return response()->json(['success'=> true, 'data' => new ProductResource($product)]);
+            $relatedProducts = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
+                ->where('product_type_id', $product->product_type_id)
+                ->where('id', '!=', $product->id)
+                ->take(8)
+                ->get();
+
+            return response()->json(['success' => true, 'data' => new ProductResource($product, $relatedProducts)]);
         } catch (Exception  $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage(), 'data' => (object)[]]);
         }
