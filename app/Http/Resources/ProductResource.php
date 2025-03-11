@@ -45,7 +45,6 @@ class ProductResource extends JsonResource
                 'image' => optional($this->department)->image ?? '',
                 "description" => optional($this->department)->description ?? '',
                 "image" => optional($this->department)->image ?? '',
-                "status" => optional($this->department)->status ?? '',
             ],
             'productType' =>  [
                 'id' => optional($this->productType)->id,
@@ -63,7 +62,6 @@ class ProductResource extends JsonResource
                 "meta_title" => optional($this->webInfo)->meta_title,
                 "meta_keywords" => optional($this->webInfo)->meta_keywords,
                 "meta_description" => optional($this->webInfo)->meta_description,
-                "status" => optional($this->webInfo)->status,
             ],
             'images' => $this->webImage->map(function ($image) {
                 return [
@@ -86,15 +84,13 @@ class ProductResource extends JsonResource
                     'product_id' => $size->product_id,
                     'size_id' => $size->size_id,
                     'mrp' => $size->mrp,
-                    'web_price' => $size->web_price,
-                    'web_sale_price' => $size->web_sale_price,
+                    'price' => $size->web_price,
+                    'sale_price' => $size->web_sale_price,
                     'detail' => $size->sizeDetail ? [
                         "id" => $size->sizeDetail->id,
-                        "size_scale_id" => $size->sizeDetail->size_scale_id,
                         "name" => $size->sizeDetail->size,
-                        "new_code" => $size->sizeDetail->new_code,
+                        "code" => $size->sizeDetail->new_code,
                         "length" => $size->sizeDetail->length,
-                        "status" => $size->sizeDetail->status,
                     ] : null,
                 ];
             }),
