@@ -74,9 +74,9 @@ class ProductController extends Controller
 
             if ($request->has('min_price') && $request->has('max_price')) {
                 $minPrice = $request->input('min_price');
-                $maxPrice = $request->input('max_price');
-                $query->whereHas('sizes', function ($q) use ($minPrice, $maxPrice) {
-                    $q->whereBetween('web_price', [$minPrice, $maxPrice]);
+                $maxPriceToFilter = $request->input('max_price');
+                $query->whereHas('sizes', function ($q) use ($minPrice, $maxPriceToFilter) {
+                    $q->whereBetween('web_price', [$minPrice, $maxPriceToFilter]);
                 });
             }
 
@@ -122,19 +122,66 @@ class ProductController extends Controller
                 });
 
 
-            $colors = Product::whereIn('id', $products->pluck('id'))
-                ->with('colors.colorDetail')->get()
-                ->pluck('colors')->flatten()
-                ->unique(function ($color) {
-                    return $color->colorDetail ? $color->colorDetail->id : null;
-                })->values()
-                ->map(function ($color) {
-                    return [
-                        'id' => $color->color_id,
-                        'name' => $color->colorDetail ? $color->colorDetail->name : null,
-                        'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
-                    ];
-                });
+            if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
+                if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
+                    $colors = Product::whereIn('id', $products->pluck('id'))
+                                        ->with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
+                }else{
+                    $colors = Product::whereIn('id', $products->pluck('id'))
+                                        ->with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
+                }
+            }else{
+                if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
+                    $colors = Product::with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
+                }else{
+                    $colors = Product::whereIn('id', $products->pluck('id'))
+                                        ->with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
+                }
+            }
 
             $sizes = Product::whereIn('id', $products->pluck('id'))
                 ->with('sizes.sizeDetail')
@@ -147,16 +194,24 @@ class ProductController extends Controller
                         'id' => $size->size_id,
                         'name' => $size->sizeDetail->size, // Assuming 'sizeDetail' has the 'size' attribute
                     ];
-                })
+                })->take(9)
                 ->values(); // Reset array keys
 
             $minPrice = $products->min(function ($product) {
                 return $product->sizes->min('web_sale_price');
             });
 
-            $maxPrice = $products->max(function ($product) {
-                return $product->sizes->max('web_price');
-            });
+            if (!empty($request->input('sizes')) && !is_null($request->input('sizes') && !empty($request->input('colors')) && !is_null($request->input('colors')))) {
+                $maxPrice = $products->max(function ($product) {
+                    return $product->sizes->max('web_price');
+                });
+            }else{
+                $maxPrice = Product::with('sizes')
+                                    ->get()
+                                    ->pluck('sizes')
+                                    ->flatten()
+                                    ->max('web_price');
+            }
 
             // Return the paginated results as JSON
             return response()->json([
@@ -187,6 +242,18 @@ class ProductController extends Controller
         }
     }
 
+    protected function getUniqueColors($products) {
+        return Product::whereIn('id', $products->pluck('id'))
+            ->with('colors.colorDetail')->get()
+            ->pluck('colors')->flatten()
+            ->unique(fn($color) => $color->colorDetail ? $color->colorDetail->id : null)
+            ->values()
+            ->map(fn($color) => [
+                'id' => $color->color_id,
+                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+            ]);
+    }
     /**
      * Transform products to handle `is_splitted_with_colors`.
      *
