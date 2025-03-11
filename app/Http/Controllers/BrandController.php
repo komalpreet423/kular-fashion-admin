@@ -46,9 +46,6 @@ class BrandController extends Controller
                 'required',
                     Rule::unique('brands')->whereNull('deleted_at'),
             ],
-            'meta_title'  => ['required'],
-            'meta_keywords' => ['required'],
-            'heading' => ['required'],
         ]);
 
         $imageName = uploadFile($request->file('brand_image'), 'uploads/brands/');
@@ -98,10 +95,6 @@ class BrandController extends Controller
                 'required',
                 Rule::unique('brands')->ignore($brand->id)->whereNull('deleted_at'),
             ],
-            'heading'  => ['required'],
-            'meta_title'  => ['required'],
-            'meta_keywords' => ['required'],
-            'meta_description' => ['required'],
         ]);
 
         $oldBrandImage = $brand ? $brand->image : NULL;
