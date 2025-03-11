@@ -49,6 +49,10 @@ class ProductController extends Controller
                 $brands = explode(',', $request->input('brands'));
                 $query->whereIn('brand_id', $brands);
             }
+            if ($request->has('product_id')) {
+                $products = explode(',', $request->input('product_id'));
+                $query->whereIn('id', $products);
+            }
 
             /* if ($request->has('categories')) {
                 $categories = explode(',', $request->input('categories'));
@@ -192,7 +196,7 @@ class ProductController extends Controller
                 ->max('web_price');
 
             // Return the paginated results as JSON
-            return response()->json([
+            $response = [
                 'success' => true,
                 'data' => $productCollection,
                 'pagination' => [
@@ -201,7 +205,11 @@ class ProductController extends Controller
                     'total' => $paginatedProducts->total(),
                     'last_page' => $paginatedProducts->lastPage(),
                 ],
-                'filters' => [
+            ];
+            
+            // Check if filters are requested
+            if ($request->filters == true) {
+                $response['filters'] = [
                     'brands' => $brands,
                     'product_types' => $productTypes,
                     'colors' => $colors,
@@ -210,8 +218,11 @@ class ProductController extends Controller
                         'min' => (float)$minPrice,
                         'max' => (float)$maxPrice,
                     ]
-                ]
-            ]);
+                ];
+            }
+            
+            return response()->json($response);
+            
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
