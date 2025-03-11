@@ -1001,14 +1001,14 @@ class ProductController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Sizes');
 
-        $headers = ['ID', 'Size Scale Id', 'Size', 'New Code', 'Old Code', 'Length', 'Status'];
+        $headers = ['ID', 'Size Scale Id', 'Size', 'New Code', 'Old Code', 'Status'];
         $sheet->fromArray($headers, NULL, 'A1');
 
         $sizes = Size::all();
 
         foreach ($sizes as $key => $size) {
             $sheet->fromArray(
-                [$size->id, $size->size_scale_id, $size->size, $size->new_code, $size->old_code, $size->length, $size->status],
+                [$size->id, $size->size_scale_id, $size->size, $size->new_code, $size->old_code, $size->status],
                 NULL,
                 'A' . ($key + 2)
             );

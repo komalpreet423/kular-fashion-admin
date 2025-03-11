@@ -80,13 +80,12 @@ class ProductResource extends JsonResource
                     'product_id' => $size->product_id,
                     'size_id' => $size->size_id,
                     'mrp' => $size->mrp,
-                    'price' => $size->web_price,
-                    'sale_price' => $size->web_sale_price,
+                    'price' => number_format($size->web_price, 2),
+                    'sale_price' => number_format($size->web_sale_price, 2),
                     'detail' => $size->sizeDetail ? [
                         "id" => $size->sizeDetail->id,
                         "name" => $size->sizeDetail->size,
                         "code" => $size->sizeDetail->new_code,
-                        "length" => $size->sizeDetail->length,
                     ] : null,
                 ];
             }),
