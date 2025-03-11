@@ -31,9 +31,6 @@ class ProductResource extends JsonResource
             'sale_start' => $this->sale_start,
             'sale_end' => $this->sale_end,
             'season' => $this->season,
-            'size_scale_id' => $this->size_scale_id,
-            'min_size_id' => $this->min_size_id,
-            'max_size_id' => $this->max_size_id,
             'brand' =>  [
                 'id' => optional($this->brand)->id,
                 'name' => optional($this->brand)->name ?? '',

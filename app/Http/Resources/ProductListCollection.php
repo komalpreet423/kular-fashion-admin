@@ -31,9 +31,6 @@ class ProductListCollection extends ResourceCollection
                 'sale_start' => $product->sale_start,
                 'sale_end' => $product->sale_end,
                 'season' => $product->season,
-                'size_scale_id' => $product->size_scale_id,
-                'min_size_id' => $product->min_size_id,
-                'max_size_id' => $product->max_size_id,
                 'default_image' => setting('default_product_image') && file_exists(setting('default_product_image')) ? setting('default_product_image') : null,
                 'brand' => [
                     'id' => optional($product->brand)->id,
