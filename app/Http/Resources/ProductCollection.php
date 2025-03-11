@@ -85,7 +85,7 @@ class ProductCollection extends ResourceCollection
                                 'size' => optional($size->sizeDetail)->size,
                             ]
                         ];
-                    }),
+                    })
                 ];
             }),
         ];

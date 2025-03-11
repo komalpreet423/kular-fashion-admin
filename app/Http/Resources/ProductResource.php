@@ -115,6 +115,15 @@ class ProductResource extends JsonResource
                     ] : null,
                 ];
             }),
+            'variants' => $this->quantities->map(function ($variant) {
+                return [
+                    'id' => $variant->id,
+                    'product_color_id' => $variant->product_color_id,
+                    'product_size_id' => $variant->product_size_id,
+                    'sku' => $variant->sku,
+                    'quantity' => $variant->quantity,
+                ];
+            }),
             'relatedProducts' => $this->relatedProducts->map(function ($relatedProduct) {
                 return [
                     'id' => $relatedProduct->id,

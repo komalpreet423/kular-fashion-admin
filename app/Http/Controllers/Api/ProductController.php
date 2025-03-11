@@ -306,7 +306,7 @@ class ProductController extends Controller
     public function show(Request $request, $slug)
     {
         try {
-            $product = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
+            $product = Product::with('brand', 'department', 'quantities', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
                 ->where('slug', $slug)->first();
             if (!$product) {
                 return response()->json(['success' => false, 'error' => 'Product not found'], 404);
