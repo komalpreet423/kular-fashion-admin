@@ -49,9 +49,9 @@ class ProductController extends Controller
                 $brands = explode(',', $request->input('brands'));
                 $query->whereIn('brand_id', $brands);
             }
-            if ($request->has('product_id')) {
-                $products = explode(',', $request->input('product_id'));
-                $query->whereIn('id', $products);
+            if ($request->has('product_ids')) {
+                $product_ids = explode(',', $request->input('product_ids'));
+                $query->whereIn('id', $product_ids);
             }
 
             /* if ($request->has('categories')) {
@@ -222,7 +222,7 @@ class ProductController extends Controller
             }
             
             return response()->json($response);
-            
+
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
