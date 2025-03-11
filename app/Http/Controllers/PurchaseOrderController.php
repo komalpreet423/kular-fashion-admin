@@ -13,6 +13,8 @@ use App\Models\PurchaseOrderProduct;
 use App\Models\PurchaseOrderVariant;
 use App\Models\PurchaseOrderVariantSize;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 
 class PurchaseOrderController extends Controller
 {
@@ -105,8 +107,8 @@ class PurchaseOrderController extends Controller
        
         $purchaseOrder = PurchaseOrder::create([
             'order_no' => $request->supplier_order_no,
-            'supplier_order_date' => \Carbon\Carbon::createFromFormat('d-m-Y', $request->supplier_order_date),
-            'delivery_date' => \Carbon\Carbon::createFromFormat('d-m-Y', $request->delivery_date),
+            'supplier_order_date' => Carbon::createFromFormat('d-m-Y', $request->supplier_order_date),
+            'delivery_date' => Carbon::createFromFormat('d-m-Y', $request->delivery_date),
             'supplier_id'   => $request->supplier,
         ]);
 
@@ -118,7 +120,7 @@ class PurchaseOrderController extends Controller
                     'size_scale_id' => $productData['size_scale'],
                     'min_size_id' => $productData['min_size'],
                     'max_size_id' => $productData['max_size'],
-                    'delivery_date' => \Carbon\Carbon::createFromFormat('d-m-Y', $productData['delivery_date']),
+                    'delivery_date' => Carbon::createFromFormat('d-m-Y', $productData['delivery_date']),
                     'price' => $productData['price'],
                     'short_description' => $productData['short_description'],
                     'purchase_order_id' => $purchaseOrder->id,
@@ -160,7 +162,6 @@ class PurchaseOrderController extends Controller
      */
     public function edit(PurchaseOrder $purchaseOrder)
     {
-        $purchaseOrder = PurchaseOrder::with('purchaseOrderProduct')->find($purchaseOrder->id);
         $suppliers = Supplier::latest()->where('status', 'Active')->get();
         $colors = Color::where('status', 'Active')->get();
         $sizeScales = SizeScale::select('id', 'name')->where('status', 'Active')->latest()->with('sizes')->get();
@@ -186,7 +187,7 @@ class PurchaseOrderController extends Controller
             'products.*.product_code' => 'required|string|max:255',
             'products.*.short_description' => 'required|string|max:500',
             'products.*.product_type' => 'required|string|max:100',
-            'products.*.name' => 'required|string|exists:size_scales,id',
+            'products.*.size_scale' => 'required|string|exists:size_scales,id',
             'products.*.min_size' => 'required|string|exists:sizes,id',
             'products.*.max_size' => 'required|string|exists:sizes,id',
             'products.*.delivery_date' => 'required|date',
@@ -235,16 +236,55 @@ class PurchaseOrderController extends Controller
             'products.*.price.between' => 'The price must be between 0 and 999,999.99',
         ]);
 
-        $purchaseOrder = PurchaseOrder::where('id', $purchaseOrder->id)->first();
-        if ($purchaseOrder)
-        {
-            $purchaseOrder->update([
-                'order_no' => $request->supplier_order_no,
-                'supplier_order_date' => \Carbon\Carbon::createFromFormat('d-m-Y', $request->supplier_order_date),
-                'delivery_date' => \Carbon\Carbon::createFromFormat('d-m-Y', $request->delivery_date),
-                'supplier_id'   => $request->supplier,
-            ]);
 
+        $purchaseOrder->update([
+            'order_no' => $request->supplier_order_no,
+            'supplier_order_date' => date('Y-m-d', strtotime($request->supplier_order_date)),
+            'delivery_date' => date('Y-m-d', strtotime($request->delivery_date)),
+            'supplier_id' => $request->supplier,
+        ]);
+    
+        foreach ($request->products as $productData) {
+            $productDetail = PurchaseOrderProduct::updateOrCreate(
+                [
+                    'purchase_order_id' => $purchaseOrder->id,
+                    'product_code' => $productData['product_code'],
+                ],
+                [
+                    'product_type_id' => $productData['product_type'],
+                    'size_scale_id' => $productData['size_scale'],
+                    'min_size_id' => $productData['min_size'],
+                    'max_size_id' => $productData['max_size'],
+                    'delivery_date' => date('Y-m-d', strtotime($productData['delivery_date'])),
+                    'price' => $productData['price'],
+                    'short_description' => $productData['short_description'],
+                ]
+            );
+    
+            foreach ($productData['variants'] as $variantData) {
+                $purchaseOrderVariant = PurchaseOrderVariant::updateOrCreate(
+                    [
+                        'purchase_product_id' => $productDetail->id,
+                        'color_id' => $variantData['color_id'],
+                    ],
+                    [
+                        'supplier_color_code' => $variantData['supplier_color_code'],
+                        'supplier_color_name' => $variantData['supplier_color_name'],
+                    ]
+                );
+    
+                foreach ($variantData['size'] as $key => $sizes) {
+                    PurchaseOrderVariantSize::updateOrCreate(
+                        [
+                            'purchase_product_variant_id' => $purchaseOrderVariant->id,
+                            'size_id' => $key,
+                        ],
+                        [
+                            'quantity' => $sizes,
+                        ]
+                    );
+                }
+            }
         }
 
         return redirect()->route('purchase-orders.index')->with('success', 'Purchase order updated successfully.');
@@ -261,8 +301,7 @@ class PurchaseOrderController extends Controller
     public function getSizeRange(Request $request)
     {
         $sizeScaleId = $request->input('size_scale_id');
-        $sizeScale = Size::with('sizedata')->where('status', 'Active')->where('size_scale_id', $sizeScaleId)->get();
-
+        $sizeScale = Size::select('id', 'size')->where('status', 'Active')->where('size_scale_id', $sizeScaleId)->get();
         $minSizes = $sizeScale->pluck('size', 'id');
         $maxSizes = $sizeScale->pluck('size', 'id')->reverse();
 

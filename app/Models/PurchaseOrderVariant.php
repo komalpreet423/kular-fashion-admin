@@ -16,7 +16,7 @@ class PurchaseOrderVariant extends Model
 
     public function colors()
     {
-        return $this->hasMany(Color::class,'id','color_id');
+        return $this->hasOne(Color::class,'id','color_id');
     }
 
 }
