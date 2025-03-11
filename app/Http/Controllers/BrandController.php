@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rule;
 use App\Imports\BrandImport;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Gate;
 
 class BrandController extends Controller
@@ -67,7 +66,7 @@ class BrandController extends Controller
         return redirect()->route('brands.index')->with('success', 'Brand created successfully.');
     }
 
-    public function show(string $id)
+    public function show(Brand $brand)
     {
         //
     }
