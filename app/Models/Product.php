@@ -45,9 +45,8 @@ class Product extends Model
         $slug = Str::slug($this->name);
         $originalSlug = $slug;
 
-        // Check if the slug already exists, and if so, append a number to make it unique
         $counter = 1;
-        while (self::where('slug', $slug)->exists()) {
+        while (self::where('slug', $slug)->where('id', '!=', $this->id)->exists()) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         }
