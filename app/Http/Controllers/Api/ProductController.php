@@ -123,8 +123,7 @@ class ProductController extends Controller
 
 
             if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
-                if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
-                    $colors = Product::whereIn('id', $products->pluck('id'))
+                $colors = Product::whereIn('id', $products->pluck('id'))
                                         ->with('colors.colorDetail')->get()
                                         ->pluck('colors')->flatten()
                                         ->unique(function ($color) {
@@ -137,21 +136,6 @@ class ProductController extends Controller
                                                 'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
                                             ];
                                         });
-                }else{
-                    $colors = Product::whereIn('id', $products->pluck('id'))
-                                        ->with('colors.colorDetail')->get()
-                                        ->pluck('colors')->flatten()
-                                        ->unique(function ($color) {
-                                            return $color->colorDetail ? $color->colorDetail->id : null;
-                                        })->values()
-                                        ->map(function ($color) {
-                                            return [
-                                                'id' => $color->color_id,
-                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
-                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
-                                            ];
-                                        });
-                }
             }else{
                 if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
                     $colors = Product::with('colors.colorDetail')->get()
@@ -201,17 +185,11 @@ class ProductController extends Controller
                 return $product->sizes->min('web_sale_price');
             });
 
-            if (!empty($request->input('sizes')) && !is_null($request->input('sizes') && !empty($request->input('colors')) && !is_null($request->input('colors')))) {
-                $maxPrice = $products->max(function ($product) {
-                    return $product->sizes->max('web_price');
-                });
-            }else{
-                $maxPrice = Product::with('sizes')
-                                    ->get()
-                                    ->pluck('sizes')
-                                    ->flatten()
-                                    ->max('web_price');
-            }
+            $maxPrice = Product::with('sizes')
+                ->get()
+                ->pluck('sizes')
+                ->flatten()
+                ->max('web_price');
 
             // Return the paginated results as JSON
             return response()->json([
