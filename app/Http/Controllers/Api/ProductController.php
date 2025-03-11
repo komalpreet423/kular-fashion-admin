@@ -5,171 +5,322 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductListCollection;
 use App\Http\Resources\ProductResource;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use App\Models\ProductColor;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\ProductSize;
-use App\Models\ProductQuantity;
-use App\Models\Brand;
-use App\Models\Color;
-use App\Models\Department;
-use App\Models\Coupon;
-use Illuminate\Support\Carbon;
-use App\Models\ProductType;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductController extends Controller
 {
-    public function index(Request $request){
-        try{
-        $validator = Validator::make($request->all(), [
-            'column'      => 'in:price,name,productType',
-        ]);
-    
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 400);
-        }
-        $column = $request->input('column') ?? 'products.created_at';
-        $orderBy = request()->input('order_by') ??  'asc'; 
+    public function index(Request $request)
+    {
+        try {
+            $query = Product::with([
+                'brand',
+                'department',
+                'productType',
+                'webImage',
+                'quantities',
+                'colors.colorDetail',
+                'sizes.sizeDetail',
+                'webInfo'
+            ]);
 
-        $query = Product::with(['brand', 'department', 'productType', 'webImage', 'specifications','quantities', 'colors.colorDetail', 'sizes.sizeDetail', 'webInfo'])
-                    ->whereHas('webInfo', function ($q) {
-                        $q->where(function ($subQuery) {
-                            $subQuery->where('is_splitted_with_colors', 1)
-                            ->where('status', 1) 
-                            ->orWhere('status', 2); 
-                        });
-                    })
+            $query->where(function ($q) {
+                // Include products where `web_info.status` is 1
+                $q->whereHas('webInfo', function ($q) {
+                    $q->where('status', 1);
+                });
 
-                    ->where(function ($query) {
-                        $query->whereHas('quantities', function ($q) {
-                            $q->select(DB::raw('SUM(product_quantities.quantity) as total_quantity'))
-                            ->havingRaw('SUM(quantity) > ?', [1]);
-                        })
-                        ->orWhereHas('webInfo', function ($q) {
-                            $q->where('status', 1); 
-                        });
-                    });
-                  
-                    
-            $filterable = [
-                'brand_id' => 'brand',
-                'department_id' => 'department',
-                'color_id' => 'colors',
-                'size_id' => 'sizes',
-            ];
-            
-            foreach ($filterable as $param => $relation) {
-                if ($request->filled($param)) {
-                    $ids = explode(',', $request->input($param));
-                    $query->whereHas($relation, function ($q) use ($ids, $param) {
-                        $column = $param === 'color_id' || $param === 'size_id' ? $param : 'id';
-                        $q->whereIn($column, $ids);
-                    });
+                // Include products where `web_info.status` is 2 AND sum of `quantities.quantity` > 0
+                $q->orWhereHas('webInfo', function ($q) {
+                    $q->where('status', 2);
+                })->whereHas('quantities', function ($q) {
+                    $q->select('product_id')
+                        ->groupBy('product_id')
+                        ->havingRaw('SUM(quantity) > 0');
+                });
+
+                $q->orWhereDoesntHave('webInfo');
+            });
+
+            if ($request->has('brands')) {
+                $brands = explode(',', $request->input('brands'));
+                $query->whereIn('brand_id', $brands);
+            }
+
+            /* if ($request->has('categories')) {
+                $categories = explode(',', $request->input('categories'));
+                $query->whereHas('productType', function ($q) use ($categories) {
+                    $q->whereIn('id', $categories);
+                });
+            } */
+
+            if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
+                $sizes = explode(',', $request->input('sizes'));
+                $query->whereHas('sizes', function ($q) use ($sizes) {
+                    $q->whereIn('size_id', $sizes);
+                });
+            }
+
+
+            if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
+                $colors = explode(',', $request->input('colors'));
+                $query->whereHas('colors', function ($q) use ($colors) {
+                    $q->whereIn('color_id', $colors);
+                });
+            }
+
+            if ($request->has('min_price') && $request->has('max_price')) {
+                $minPrice = $request->input('min_price');
+                $maxPriceToFilter = $request->input('max_price');
+                $query->whereHas('sizes', function ($q) use ($minPrice, $maxPriceToFilter) {
+                    $q->whereBetween('web_price', [$minPrice, $maxPriceToFilter]);
+                });
+            }
+
+            // Sort by a specific field (if provided)
+            if ($request->has('sort_by')) {
+                $sortField = $request->input('sort_by');
+                $sortDirection = $request->input('sort_dir', 'asc');
+                $query->orderBy($sortField, $sortDirection);
+            }
+
+            // Get all products (without pagination)
+            $products = $query->get();
+
+            // Transform products to handle `is_splitted_with_colors`
+            $transformedProducts = $this->transformProducts($products);
+
+            // Paginate the transformed products manually
+            $perPage = $request->input('per_page', 10); // Default to 10 items per page
+            $currentPage = $request->input('page', 1); // Default to page 1
+            $paginatedProducts = $this->paginateCollection($transformedProducts, $perPage, $currentPage);
+
+            $productCollection = new ProductListCollection($paginatedProducts);
+
+            // Fetch all distinct brands and product types
+            $brands = Product::whereIn('id', $products->pluck('id'))
+                ->with('brand')->get()
+                ->pluck('brand')->filter()
+                ->unique('id')->values()->take(8)
+                ->map(function ($brand) {
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                    ];
+                });
+
+            $productTypes = Product::whereIn('id', $products->pluck('id'))
+                ->with('productType')->get()->take(8)
+                ->pluck('productType')->unique('id')->flatten()->map(function ($brand) {
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                    ];
+                });
+
+
+            if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
+                if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
+                    $colors = Product::whereIn('id', $products->pluck('id'))
+                                        ->with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
+                }else{
+                    $colors = Product::whereIn('id', $products->pluck('id'))
+                                        ->with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
+                }
+            }else{
+                if ($request->has('colors') && !empty($request->input('colors')) && !is_null($request->input('colors'))) {
+                    $colors = Product::with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
+                }else{
+                    $colors = Product::whereIn('id', $products->pluck('id'))
+                                        ->with('colors.colorDetail')->get()
+                                        ->pluck('colors')->flatten()
+                                        ->unique(function ($color) {
+                                            return $color->colorDetail ? $color->colorDetail->id : null;
+                                        })->values()
+                                        ->map(function ($color) {
+                                            return [
+                                                'id' => $color->color_id,
+                                                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                                                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                                            ];
+                                        });
                 }
             }
 
-            $products = $query->join('product_colors', 'products.id', '=', 'product_colors.product_id')
-                    ->select(
-                        'products.id', 'products.name', 'products.slug', 'products.article_code',
-                        'products.manufacture_code', 'products.brand_id', 'products.department_id', 
-                        'products.product_type_id', 'products.price', 'products.sale_price', 
-                        'products.sale_start','products.sale_end', 'products.season', 'products.size_scale_id', 
-                        'products.min_size_id', 'products.max_size_id', 'product_colors.color_id'
-                    )
-                    ->groupBy(
-                        'products.id', 'products.name', 'products.slug', 'products.article_code',
-                        'products.manufacture_code', 'products.brand_id', 'products.department_id', 
-                        'products.product_type_id', 'products.price', 'products.sale_price', 
-                        'products.sale_start','products.sale_end', 'products.season', 'products.size_scale_id', 
-                        'products.min_size_id', 'products.max_size_id', 'product_colors.color_id'
-                    )
-                     ->orderBy($column, $orderBy)  
+            $sizes = Product::whereIn('id', $products->pluck('id'))
+                ->with('sizes.sizeDetail')
+                ->get()
+                ->pluck('sizes')
+                ->flatten()
+                ->unique(fn($size) => $size->sizeDetail->size) // Ensure uniqueness by size name
+                ->map(function ($size) {
+                    return [
+                        'id' => $size->size_id,
+                        'name' => $size->sizeDetail->size, // Assuming 'sizeDetail' has the 'size' attribute
+                    ];
+                })->take(9)
+                ->values(); // Reset array keys
 
-                    ->paginate($request->input('length', 10));
+            $minPrice = $products->min(function ($product) {
+                return $product->sizes->min('web_sale_price');
+            });
 
-
-        $products->load(['brand', 'department', 'productType', 'colors.colorDetail', 'sizes.sizeDetail', 'webInfo']);
-
-        $filters = [];
-            foreach ($products as $product) {
-                foreach ($product->colors as $key => $color) {
-                        $filters['colors'][$key] = [
-                            'id' => $color->id,
-                            'color_id' => $color->color_id,
-                            'supplier_color_code' => $color->supplier_color_code,
-                            'supplier_color_name' => $color->supplier_color_name,
-                            'swatch_image_path' => $color->swatch_image_path,
-                            'detail' => [
-                                'id' => optional($color->colorDetail)->id,
-                                'name' => optional($color->colorDetail)->name,
-                                'slug' => optional($color->colorDetail)->slug,
-                                'code' => optional($color->colorDetail)->code,
-                                'ui_color_code' => optional($color->colorDetail)->ui_color_code,
-                        ]];
-                }
-                foreach ($product->sizes as $key => $size) {
-                        $filters['sizes'][$key] =[
-                                'id' => $size->id,
-                                'size_id' => $size->size_id,
-                                'detail' => [
-                                    'id' => optional($size->sizeDetail)->id,
-                                    'size' => optional($size->sizeDetail)->size,
-                                ]
-                    ] ;
-                }
-   
-                    $filters['brands'] = 
-                        [
-                            'id' => optional($product->brand)->id,
-                            'name' => optional($product->brand)->name,
-                            'slug' => optional($product->brand)->slug,
-                        ];
-
-            $filters['minPrice'] = Product::min('price');   
-            $filters['maxPrice'] = Product::max('price');       
-              
+            if (!empty($request->input('sizes')) && !is_null($request->input('sizes') && !empty($request->input('colors')) && !is_null($request->input('colors')))) {
+                $maxPrice = $products->max(function ($product) {
+                    return $product->sizes->max('web_price');
+                });
+            }else{
+                $maxPrice = Product::with('sizes')
+                                    ->get()
+                                    ->pluck('sizes')
+                                    ->flatten()
+                                    ->max('web_price');
             }
-          
+
+            // Return the paginated results as JSON
             return response()->json([
                 'success' => true,
-                'products' => new ProductListCollection($products),
-                'filters' => $filters
+                'data' => $productCollection,
+                'pagination' => [
+                    'current_page' => $paginatedProducts->currentPage(),
+                    'per_page' => $paginatedProducts->perPage(),
+                    'total' => $paginatedProducts->total(),
+                    'last_page' => $paginatedProducts->lastPage(),
+                ],
+                'filters' => [
+                    'brands' => $brands,
+                    'product_types' => $productTypes,
+                    'colors' => $colors,
+                    'sizes' => $sizes,
+                    'price' => [
+                        'min' => (float)$minPrice,
+                        'max' => (float)$maxPrice,
+                    ]
+                ]
             ]);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'data' => $e->getMessage()
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    protected function getUniqueColors($products) {
+        return Product::whereIn('id', $products->pluck('id'))
+            ->with('colors.colorDetail')->get()
+            ->pluck('colors')->flatten()
+            ->unique(fn($color) => $color->colorDetail ? $color->colorDetail->id : null)
+            ->values()
+            ->map(fn($color) => [
+                'id' => $color->color_id,
+                'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
             ]);
-        }
-       
- 
     }
+    /**
+     * Transform products to handle `is_splitted_with_colors`.
+     *
+     * @param \Illuminate\Support\Collection $products
+     * @return \Illuminate\Support\Collection
+     */
+    protected function transformProducts($products)
+    {
+        $transformed = new Collection();
 
-
-
-    public function showProduct(Request $request, $product){
-        try{
-
-            $product = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications','productType', 'colors.colorDetail', 'sizes.sizeDetail')
-                        ->where('id', $product)->first();
-            if(!$product)
-            {
-              return response()->json(['success' => false, 'data' => (object)[]]);
+        foreach ($products as $product) {
+            // Check if the product should be split by colors
+            if ($product->webInfo && $product->webInfo->is_splitted_with_colors == 1) {
+                // Repeat the product for each color
+                foreach ($product->colors as $color) {
+                    $clonedProduct = clone $product;
+                    $clonedProduct->color = $color;
+                    $transformed->push($clonedProduct);
+                }
+            } else {
+                // Add the product as is
+                $transformed->push($product);
             }
-            
-            $sizes = $product->sizes()->with('sizeDetail')->paginate($request->input('sizes_length', 10)) ?? collect([]);
-            
-            $colors = $product->colors()->with('colorDetail')->paginate($request->input('colors_length', 10)) ?? collect([]);
-
-           return new ProductResource($product, $sizes, $colors);
-
-        }catch(Exception  $e){
-            return response()->json(['success' => false, 'message'=> $e->getMessage(), 'data' => (object)[]]);
         }
-         
+
+        return $transformed;
     }
- 
+
+    /**
+     * Paginate a collection manually.
+     *
+     * @param \Illuminate\Support\Collection $collection
+     * @param int $perPage
+     * @param int $currentPage
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    protected function paginateCollection($collection, $perPage, $currentPage)
+    {
+        $items = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $paginator = new LengthAwarePaginator(
+            $items,
+            $collection->count(),
+            $perPage,
+            $currentPage,
+        );
+
+        return $paginator;
+    }
+
+    public function show(Request $request, $slug)
+    {
+        try {
+            $product = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
+                ->where('slug', $slug)->first();
+            if (!$product) {
+                return response()->json(['success' => false, 'error' => 'Product not found'], 404);
+            }
+
+            $relatedProducts = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
+                ->where('product_type_id', $product->product_type_id)
+                ->where('id', '!=', $product->id)
+                ->take(8)
+                ->get();
+
+            return response()->json(['success' => true, 'data' => new ProductResource($product, $relatedProducts)]);
+        } catch (Exception  $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage(), 'data' => (object)[]]);
+        }
+    }
 }

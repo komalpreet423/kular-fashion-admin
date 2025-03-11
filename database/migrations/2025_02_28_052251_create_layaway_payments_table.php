@@ -15,14 +15,17 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('layaway_id')->index();
             $table->unsignedBigInteger('customer_id')->index();
-            $table->decimal('balance', 15, 2);
-            $table->decimal('amount_paid', 15, 2)->default(0);
+            $table->string('method', 25);
+            $table->decimal('amount', 15, 2)->default(0);
+            $table->decimal('original_amount', 15, 2)->nullable(); // For Euro
             $table->date('payment_date')->nullable();
+            $table->unsignedBigInteger('sales_person_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('layaway_id')->references('id')->on('layaways')->onDelete('cascade');
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
+            $table->foreign('sales_person_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

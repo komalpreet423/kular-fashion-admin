@@ -19,4 +19,9 @@ class Brand extends Model
             ]
         ];
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'color_id');
+    }
 }

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('order_id')->index();
             $table->string('method', 25);
-            $table->decimal('amount');
-            $table->decimal('original_amount')->nullable(); // For Euro
+            $table->decimal('amount', 15, 2);
+            $table->decimal('original_amount', 15, 2)->nullable(); // For Euro
             $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');

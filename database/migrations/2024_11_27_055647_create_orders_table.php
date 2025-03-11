@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('code', 20);
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('sales_person_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->integer('total_items')->nullable();
             $table->integer('total_return_items')->nullable();
@@ -23,7 +22,8 @@ return new class extends Migration
             $table->decimal('total_payable_amount')->nullable();
             $table->decimal('paid_amount')->nullable();
             $table->string('note')->nullable();
-            $table->enum('source',['POS', 'Website', 'Other'])->default('Other');
+            $table->tinyInteger('source')->default(1)->index();
+            $table->unsignedBigInteger('sales_person_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

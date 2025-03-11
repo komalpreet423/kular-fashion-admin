@@ -18,6 +18,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{slug}', [ProductController::class, 'show']);
+
 Route::post('products/add-manufacture-barcode', [ProductBarcodeController::class, 'addManufactureBarcode']);
 Route::post('/collections/check-name', [CollectionController::class, 'checkCollectionName']);
 
