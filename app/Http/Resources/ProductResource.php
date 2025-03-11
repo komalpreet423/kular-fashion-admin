@@ -36,7 +36,6 @@ class ProductResource extends JsonResource
                 'name' => optional($this->brand)->name ?? '',
                 'slug' => optional($this->brand)->slug,
                 "short_name" => optional($this->brand)->short_name,
-                "image" => optional($this->brand)->image,
             ],
             'department' => [
                 'id' => optional($this->department)->id,
