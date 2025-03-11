@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
-            $table->string('slug');
+            $table->string('slug')->nullable();
             $table->string('name');
             $table->string('short_name', 100)->unique()->nullable(); 
             $table->string('image')->nullable();
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('large_image')->nullable();
             $table->text('summary')->nullable();
             $table->longText('description')->nullable();
-            $table->decimal('margin', 5, 2)->default('50');
+            $table->decimal('margin', 5, 2)->default(50);
             $table->string('heading')->nullable();
             $table->string('meta_title')->nullable();
             $table->string('meta_keywords')->nullable();
