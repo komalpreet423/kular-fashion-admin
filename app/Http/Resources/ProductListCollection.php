@@ -41,7 +41,6 @@ class ProductListCollection extends ResourceCollection
                     'id' => optional($product->department)->id,
                     'name' => optional($product->department)->name,
                     'slug' => optional($product->department)->slug,
-                    'image' => optional($product->department)->image,
                 ],
                 'productType' => [
                     'id' => optional($product->productType)->id,

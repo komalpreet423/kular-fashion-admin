@@ -42,16 +42,13 @@ class ProductResource extends JsonResource
                 'id' => optional($this->department)->id,
                 'name' => optional($this->department)->name,
                 'slug' => optional($this->department)->slug ?? '',
-                'image' => optional($this->department)->image ?? '',
                 "description" => optional($this->department)->description ?? '',
-                "image" => optional($this->department)->image ?? '',
             ],
             'productType' =>  [
                 'id' => optional($this->productType)->id,
                 'name' => optional($this->productType)->name,
                 'slug' => optional($this->productType)->slug,
                 "short_name" => optional($this->productType)->short_name,
-                "image" => optional($this->productType)->image,
             ],
             'webInfo' =>  [
                 "id" => optional($this->webInfo)->id,
