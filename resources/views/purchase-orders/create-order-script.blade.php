@@ -330,11 +330,11 @@
                         alert("This variant already exists.");
                         return false;  // Stop the loop
                     }
-                    if(colorName == existingColor){
+                    /*if(colorName == existingColor){
                         isUnique = false;
                         alert("This color already exists.");
                         return false;  
-                    }
+                    }*/
 
                 });
 
@@ -378,6 +378,11 @@
                     $('#supplier_color_name').val('');
                     $('#color-name').val('');
                 }
+            });
+
+            $('#color-name').select2({
+                width: '100%',
+                dropdownParent: $('#variantModal')
             });
         });
     </script>
