@@ -318,7 +318,7 @@ class ProductImportExportController extends Controller
 
         foreach ($sizes as $key => $size) {
             $sheet->fromArray(
-                [$size->id, $size->size_scale_id, $size->size, $size->new_code, $size->old_code, $size->length],
+                [$size->id, $size->size_scale_id, $size->size, $size->new_code, $size->old_code],
                 NULL,
                 'A' . ($key + 2)
             );

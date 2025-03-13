@@ -54,10 +54,10 @@ class ProductController extends Controller
                 $query->whereIn('id', $product_ids);
             }
 
-            /* if ($request->has('categories')) {
-                $categories = explode(',', $request->input('categories'));
-                $query->whereHas('productType', function ($q) use ($categories) {
-                    $q->whereIn('id', $categories);
+            /* if ($request->has('product_types')) {
+                $product_types = explode(',', $request->input('product_types'));
+                $query->whereHas('productType', function ($q) use ($product_types) {
+                    $q->whereIn('id', $product_types);
                 });
             } */
 
@@ -301,7 +301,7 @@ class ProductController extends Controller
     public function show(Request $request, $slug)
     {
         try {
-            $product = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
+            $product = Product::with('brand', 'department', 'quantities', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
                 ->where('slug', $slug)->first();
             if (!$product) {
                 return response()->json(['success' => false, 'error' => 'Product not found'], 404);

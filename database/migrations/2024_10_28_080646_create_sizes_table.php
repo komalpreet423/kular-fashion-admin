@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('size', 100);
             $table->string('new_code', 100)->nullable();
             $table->string('old_code', 100)->nullable();
-            $table->string('length', 25)->nullable();
             $table->enum('status', ['Active', 'Inactive'])->default('Active')->index();
             $table->softDeletes();
             $table->timestamps();

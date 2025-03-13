@@ -31,31 +31,23 @@ class ProductResource extends JsonResource
             'sale_start' => $this->sale_start,
             'sale_end' => $this->sale_end,
             'season' => $this->season,
-            'size_scale_id' => $this->size_scale_id,
-            'min_size_id' => $this->min_size_id,
-            'max_size_id' => $this->max_size_id,
             'brand' =>  [
                 'id' => optional($this->brand)->id,
                 'name' => optional($this->brand)->name ?? '',
                 'slug' => optional($this->brand)->slug,
                 "short_name" => optional($this->brand)->short_name,
-                "image" => optional($this->brand)->image,
             ],
             'department' => [
                 'id' => optional($this->department)->id,
                 'name' => optional($this->department)->name,
                 'slug' => optional($this->department)->slug ?? '',
-                'image' => optional($this->department)->image ?? '',
                 "description" => optional($this->department)->description ?? '',
-                "image" => optional($this->department)->image ?? '',
-                "status" => optional($this->department)->status ?? '',
             ],
             'productType' =>  [
                 'id' => optional($this->productType)->id,
                 'name' => optional($this->productType)->name,
                 'slug' => optional($this->productType)->slug,
                 "short_name" => optional($this->productType)->short_name,
-                "image" => optional($this->productType)->image,
             ],
             'webInfo' =>  [
                 "id" => optional($this->webInfo)->id,
@@ -66,7 +58,6 @@ class ProductResource extends JsonResource
                 "meta_title" => optional($this->webInfo)->meta_title,
                 "meta_keywords" => optional($this->webInfo)->meta_keywords,
                 "meta_description" => optional($this->webInfo)->meta_description,
-                "status" => optional($this->webInfo)->status,
             ],
             'images' => $this->webImage->map(function ($image) {
                 return [
@@ -88,16 +79,12 @@ class ProductResource extends JsonResource
                     'id' => $size->id,
                     'product_id' => $size->product_id,
                     'size_id' => $size->size_id,
-                    'mrp' => $size->mrp,
-                    'web_price' => $size->web_price,
-                    'web_sale_price' => $size->web_sale_price,
+                    'price' => (float) $size->web_price,
+                    'sale_price' => $size->web_sale_price !== null ? (float) $size->web_sale_price : null,
                     'detail' => $size->sizeDetail ? [
                         "id" => $size->sizeDetail->id,
-                        "size_scale_id" => $size->sizeDetail->size_scale_id,
                         "name" => $size->sizeDetail->size,
-                        "new_code" => $size->sizeDetail->new_code,
-                        "length" => $size->sizeDetail->length,
-                        "status" => $size->sizeDetail->status,
+                        "code" => $size->sizeDetail->new_code,
                     ] : null,
                 ];
             }),
@@ -116,6 +103,15 @@ class ProductResource extends JsonResource
                         "code" => $color->colorDetail->code,
                         "ui_color_code" => $color->colorDetail->ui_color_code,
                     ] : null,
+                ];
+            }),
+            'variants' => $this->quantities->map(function ($variant) {
+                return [
+                    'id' => $variant->id,
+                    'product_color_id' => $variant->product_color_id,
+                    'product_size_id' => $variant->product_size_id,
+                    'sku' => $variant->sku,
+                    'quantity' => $variant->quantity,
                 ];
             }),
             'relatedProducts' => $this->relatedProducts->map(function ($relatedProduct) {
