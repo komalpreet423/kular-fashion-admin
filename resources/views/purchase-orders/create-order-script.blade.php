@@ -350,7 +350,7 @@
 
                     // Generate the size input cells
                     getSizes(productIndex).forEach(function(sizeObj) {
-                        quantityInputCell += `<td><input type="text" name="products[${productIndex}][variants][${variantIndex}][size][${sizeObj.id}]"></td>`;
+                        quantityInputCell += `<td><input type="text" class="form-control" name="products[${productIndex}][variants][${variantIndex}][size][${sizeObj.id}]"></td>`;
                     });
 
                     $(`[data-product-index="${productIndex}"] .variants-container tbody`).append(`<tr>
