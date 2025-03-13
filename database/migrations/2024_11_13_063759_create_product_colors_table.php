@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('color_id')->index(); 
             $table->string('supplier_color_code')->nullable();
             $table->string('supplier_color_name')->nullable();
+            $table->string('image_path')->nullable();
             $table->string('swatch_image_path')->nullable();
             $table->timestamps();
 

@@ -54,10 +54,10 @@ class ProductController extends Controller
                 $query->whereIn('id', $product_ids);
             }
 
-            /* if ($request->has('categories')) {
-                $categories = explode(',', $request->input('categories'));
-                $query->whereHas('productType', function ($q) use ($categories) {
-                    $q->whereIn('id', $categories);
+            /* if ($request->has('product_types')) {
+                $product_types = explode(',', $request->input('product_types'));
+                $query->whereHas('productType', function ($q) use ($product_types) {
+                    $q->whereIn('id', $product_types);
                 });
             } */
 
