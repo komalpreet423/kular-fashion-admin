@@ -43,6 +43,10 @@ input[switch=danger]:label {
     border-color: var(--bs-form-invalid-border-color)!important;
 }
 
+.cursor-pointer{
+    cursor: pointer;
+}
+
 .overlay {
     position: absolute;
     top: 0;
@@ -56,6 +60,37 @@ input[switch=danger]:label {
     /* Semi-transparent overlay */
     opacity: 0;
     transition: opacity 0.3s;
+}
+
+#googleImagesModal .selected-image{
+    border: 1px solid #556ee6;
+    box-shadow: 1px 1px 5px 0;
+}
+
+.btn-google {
+    background-color: #4285F4; /* Google Blue */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+    transition: background-color 0.3s ease;
+}
+
+.btn-google:hover {
+    background-color: #357ABD;
+    color: #fff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.25);
+}
+
+.google-logo {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
 }
 
 .avatar-sm:hover .overlay {

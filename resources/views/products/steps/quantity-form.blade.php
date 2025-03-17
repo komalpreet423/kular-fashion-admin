@@ -27,9 +27,9 @@
         @endphp
 
         <tr data-id="rm-{{ $color['id'] }}" data-color-detail='{{ json_encode($color)  }}'>
-            <th class="d-flex align-items-center justify-content-center flex-column text-center">
+            <th class="d-flex align-items-center justify-content-center flex-column text-center cursor-pointer change-color-image-modal">
                 <div class="me-1 d-color-code color-selector" style="background: {{ $color['ui_color_code'] }}"></div>
-                <span class="font-size-12 fw-bold text-decoration-none cursor-pointer" data-bs-toggle="modal" data-bs-target="#colorModal{{ $color['id'] }}">
+                <span class="font-size-12 fw-bold text-decoration-none">
                     {{ $color['name'] }} ({{ $color['code'] }})
                 </span>
             </th>

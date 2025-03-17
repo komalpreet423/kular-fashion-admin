@@ -1,67 +1,173 @@
-@foreach ($savedColors as $color)
-<div class="modal fade" id="colorModal{{ $color['id'] }}" tabindex="-1" aria-labelledby="colorModalLabel{{ $color['id'] }}" aria-hidden="true">
+<div class="modal fade" id="chooseColorImageModal" tabindex="-1" aria-labelledby="chooseColorImageModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="colorModalLabel{{ $color['id'] }}">{{ $color['name'] }} ({{ $color['code'] }})</h5>
+                <h5 class="modal-title d-flex gap-2" id="chooseColorImageModalLabel"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Color Code:</strong> {{ $color['code'] }}</p>
-                <p>
-                    <strong>UI Color:</strong>
-                    <span class="d-inline-block p-2" style="background: {{ $color['ui_color_code'] }}; width: 50px; height: 50px;"></span>
-                </p>
-
-                <!-- Display Uploaded Image -->
                 <div class="mb-3">
-                    <label class="form-label"><strong>Uploaded Image:</strong></label>
-                    <div>
-                        @if(isset($color['image']))
-                        <img src="{{ asset('uploads/colors/' . $color['image']) }}" class="img-fluid rounded" alt="Color Image" width="150">
-                        @else
-                        <p class="text-muted">No image uploaded</p>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Image Upload Form -->
-                @csrf
-                <div class="mb-3">
-                    <label for="colorImage{{ $color['id'] }}" class="form-label"><strong>Upload Color Image:</strong></label>
-                    <div class="row m-1">
-                        <div class="col-md-7">
-                            <input type="file" class="form-control" name="color_image" id="colorImage{{ $color['id'] }}" required>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <x-form-input type="file" name="choose_color_image" label="Choose Image" required />
                         </div>
-                        <div class="col-md-5">
-                            <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#googleSelectModal{{ $color['id'] }}">
-                                Select from Google
+                        <div class="col-md-6 mt-4">
+                            <button type="button" class="btn btn-google w-100 search-image-modal">
+                                <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
+                                Choose from Google
                             </button>
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Upload</button>
+                <button type="button" class="btn btn-primary">Upload</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Google Image Selection Modal (Unique per Color) -->
-<div class="modal fade" id="googleSelectModal{{ $color['id'] }}" tabindex="-1" aria-labelledby="googleSelectModalLabel{{ $color['id'] }}" aria-hidden="true">
+<div class="modal fade" id="googleImagesModal" tabindex="-1" aria-labelledby="googleImagesModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="googleSelectModalLabel{{ $color['id'] }}">Select Image from Google</h5>
+                <h5 class="modal-title" id="googleImagesModalLabel">Select Image For Color</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p>Display a gallery of images fetched from Google or integrate an image search API here.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary select-google-image-btn" data-color-id="{{ $color['id'] }}">Select Image</button>
-            </div>
+            <div class="modal-body"></div>
         </div>
     </div>
 </div>
-@endforeach
+
+@push('scripts')
+    <script>
+        $(function() {
+            function fetchImageBinary(imageUrl) {
+                fetch(imageUrl, {
+                        mode: 'no-cors'
+                    })
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const reader = new FileReader();
+
+                        reader.onloadend = function() {
+                            const file = new File([blob], "image.jpg", {
+                                type: blob.type
+                            });
+
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+
+                            $('#choose_color_image')[0].files = dataTransfer.files
+                        };
+
+                        reader.readAsDataURL(blob);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching image:', error);
+                    });
+            }
+
+            let selectedColor = null;
+            let article = null;
+
+            @if(isset($product))
+                article = @json($product->load('brand', 'productType'));
+            @else
+                article = @json($savingProduct);
+            @endif
+
+            $(document).on('click', '.change-color-image-modal', function() {
+                let parentElement = $(this).parents('[data-color-detail]');
+                selectedColor = parentElement.data('color-detail');
+
+                let colorBox =
+                    `<div class="d-inline-block px-3" style="background: ${selectedColor.ui_color_code};"></div>`
+                $('#chooseColorImageModal .modal-title').html(`${colorBox} ${selectedColor.name || selectedColor.color_name} (${selectedColor.code || selectedColor.color_code})`);
+
+                $('#chooseColorImageModal').modal('show');
+            });
+
+            $('.search-image-modal').click(function() {
+                $('#googleImagesModal').modal('show');
+                let searchImageContent = ``;
+                const googleSearchApiKey = 'AIzaSyCqfteqFcsn7rIbUXKEJdBxqdD8_2B6rSA';
+                const searchEngineId = '940f102d41cdc446e';
+                const searchQuery = `${article.brand?.name || ''} ${article.manufacture_code} ${article.short_description} ${article.product_type?.name || ''}`;
+                const resultsPerPage = 10;
+                let startIndex = 1;
+                let allItems = [];
+
+                function fetchImages(startIndex) {
+                    return $.ajax({
+                        url: 'https://www.googleapis.com/customsearch/v1',
+                        method: 'GET',
+                        data: {
+                            q: searchQuery,
+                            cx: searchEngineId,
+                            searchType: 'image',
+                            key: googleSearchApiKey,
+                            start: startIndex
+                        }
+                    });
+                }
+
+                function renderImages(items) {
+                    let newContent = '';
+                    $(items).each(function() {
+                        newContent += `
+                            <div class="col-md-3">
+                                <img src="${this.link}" alt="${this.title}" data-image-url="${this.link}" class="img-fluid" />
+                            </div>
+                        `;
+                    });
+                    $('#googleImagesModal .image-container').append(newContent);
+                }
+
+                function loadMoreImages() {
+                    fetchImages(startIndex).done(function(response) {
+                        if (response.items && response.items.length > 0) {
+                            allItems = allItems.concat(response.items);
+                            renderImages(response.items);
+                            startIndex += resultsPerPage;
+
+                            if (response.queries.nextPage) {
+                                $('#loadMoreButton').show();
+                            } else {
+                                $('#loadMoreButton').hide();
+                            }
+                        } else {
+                            $('#loadMoreButton').hide();
+                        }
+                    }).fail(function(error) {
+                        console.error('Error fetching images:', error);
+                        $('#loadMoreButton').hide();
+                    });
+                }
+
+                function initialize() {
+                    searchImageContent = `<div class="row image-container"></div>`;
+                    searchImageContent += `<div class="text-center my-1">
+                        <button id="loadMoreButton" type="button" class="btn btn-primary">Load More</button>
+                    </div>`;
+                    $('#googleImagesModal .modal-body').html(searchImageContent);
+
+                    loadMoreImages();
+
+                    $('#loadMoreButton').click(function() {
+                        loadMoreImages();
+                    });
+                }
+
+                initialize();
+            });
+
+            $('#googleImagesModal').on('click', 'img', function() {
+                const imageUrl = $(this).data('image-url');
+                $('#googleImagesModal img').removeClass('selected-image');
+                $(this).addClass('selected-image');
+                fetchImageBinary(imageUrl);
+            });
+        })
+    </script>
+@endpush
