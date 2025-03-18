@@ -18,6 +18,26 @@ class DefaultSettingsSeeder extends Seeder
             [
                 'key' => 'euro_to_pound',
                 'value' => '0.83'
+            ],
+            [
+                'key' => 'google_search_engine_id',
+                'value' => '940f102d41cdc446e'
+            ],
+            [
+                'key' => 'google_search_api_key',
+                'value' => 'AIzaSyCqfteqFcsn7rIbUXKEJdBxqdD8_2B6rSA'
+            ],
+            [
+                'key' => 'website_title',
+                'value' => 'Kular Fashion'
+            ],
+            [
+                'key' => 'web_contact_no',
+                'value' => '9874560231'
+            ],
+            [
+                'key' => 'web_contact_email',
+                'value' => 'info@kularfashion.com'
             ]
         ];
         

@@ -1341,4 +1341,8 @@ class ProductController extends Controller
             ]);
         }
     }
+
+    public function uploadColorImage(Request $request){
+        dd($request->all());
+    }
 }

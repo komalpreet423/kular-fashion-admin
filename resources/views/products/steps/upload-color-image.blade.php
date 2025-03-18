@@ -20,7 +20,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary">Upload</button>
+                <button type="button" class="btn btn-primary" id="uploadImageButton" disabled>Upload</button>
             </div>
         </div>
     </div>
@@ -42,7 +42,38 @@
 @push('scripts')
     <script>
         $(function() {
-            // Function to fetch image binary data
+            $('#choose_color_image').change(function() {
+                if ($(this)[0].files.length === 0) {
+                    $('#uploadImageButton').attr('disabled', 'disabled');
+                } else {
+                    $('#uploadImageButton').removeAttr('disabled');
+                }
+            });
+
+            $('#uploadImageButton').click(function() {
+                const fileInput = $('#choose_color_image')[0];
+                const file = fileInput.files[0];
+
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('image', file);
+
+                $.ajax({
+                    url: '{{ route("products.colors.upload-image") }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log('Upload response:', response);
+                        $('#chooseColorImageModal').modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Upload error:', error);
+                    }
+                });
+            });
+
             function fetchImageBinary(imageUrl) {
                 fetch(imageUrl, {
                         mode: 'no-cors'
@@ -78,7 +109,6 @@
                 article = @json($savingProduct);
             @endif
 
-            // Open the color image modal
             $(document).on('click', '.change-color-image-modal', function() {
                 let parentElement = $(this).parents('[data-color-detail]');
                 selectedColor = parentElement.data('color-detail');
@@ -99,8 +129,8 @@
             });
 
             // Google Custom Search API variables
-            const googleSearchApiKey = 'AIzaSyCqfteqFcsn7rIbUXKEJdBxqdD8_2B6rSA';
-            const searchEngineId = '940f102d41cdc446e';
+            const searchEngineId = '{{ setting("google_search_engine_id") }}';
+            const googleSearchApiKey = '{{ setting("google_search_api_key") }}';
             const resultsPerPage = 10;
             let startIndex = 1;
             let allItems = [];
@@ -154,9 +184,8 @@
 
                     errors.forEach(err => {
                         const alertHTML = `
-                            <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                            <div class="alert alert-danger fade show mt-2" role="alert">
                                 <strong>Error!</strong> ${err.message}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         `;
                         $('#googleImagesModal .modal-body').append(alertHTML);
