@@ -50,30 +50,6 @@
                 }
             });
 
-            $('#uploadImageButton').click(function() {
-                const fileInput = $('#choose_color_image')[0];
-                const file = fileInput.files[0];
-
-                const formData = new FormData();
-                formData.append('_token', '{{ csrf_token() }}');
-                formData.append('image', file);
-
-                $.ajax({
-                    url: '{{ route("products.colors.upload-image") }}',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        console.log('Upload response:', response);
-                        $('#chooseColorImageModal').modal('hide');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Upload error:', error);
-                    }
-                });
-            });
-
             function fetchImageBinary(imageUrl) {
                 fetch(imageUrl, {
                         mode: 'no-cors'
@@ -159,14 +135,14 @@
                         </div>
                     `;
                 });
-                $('#googleImagesModal .image-container').append(newContent); // Use append instead of html
+                $('#googleImagesModal .image-container').append(newContent);
             }
 
             function loadMoreImages(searchKeyword) {
                 fetchImages(startIndex, searchKeyword).done(function(response) {
                     if (response.items && response.items.length > 0) {
                         allItems = allItems.concat(response.items);
-                        renderImages(response.items); // This will now append the new images
+                        renderImages(response.items);
                         startIndex += resultsPerPage;
 
                         if (response.queries.nextPage) {
@@ -221,17 +197,16 @@
                 // Search button click event
                 $('.search-by-keyword').click(function() {
                     const searchKeyword = $('#google_search_keyword').val();
-                    startIndex = 1; // Reset start index for new search
-                    allItems = []; // Clear previous items
-                    $('#googleImagesModal .image-container').html(
-                        ''); // Clear the container before new search
-                    loadMoreImages(searchKeyword); // Fetch new images
+                    startIndex = 1;
+                    allItems = [];
+                    $('#googleImagesModal .image-container').html('');
+                    loadMoreImages(searchKeyword);
                 });
 
                 // Load more button click event
                 $('#loadMoreButton').click(function() {
                     const searchKeyword = $('#google_search_keyword').val();
-                    loadMoreImages(searchKeyword); // Fetch more images
+                    loadMoreImages(searchKeyword);
                 });
 
                 // Initial load with default search query
@@ -245,6 +220,33 @@
                 $(this).addClass('selected-image');
                 fetchImageBinary(imageUrl);
             });
+
+            $('#uploadImageButton').click(function() {
+                const fileInput = $('#choose_color_image')[0];
+                const file = fileInput.files[0];
+
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('image', file);
+                formData.append('color_id', selectedColor.id);
+                formData.append('article_id', article.id);
+
+                $.ajax({
+                    url: '{{ route("products.colors.upload-image") }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log('Upload response:', response);
+                        $('#chooseColorImageModal').modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Upload error:', error);
+                    }
+                });
+            });
+
         });
     </script>
 @endpush
