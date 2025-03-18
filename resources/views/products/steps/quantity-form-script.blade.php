@@ -133,10 +133,10 @@
                             $('#color_select').trigger('chosen:updated');
 
                             let uniqueId = $('.quantities-table [data-id]').length + 1;
-                            let $newRow = $(`<tr data-id="rm-${response.data.color_id}"></tr>`);
+                            let $newRow = $(`<tr data-id="rm-${response.data.color_id}" data-color-detail='${JSON.stringify(response.data)}'></tr>`);
 
                             let $newTh = $(
-                                '<th class="d-flex align-items-center justify-content-center flex-column text-center"></th>'
+                                '<th class="d-flex align-items-center justify-content-center flex-column text-center change-color-image-modal"></th>'
                             ).html(
                                 `<div class="me-1 d-color-code color-selector" style="background: ${response.data.ui_color_code}"></div>
                                     <label class="font-size-12 fw-bold">${response.data.color_name}(${response.data.color_code})</label>`

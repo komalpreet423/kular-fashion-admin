@@ -202,7 +202,8 @@ class ProductController extends Controller
                 $response['filters'] = [
                     'brands' => $brands,
                     'product_types' => [
-                        'data' => $productTypes,
+                        //'data' => $productTypes,
+                        'data' => [],
                         'pagination' => [
                             'total' => $productTypes->count(),
                             'per_page' => $perPage,
@@ -237,18 +238,6 @@ class ProductController extends Controller
         }
     }
 
-    protected function getUniqueColors($products) {
-        return Product::whereIn('id', $products->pluck('id'))
-            ->with('colors.colorDetail')->get()
-            ->pluck('colors')->flatten()
-            ->unique(fn($color) => $color->colorDetail ? $color->colorDetail->id : null)
-            ->values()
-            ->map(fn($color) => [
-                'id' => $color->color_id,
-                'name' => $color->colorDetail ? $color->colorDetail->name : null,
-                'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
-            ]);
-    }
     /**
      * Transform products to handle `is_splitted_with_colors`.
      *

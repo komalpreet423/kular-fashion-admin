@@ -33,6 +33,16 @@
                                     </div>
                                     <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3">
                                         <div class="mb-3">
+                                            <x-form-input name="google_search_engine_id" value="{{ setting('google_search_engine_id') }}" label="Google Search Engine ID" placeholder="Enter Google Search Engine ID" required="true" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                                        <div class="mb-3">
+                                            <x-form-input name="google_search_api_key" value="{{ setting('google_search_api_key') }}" label="Google Search Api Key" placeholder="Enter Google Search Api Key" required="true" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                                        <div class="mb-3">
                                             <label for="order_receipt_header">Order Receipt Header</label>
                                             <textarea name="order_receipt_header" id="order_receipt_header" class="form-control" placeholder="Enter order receipt header">{{ setting('order_receipt_header') }}</textarea>
                                         </div>
