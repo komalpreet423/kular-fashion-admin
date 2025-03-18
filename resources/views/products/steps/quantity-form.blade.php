@@ -56,21 +56,20 @@
             @endisset
 
             <td @class(['actionColumn', 'd-none'=> count($savedColors) <= 1])>
-                    <div class="d-flex gap-2">
-                        @isset($product)
-                        <a href="{{ route('products.remove-variant', $color['id'] . '?productId=' . $product->id) }}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                        @else
-                        <a href="{{ route('products.remove-variant', $color['id']) }}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                        @endisset
-
-                        <button type="button" class="btn btn-secondary copy-quantity-btn btn-sm d-none" data-color-id="{{ $color['id'] }}">
-                            <i class="mdi mdi-content-copy fs-6"></i>
-                        </button>
-                    </div>
+                <div class="d-flex gap-2">
+                    @isset($product)
+                    <a href="{{ route('products.remove-variant', $color['id'] . '?productId=' . $product->id) }}" @class(['btn btn-danger btn-sm', 'disabled' => $total_in > 0])>
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                    @else
+                    <a href="{{ route('products.remove-variant', $color['id']) }}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                    @endisset
+                    <button type="button" class="btn btn-secondary copy-quantity-btn btn-sm d-none" data-color-id="{{ $color['id'] }}">
+                        <i class="mdi mdi-content-copy fs-6"></i>
+                    </button>
+                </div>
             </td>
         </tr>
         @endif

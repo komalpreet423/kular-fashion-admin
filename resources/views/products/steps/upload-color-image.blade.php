@@ -42,6 +42,7 @@
 @push('scripts')
     <script>
         $(function() {
+            // Function to fetch image binary data
             function fetchImageBinary(imageUrl) {
                 fetch(imageUrl, {
                         mode: 'no-cors'
@@ -58,7 +59,7 @@
                             const dataTransfer = new DataTransfer();
                             dataTransfer.items.add(file);
 
-                            $('#choose_color_image')[0].files = dataTransfer.files
+                            $('#choose_color_image')[0].files = dataTransfer.files;
                         };
 
                         reader.readAsDataURL(blob);
@@ -71,103 +72,150 @@
             let selectedColor = null;
             let article = null;
 
-            @if(isset($product))
+            @if (isset($product))
                 article = @json($product->load('brand', 'productType'));
             @else
                 article = @json($savingProduct);
             @endif
 
+            // Open the color image modal
             $(document).on('click', '.change-color-image-modal', function() {
                 let parentElement = $(this).parents('[data-color-detail]');
                 selectedColor = parentElement.data('color-detail');
 
                 let colorBox =
-                    `<div class="d-inline-block px-3" style="background: ${selectedColor.ui_color_code};"></div>`
-                $('#chooseColorImageModal .modal-title').html(`${colorBox} ${selectedColor.name || selectedColor.color_name} (${selectedColor.code || selectedColor.color_code})`);
+                    `<div class="d-inline-block px-3" style="background: ${selectedColor.ui_color_code};"></div>`;
+                $('#chooseColorImageModal .modal-title').html(
+                    `${colorBox} ${selectedColor.name || selectedColor.color_name} (${selectedColor.code || selectedColor.color_code})`
+                );
 
                 $('#chooseColorImageModal').modal('show');
             });
 
+            // Open the Google Images modal
             $('.search-image-modal').click(function() {
                 $('#googleImagesModal').modal('show');
-                let searchImageContent = ``;
-                const googleSearchApiKey = 'AIzaSyCqfteqFcsn7rIbUXKEJdBxqdD8_2B6rSA';
-                const searchEngineId = '940f102d41cdc446e';
-                const searchQuery = `${article.brand?.name || ''} ${article.manufacture_code} ${article.short_description} ${article.product_type?.name || ''}`;
-                const resultsPerPage = 10;
-                let startIndex = 1;
-                let allItems = [];
-
-                function fetchImages(startIndex) {
-                    return $.ajax({
-                        url: 'https://www.googleapis.com/customsearch/v1',
-                        method: 'GET',
-                        data: {
-                            q: searchQuery,
-                            cx: searchEngineId,
-                            searchType: 'image',
-                            key: googleSearchApiKey,
-                            start: startIndex
-                        }
-                    });
-                }
-
-                function renderImages(items) {
-                    let newContent = '';
-                    $(items).each(function() {
-                        newContent += `
-                            <div class="col-md-3">
-                                <img src="${this.link}" alt="${this.title}" data-image-url="${this.link}" class="img-fluid" />
-                            </div>
-                        `;
-                    });
-                    $('#googleImagesModal .image-container').append(newContent);
-                }
-
-                function loadMoreImages() {
-                    fetchImages(startIndex).done(function(response) {
-                        if (response.items && response.items.length > 0) {
-                            allItems = allItems.concat(response.items);
-                            renderImages(response.items);
-                            startIndex += resultsPerPage;
-
-                            if (response.queries.nextPage) {
-                                $('#loadMoreButton').show();
-                            } else {
-                                $('#loadMoreButton').hide();
-                            }
-                        } else {
-                            $('#loadMoreButton').hide();
-                        }
-                    }).fail(function(error) {
-                        console.error('Error fetching images:', error);
-                        $('#loadMoreButton').hide();
-                    });
-                }
-
-                function initialize() {
-                    searchImageContent = `<div class="row image-container"></div>`;
-                    searchImageContent += `<div class="text-center my-1">
-                        <button id="loadMoreButton" type="button" class="btn btn-primary">Load More</button>
-                    </div>`;
-                    $('#googleImagesModal .modal-body').html(searchImageContent);
-
-                    loadMoreImages();
-
-                    $('#loadMoreButton').click(function() {
-                        loadMoreImages();
-                    });
-                }
-
                 initialize();
             });
 
+            // Google Custom Search API variables
+            const googleSearchApiKey = 'AIzaSyCqfteqFcsn7rIbUXKEJdBxqdD8_2B6rSA';
+            const searchEngineId = '940f102d41cdc446e';
+            const resultsPerPage = 10;
+            let startIndex = 1;
+            let allItems = [];
+
+            // Function to fetch images from Google Custom Search API
+            function fetchImages(startIndex, searchKeyword) {
+                return $.ajax({
+                    url: 'https://www.googleapis.com/customsearch/v1',
+                    method: 'GET',
+                    data: {
+                        q: searchKeyword,
+                        cx: searchEngineId,
+                        searchType: 'image',
+                        key: googleSearchApiKey,
+                        start: startIndex
+                    }
+                });
+            }
+
+            function renderImages(items) {
+                let newContent = '';
+                $(items).each(function() {
+                    newContent += `
+                        <div class="col-md-3">
+                            <img src="${this.link}" alt="${this.title}" data-image-url="${this.link}" class="img-fluid" />
+                        </div>
+                    `;
+                });
+                $('#googleImagesModal .image-container').append(newContent); // Use append instead of html
+            }
+
+            function loadMoreImages(searchKeyword) {
+                fetchImages(startIndex, searchKeyword).done(function(response) {
+                    if (response.items && response.items.length > 0) {
+                        allItems = allItems.concat(response.items);
+                        renderImages(response.items); // This will now append the new images
+                        startIndex += resultsPerPage;
+
+                        if (response.queries.nextPage) {
+                            $('#loadMoreButton').show();
+                        } else {
+                            $('#loadMoreButton').hide();
+                        }
+                    } else {
+                        $('#loadMoreButton').hide();
+                    }
+                }).fail(function(apiErr) {
+                    let {
+                        errors
+                    } = apiErr.responseJSON.error;
+
+                    errors.forEach(err => {
+                        const alertHTML = `
+                            <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                <strong>Error!</strong> ${err.message}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `;
+                        $('#googleImagesModal .modal-body').append(alertHTML);
+                    });
+
+
+                    $('#loadMoreButton').hide();
+                });
+            }
+
+
+            function initialize() {
+                const searchImageContent = `
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-8 d-flex gap-2">
+                            <input type="text" id="google_search_keyword" class="form-control" placeholder="Enter search keyword">
+                            <button type="button" class="btn btn-primary search-by-keyword">Search</button>
+                        </div>
+                    </div>
+                    <div class="row image-container"></div>
+                    <div class="text-center my-1">
+                        <button id="loadMoreButton" type="button" class="btn btn-primary">Load More</button>
+                    </div>
+                `;
+                $('#googleImagesModal .modal-body').html(searchImageContent);
+
+                // Set default search query
+                const searchQuery =
+                    `${article.brand?.name || ''} ${article.manufacture_code} ${article.short_description} ${article.product_type?.name || ''}`;
+                $('#google_search_keyword').val(searchQuery);
+
+                // Search button click event
+                $('.search-by-keyword').click(function() {
+                    const searchKeyword = $('#google_search_keyword').val();
+                    startIndex = 1; // Reset start index for new search
+                    allItems = []; // Clear previous items
+                    $('#googleImagesModal .image-container').html(
+                        ''); // Clear the container before new search
+                    loadMoreImages(searchKeyword); // Fetch new images
+                });
+
+                // Load more button click event
+                $('#loadMoreButton').click(function() {
+                    const searchKeyword = $('#google_search_keyword').val();
+                    loadMoreImages(searchKeyword); // Fetch more images
+                });
+
+                // Initial load with default search query
+                loadMoreImages(searchQuery);
+            }
+
+            // Handle image selection in the Google Images modal
             $('#googleImagesModal').on('click', 'img', function() {
                 const imageUrl = $(this).data('image-url');
                 $('#googleImagesModal img').removeClass('selected-image');
                 $(this).addClass('selected-image');
                 fetchImageBinary(imageUrl);
             });
-        })
+        });
     </script>
 @endpush
