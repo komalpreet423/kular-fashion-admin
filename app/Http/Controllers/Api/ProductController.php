@@ -54,12 +54,12 @@ class ProductController extends Controller
                 $query->whereIn('id', $product_ids);
             }
 
-            /* if ($request->has('product_types')) {
+            if ($request->has('product_types')) {
                 $product_types = explode(',', $request->input('product_types'));
                 $query->whereHas('productType', function ($q) use ($product_types) {
                     $q->whereIn('id', $product_types);
                 });
-            } */
+            }
 
             if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
                 $sizes = explode(',', $request->input('sizes'));

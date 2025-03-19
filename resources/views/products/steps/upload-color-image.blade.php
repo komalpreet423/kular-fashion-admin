@@ -10,7 +10,7 @@
                 <div class="mb-3">
                     <div class="row">
                         <div class="col-md-6">
-                            <x-form-input type="file" name="choose_color_image" label="Choose Image" required />
+                            <x-form-input type="file" accept="image/*" id="choose_color_image" name="choose_color_image" label="Choose Image" data-selected-id="{{ $color['id'] }}" required />
                         </div>
                         <div class="col-md-6 mt-4">
                             <button type="button" class="btn btn-google w-100 search-image-modal">
@@ -19,8 +19,12 @@
                             </button>
                         </div>
                     </div>
+                    <div class="mt-2">
+                        <img id="previewImage" src="" alt="Image Preview" style="max-width: 200px; display: none;">
+                    </div>
                 </div>
-                <button type="button" class="btn btn-primary" id="uploadImageButton" disabled>Upload</button>
+                {{--<button type="button" class="btn btn-primary" id="uploadImageButton" disabled>Upload</button>--}}
+                <button type="button" class="btn btn-danger" id="deleteImageButton" disabled>Delete</button>
             </div>
         </div>
     </div>
@@ -41,7 +45,41 @@
 
 @push('scripts')
     <script>
-        $(function() {
+            $(function() {
+                document.getElementById('choose_color_image').addEventListener('change', function(event) {
+                let file = event.target.files[0]; 
+                if (file) {
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        let img = document.getElementById('previewImage');
+                        img.src = e.target.result; 
+                        img.style.display = 'block'; 
+                    };
+                    reader.readAsDataURL(file); 
+                }
+
+                let fileInput = document.getElementById('choose_color_image');
+
+                let inputName = fileInput.getAttribute('data-selected-id');
+                console.log('Selected ID:', inputName); 
+
+                let targetInput = document.querySelector(`[name="image[${inputName}]"]`);
+                console.log('Target Input:', targetInput); 
+
+                if (targetInput) {
+                    let dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file); 
+
+                    targetInput.files = dataTransfer.files;
+
+                    let changeEvent = new Event('change', { bubbles: true });
+                    targetInput.dispatchEvent(changeEvent);
+                } else {
+                    console.error('Target input not found!');
+                }
+            });
+
+
             $('#choose_color_image').change(function() {
                 if ($(this)[0].files.length === 0) {
                     $('#uploadImageButton').attr('disabled', 'disabled');
@@ -50,31 +88,39 @@
                 }
             });
 
-            function fetchImageBinary(imageUrl) {
-                fetch(imageUrl, {
-                        mode: 'no-cors'
+            function fetchImageBinary(imageUrl, selectedColorId) {
+                fetch(imageUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.blob();
                     })
-                    .then(response => response.blob())
                     .then(blob => {
-                        const reader = new FileReader();
+                        const fileName = "image.jpg"; 
+                        const file = new File([blob], fileName, { type: blob.type });
 
-                        reader.onloadend = function() {
-                            const file = new File([blob], "image.jpg", {
-                                type: blob.type
-                            });
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
 
-                            const dataTransfer = new DataTransfer();
-                            dataTransfer.items.add(file);
+                        let inputElement = document.querySelector(`[name="image[${selectedColorId}]"]`);
+                        if (inputElement) {
+                            inputElement.files = dataTransfer.files;
 
-                            $('#choose_color_image')[0].files = dataTransfer.files;
-                        };
-
-                        reader.readAsDataURL(blob);
+                            let formData = new FormData();
+                            formData.append(`image[${selectedColorId}]`, file);
+                            
+                            console.log("File set in input:", inputElement.files[0]);
+                        } else {
+                            console.error('File input not found for:', selectedColorId);
+                        }
                     })
                     .catch(error => {
                         console.error('Error fetching image:', error);
                     });
             }
+
+
 
             let selectedColor = null;
             let article = null;
@@ -86,9 +132,10 @@
             @endif
 
             $(document).on('click', '.change-color-image-modal', function() {
+                document.getElementById('choose_color_image').value = null;
                 let parentElement = $(this).parents('[data-color-detail]');
                 selectedColor = parentElement.data('color-detail');
-
+                $('#choose_color_image').attr('data-selected-id',selectedColor.id);
                 let colorBox =
                     `<div class="d-inline-block px-3" style="background: ${selectedColor.ui_color_code};"></div>`;
                 $('#chooseColorImageModal .modal-title').html(
@@ -96,6 +143,64 @@
                 );
 
                 $('#chooseColorImageModal').modal('show');
+
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('color_id', selectedColor.id);
+                formData.append('article_id', article.id);
+
+                $.ajax({
+                    url: '{{ route("products.colors.fetch-image") }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if(response.success){
+                            $('#previewImage').attr('src',response.imagePath).css('display','block');
+                            $('#deleteImageButton').removeAttr('disabled');
+                        }else{
+                            $('#previewImage').attr('src','').hide();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Image error:', error);
+                    }
+                });
+            });
+
+            $(document).on('click', '#deleteImageButton', function() {
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('color_id', selectedColor.id);
+                formData.append('article_id', article.id);
+                swal({
+                    title: "Are you sure?",
+                    text: `You really want to remove this Image?`,
+                    type: "warning",
+                    showCancelButton: true,
+                    closeOnConfirm: false,
+                }, function(isConfirm) {
+                    if (isConfirm) {
+                        $.ajax({
+                            url: '{{ route("products.colors.delete-image") }}',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if(response.success){
+                                    $('#previewImage').attr('src','').css('display','none');
+                                    $('#deleteImageButton').attr('disabled', 'disabled');
+                                    Swal.fire("Deleted!", "Image has been deleted.", "success");
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire("Error!", "Something went wrong.", "error");
+                            }
+                        });
+                    }
+                });
             });
 
             // Open the Google Images modal
@@ -216,12 +321,12 @@
             // Handle image selection in the Google Images modal
             $('#googleImagesModal').on('click', 'img', function() {
                 const imageUrl = $(this).data('image-url');
+                fetchImageBinary(imageUrl, selectedColor.id)
                 $('#googleImagesModal img').removeClass('selected-image');
                 $(this).addClass('selected-image');
-                fetchImageBinary(imageUrl);
             });
 
-            $('#uploadImageButton').click(function() {
+           /*  $('#uploadImageButton').click(function() {
                 const fileInput = $('#choose_color_image')[0];
                 const file = fileInput.files[0];
 
@@ -246,7 +351,7 @@
                     }
                 });
             });
-
+ */
         });
     </script>
 @endpush

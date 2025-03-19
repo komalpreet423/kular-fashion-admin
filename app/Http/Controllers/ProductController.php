@@ -189,7 +189,7 @@ class ProductController extends Controller
     public function editStep2(Product $product)
     {
         $sizes = $product->sizes;
-
+        
         $savedColorIds = $product->colors->pluck('color_id')->toArray();
         $savedColors = Color::whereIn('id', $savedColorIds)->get();
         $savedColorsMapped = $savedColors->keyBy('id')->toArray();
@@ -357,10 +357,13 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $productData = Session::get('savingProduct');
-        $productData['variantData'] = $request->all();
+        
+        // Exclude files from the request data
+        $requestData = $request->except('image');
+        
+        $productData['variantData'] = $requestData;
         Session::put('savingProduct', $productData);
-        echo '<pre>';
-
+    
         $product = Product::create([
             'name' => $productData['name'],
             'manufacture_code' => $productData['manufacture_code'] ?? NULL,
@@ -385,7 +388,7 @@ class ProductController extends Controller
             'sale_end' => isset($productData['sale_end']) ? Carbon::parse($productData['sale_end'])->toDateString() : null,
             'status' => $productData['status']
         ]);
-
+    
         if (isset($productData['tags'])) {
             foreach ($productData['tags'] as $tagId) {
                 ProductTag::create([
@@ -394,7 +397,7 @@ class ProductController extends Controller
                 ]);
             }
         }
-
+    
         foreach ($productData['variantData']['mrp'] as $sizeId => $mrp) {
             ProductSize::create([
                 'product_id' => $product->id,
@@ -404,7 +407,7 @@ class ProductController extends Controller
                 'web_sale_price' => $productData['variantData']['sale_price'][$sizeId] ?? 0,
             ]);
         }
-
+    
         foreach ($productData['supplier_color_codes'] as $index => $supplierColorCode) {
             $productColor = ProductColor::create([
                 'product_id' => $product->id,
@@ -412,23 +415,30 @@ class ProductController extends Controller
                 'supplier_color_code' => $supplierColorCode,
                 'supplier_color_name' => $productData['supplier_color_names'][$index] ?? '',
             ]);
-
+    
             $color_id = $productData['colors'][$index];
-
+    
+            if ($request->hasFile("image") && isset($request->file("image")[$color_id])) {
+                $file = $request->file('image')[$color_id];
+                $imagePath = uploadFile($file, 'uploads/products-colors/');
+                $productColor->image_path = $imagePath;
+                $productColor->save();
+                
+            }
+    
             foreach ($productData['variantData']['quantity'][$color_id] as $sizeId => $quantity) {
                 $productSize = ProductSize::where('product_id', $product->id)->where('size_id', $sizeId)->first();
-
+    
                 ProductQuantity::create([
                     'product_id' => $product->id,
                     'product_color_id' => $productColor->id,
                     'product_size_id' => $productSize->id,
-                    //'quantity' => $quantity,
                     'quantity' => 0,
                     'total_quantity' => $quantity,
                 ]);
             }
         }
-
+    
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
     }
 
@@ -477,6 +487,13 @@ class ProductController extends Controller
             $productColor = ProductColor::where('product_id', $product->id)->where('color_id', $colorId)->first();
             if ($productColor) {
                 $productColorId = $productColor->id;
+                if ($request->hasFile("image") && isset($request->file("image")[$colorId])) {
+                    
+                    $file = $request->file('image')[$colorId];
+                    $imagePath = uploadFile($file, 'uploads/products-colors/');
+                    $productColor->image_path = $imagePath;
+                    $productColor->save();
+                }
 
                 foreach ($tempQuantity as $productSizeId => $newQuantity) {
                     $quantityRecord = ProductQuantity::firstOrCreate(
@@ -533,30 +550,30 @@ class ProductController extends Controller
     public function getProducts(Request $request)
     {
         $query = Product::with(['brand', 'department', 'quantities', 'productType', 'colors.colorDetail', 'sizes.sizeDetail']);
-
+    
         if ($request->new_products_only) {
             $query->where('are_barcodes_printed', 0)->orWhere('barcodes_printed_for_all', 0);
         }
-
-
+    
         if ($request->has('brand_id') && $request->brand_id) {
             $query->whereHas('brand', function ($q) use ($request) {
                 $q->where('id', $request->brand_id);
             });
         }
-
+    
         if ($request->has('product_type_id') && $request->product_type_id) {
             $query->whereHas('productType', function ($q) use ($request) {
                 $q->where('id', $request->product_type_id);
             });
         }
-
+    
         if ($request->has('department_id') && $request->department_id) {
             $query->whereHas('department', function ($q) use ($request) {
                 $q->where('id', $request->department_id);
             });
         }
-        // Apply search filter if there's any search value
+    
+        // Apply search filter
         if ($request->has('search') && !empty($request->input('search.value'))) {
             $search = $request->input('search.value');
             $query->where(function ($q) use ($search) {
@@ -574,20 +591,28 @@ class ProductController extends Controller
                     });
             });
         }
-
-        // Order by id in descending order by default
-        $products = $query->orderBy('updated_at', 'desc') // Changed to 'desc' for descending order
+    
+        // Sorting logic
+        $products = $query
+            ->join('brands', 'products.brand_id', '=', 'brands.id')
+            ->join('product_types', 'products.product_type_id', '=', 'product_types.id')
+            ->orderBy('manufacture_code', 'asc')
+            ->orderBy('brands.name', 'asc')
+            ->orderBy('product_types.name', 'asc')
+            ->orderBy('price', 'asc') // Price sorted in ascending order
+            ->select('products.*') // Ensuring only necessary fields are selected
             ->paginate($request->input('length', 10));
-
+    
         $data = [
             'draw' => $request->input('draw'),
             'recordsTotal' => $products->total(),
             'recordsFiltered' => $products->total(),
             'data' => $products->items(),
         ];
-
+    
         return response()->json($data);
     }
+    
 
 
     public function productStatus(Request $request)
@@ -1343,6 +1368,40 @@ class ProductController extends Controller
     }
 
     public function uploadColorImage(Request $request){
-        dd($request->all());
+        
+        $productColor = ProductColor::where('product_id',$request->article_id)->where('color_id',$request->color_id)->first();
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = 'color_'.$request->article_id.'_'.$request->color_id. '.' . $image->getClientOriginalExtension();
+            $path = 'uploads/products/';
+            $image->move(public_path($path), $imageName);
+
+            $imagePath = $path . $imageName;
+            $productColor->image_path = $imagePath;
+            $productColor->save();
+            return response()->json(['success' => true, 'message' => 'Successfully Updated']);
+        }
+        return response()->json(['success' => false, 'message' => 'Something went wrong']);
+    }
+    public function fetchColorImage(Request $request){
+        
+        $productColor = ProductColor::where('product_id',$request->article_id)->where('color_id',$request->color_id)->first();
+        if($productColor->image_path){
+            return response()->json(['success' => true, 'imagePath' => asset($productColor->image_path)]);
+        }else{
+            return response()->json(['success' => false, 'imagePath' => 'Image not found']);
+        }
+        
+
+    }
+    public function deleteColorImage(Request $request){
+        $productColor = ProductColor::where('product_id',$request->article_id)->where('color_id',$request->color_id)->first();
+        $path = public_path($productColor->image_path);
+        if (file_exists($path)) {
+            unlink($path);
+            $productColor->image_path = '';
+            $productColor->save();
+            return response()->json(['success' => true, 'message' => 'Product Delete Successfully']);
+        }
     }
 }

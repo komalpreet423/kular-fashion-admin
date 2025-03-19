@@ -306,6 +306,7 @@
                 let supplierColorName = $('#supplier_color_name').val();
                 let color = $('#color-name').val();
                 let colorName = $('#color-name option:selected').data('name'); 
+                
                 if (!supplierColorCode || !supplierColorName || !color) {
                     if (!supplierColorCode) {
                         $('#supplier_color_code').after('<span class="invalid-feedback" style="display: block;">Supplier Color Code is required.</span>');
@@ -324,12 +325,17 @@
                     let existingColorCode = $(this).find('.color-code').text();
                     let existingColorName = $(this).find('.color-name').text();
                     let existingColor = $(this).find('.color').text();
-
                     if (existingColorCode === supplierColorCode || existingColorName === supplierColorName || existingColor === color) {
                         isUnique = false;
                         alert("This variant already exists.");
                         return false;  // Stop the loop
                     }
+                    /*if(colorName == existingColor){
+                        isUnique = false;
+                        alert("This color already exists.");
+                        return false;  
+                    }*/
+
                 });
 
                 // If the variant is unique, proceed to append it
@@ -344,7 +350,7 @@
 
                     // Generate the size input cells
                     getSizes(productIndex).forEach(function(sizeObj) {
-                        quantityInputCell += `<td><input type="text" name="products[${productIndex}][variants][${variantIndex}][size][${sizeObj.id}]"></td>`;
+                        quantityInputCell += `<td><input type="text" class="form-control" name="products[${productIndex}][variants][${variantIndex}][size][${sizeObj.id}]"></td>`;
                     });
 
                     $(`[data-product-index="${productIndex}"] .variants-container tbody`).append(`<tr>
@@ -372,6 +378,11 @@
                     $('#supplier_color_name').val('');
                     $('#color-name').val('');
                 }
+            });
+
+            $('#color-name').select2({
+                width: '100%',
+                dropdownParent: $('#variantModal')
             });
         });
     </script>

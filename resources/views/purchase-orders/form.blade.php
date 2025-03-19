@@ -118,39 +118,51 @@
             <table class="table table-sm">
                 <thead>
                     <tr>
+                        <th>Size</th>
+                        @php
+                            $allSizes = collect();
+                            foreach ($product->variants as $variants) {
+                                foreach ($variants->sizes as $size) {
+                                    $allSizes->push($size->sizeDetail->size);
+                                }
+                            }
+                            $uniqueSizes = $allSizes->unique();
+                        @endphp
                         
-                            <th>Size</th>
-                        @dd($product->variants)
-                        @foreach($product->variants as $variants) 
-                            @foreach($variants->sizes as $size)
-                                <th>{{ $size->sizeDetail->size }}</th>
-                            @endforeach
+                        @foreach($uniqueSizes as $size)
+                            <th>{{ $size }}</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>    
-                    @foreach($purchaseOrder->purchaseOrderProduct as $proKey => $purchaseOrderProduct)
-                        @foreach($purchaseOrderProduct->variants as $vKey => $variants)
+                    @foreach($product->variants as $vKey => $variants)
                         <tr>
-                            <td>{{$variants->colors->name}}</td>
-                            <td class="color-code" hidden="">
-                                <input type="hidden" name="products[{{$proKey}}][variants][{{$vKey}}][supplier_color_code]" value="{{$variants->supplier_color_code}}">
+                            <td class="color">{{ $variants->colors->name }}</td>
+                            
+                            <td class="color-code" hidden>
+                                <input type="hidden" name="products[{{$index}}][variants][{{$vKey}}][supplier_color_code]" value="{{$variants->supplier_color_code}}">
                             </td>
-                            <td class="color-name" hidden="">
-                                <input type="hidden" name="products[{{$proKey}}][variants][{{$vKey}}][supplier_color_name]" value="{{$variants->supplier_color_name}}">
+                            <td class="color-name" hidden>
+                                <input type="hidden" name="products[{{$index}}][variants][{{$vKey}}][supplier_color_name]" value="{{$variants->supplier_color_name}}">
                             </td>
-                            <td class="color-id" hidden="">
-                                <input type="hidden" name="products[{{$proKey}}][variants][{{$vKey}}][color_id]" value="{{$variants->color_id}}">
+                            <td class="color-id" hidden>
+                                <input type="hidden" name="products[{{$index}}][variants][{{$vKey}}][color_id]" value="{{$variants->color_id}}">
                             </td>
-                            @foreach($variants->sizes as $sizes)
-                                <td><input type="number" name="products[{{$proKey}}][variants][{{$vKey}}][size][{{$sizes->size_id}}]" value="{{$sizes->quantity}}" class="form-control"></td>
+                            
+                            @foreach($uniqueSizes as $size)
+                                @php
+                                    $sizeData = $variants->sizes->firstWhere('sizeDetail.size', $size);
+                                @endphp
+                                <td>
+                                    <input type="number" name="products[{{$index}}][variants][{{$vKey}}][size][{{$sizeData->size_id ?? ''}}]" value="{{$sizeData->quantity ?? 0}}" class="form-control">
+                                </td>
                             @endforeach
                         </tr>
-                        @endforeach
                     @endforeach
                 </tbody>
             </table>
         </div>
+        
     </div>
     @empty
     <!-- Empty product form for adding new products -->

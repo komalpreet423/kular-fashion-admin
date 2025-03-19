@@ -6,6 +6,8 @@ use App\Http\Controllers\ProductController;
 
 Route::get('/get-products', [ProductController::class, 'getProducts'])->name('get.products');
 Route::post('/products/colors/upload-image', [ProductController::class, 'uploadColorImage'])->name('products.colors.upload-image');
+Route::post('/products/colors/fetch-image', [ProductController::class, 'fetchColorImage'])->name('products.colors.fetch-image');
+Route::post('/products/colors/delete-image', [ProductController::class, 'deleteColorImage'])->name('products.colors.delete-image');
 
 Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('products/create/step-1', [ProductController::class, 'productStep1'])->name('products.create.step-1');
