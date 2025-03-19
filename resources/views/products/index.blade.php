@@ -81,6 +81,7 @@
                                         <th>Brand</th>
                                         <th>Department</th>
                                         <th>Description</th>
+                                        <th>Price</th>
                                     </tr>
                                 </thead>
 
@@ -114,16 +115,15 @@
                         d.department_id = $('#departmentFilter').val();
                     }
                 },
-                columns: [{
+                columns: [
+                    {
                         title: '<input type="checkbox" class="form-check-input" id="select-all-checkbox">',
                         data: null,
                         render: function(data, type, row) {
-                            let selectedProducts = $('[data-selected-products]').attr(
-                                'data-selected-products');
+                            let selectedProducts = $('[data-selected-products]').attr('data-selected-products');
                             selectedProducts = selectedProducts.split(',');
 
-                            let checked = selectedProducts.includes(String(row.id)) ? 'checked' :
-                                '';
+                            let checked = selectedProducts.includes(String(row.id)) ? 'checked' : '';
 
                             if (selectedProducts.includes('-1')) {
                                 checked = 'checked';
@@ -138,59 +138,41 @@
                         },
                         orderable: false
                     },
-                    {
-                        title: "Article Code",
-                        data: 'article_code'
-                    },
-                    {
-                        title: "Manufacture Code",
-                        data: 'manufacture_code'
-                    },
-                    {
-                        title: "Brand",
-                        data: 'brand.name'
-                    },
-                    {
-                        title: "Product Type",
-                        data: 'product_type.name'
-                    },
-                    {
-                        title: "Department",
-                        data: 'department.name'
-                    },
-                    {
-                        title: "Short Description",
-                        data: 'short_description'
-                    },
+                    { title: "Article Code", data: 'article_code' },
+                    { title: "Manufacture Code", data: 'manufacture_code' },
+                    { title: "Brand", data: 'brand.name' },
+                    { title: "Product Type", data: 'product_type.name' },
+                    { title: "Department", data: 'department.name' },
+                    { title: "Short Description", data: 'short_description' },
+                    { title: "Price", data: 'price' },
                     {
                         title: "Actions",
                         data: null,
                         render: function(data, type, row) {
                             var actions = '<div class="action-buttons">';
                             @can('view products')
-                                actions +=
-                                    `<a href="{{ route('products.show', ':id') }}" class="btn btn-secondary btn-sm py-0 px-1">`
+                                actions += `<a href="{{ route('products.show', ':id') }}" class="btn btn-secondary btn-sm py-0 px-1">`
                                     .replace(/:id/g, row.id);
                                 actions += `<i class="fas fa-eye"></i>`;
                                 actions += `</a>`;
                             @endcan
 
                             @can('edit products')
-                                actions +=
-                                    `<a href="{{ route('products.edit.web-configuration', ':id') }}" class="btn btn-success btn-sm edit py-0 px-1">`
+                                actions += `<a href="{{ route('products.edit.web-configuration', ':id') }}" class="btn btn-success btn-sm edit py-0 px-1">`
                                     .replace(/:id/g, row.id);
                                 actions += `<i class="fas fa-image"></i>`;
                                 actions += `</a>`;
 
-                                actions +=
-                                    `<a href="{{ route('products.edit', ':id') }}" class="btn btn-primary btn-sm edit py-0 px-1">`
+                                actions += `<a href="{{ route('products.edit', ':id') }}" class="btn btn-primary btn-sm edit py-0 px-1">`
                                     .replace(/:id/g, row.id);
                                 actions += `<i class="fas fa-pencil-alt"></i>`;
                                 actions += `</a>`;
                             @endcan
+
                             @can('delete products')
-                                actions +=
-                                    `<button data-source="product" data-endpoint="{{ route('products.destroy', ':id') }}" class="delete-btn btn btn-danger btn-sm py-0 px-1"> <i class="fas fa-trash-alt"></i> </button>`
+                                actions += `<button data-source="product" data-endpoint="{{ route('products.destroy', ':id') }}" class="delete-btn btn btn-danger btn-sm py-0 px-1">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>`
                                     .replace(/:id/g, row.id);
                             @endcan
 
@@ -198,21 +180,22 @@
                         }
                     }
                 ],
+                // Sorting Manufacture Code (2nd Column), Brand (3rd Column), Product Type (4th Column) in Ascending Order (A-Z)
                 order: [
-                    [1, 'desc']
+                    [2, 'asc'], // Manufacture Code
+                    [3, 'asc'], // Brand
+                    [4, 'asc'],  // Product Type
+                    [6, 'asc']
                 ],
                 drawCallback: function(settings) {
                     let api = this.api();
                     $('#product-table th, #product-table td').addClass('p-1');
 
-                    let rows = api.rows({
-                        page: 'current'
-                    }).data().length;
+                    let rows = api.rows({ page: 'current' }).data().length;
 
                     let searchValue = $('#custom-search-input').val();
                     if (rows === 0 && searchValue) {
-                        $('#add-product-link').attr('href',
-                            `{{ route('products.create') }}?mfg_code=${searchValue}`)
+                        $('#add-product-link').attr('href', `{{ route('products.create') }}?mfg_code=${searchValue}`)
                     } else {
                         $('#add-product-link').attr('href', `{{ route('products.create') }}`)
                     }

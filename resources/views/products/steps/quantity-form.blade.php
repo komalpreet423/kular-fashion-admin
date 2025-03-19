@@ -30,16 +30,16 @@
             <th class="d-flex align-items-center justify-content-center flex-column text-center cursor-pointer change-color-image-modal">
                 <div class="me-1 d-color-code color-selector" style="background: {{ $color['ui_color_code'] }}"></div>
                 <span class="font-size-12 fw-bold text-decoration-none">
-                    {{ $color['name'] }} ({{ $color['code'] }})
+                    <input style="display:none;" type="file" name="image[{{ $color['id'] }}]" accept="image/*"> {{ $color['name'] }} ({{ $color['code'] }})
                 </span>
             </th>
             @foreach ($sizes as $key => $size)
             @php
             $quantity = 0;
             if (isset($product) ? $product->colors->where('color_id', $color['id'])->first() : null) {
-            $savedProductColorId = $product->colors->where('color_id', $color['id'])->first()->id;
-            $quantity = $size->totalQuantity($savedProductColorId);
-            $total_in += $quantity;
+                $savedProductColorId = $product->colors->where('color_id', $color['id'])->first()->id;
+                $quantity = $size->totalQuantity($savedProductColorId);
+                $total_in += $quantity;
             }
             @endphp
 
