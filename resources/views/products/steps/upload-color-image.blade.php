@@ -23,7 +23,7 @@
                         <img id="previewImage" src="" alt="Image Preview" style="max-width: 200px; display: none;">
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary" id="uploadImageButton" disabled>Upload</button>
+                {{--<button type="button" class="btn btn-primary" id="uploadImageButton" disabled>Upload</button>--}}
                 <button type="button" class="btn btn-danger" id="deleteImageButton" disabled>Delete</button>
             </div>
         </div>
@@ -88,31 +88,39 @@
                 }
             });
 
-            function fetchImageBinary(imageUrl) {
-                fetch(imageUrl, {
-                        mode: 'no-cors'
+            function fetchImageBinary(imageUrl, selectedColorId) {
+                fetch(imageUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.blob();
                     })
-                    .then(response => response.blob())
                     .then(blob => {
-                        const reader = new FileReader();
+                        const fileName = "image.jpg"; 
+                        const file = new File([blob], fileName, { type: blob.type });
 
-                        reader.onloadend = function() {
-                            const file = new File([blob], "image.jpg", {
-                                type: blob.type
-                            });
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
 
-                            const dataTransfer = new DataTransfer();
-                            dataTransfer.items.add(file);
+                        let inputElement = document.querySelector(`[name="image[${selectedColorId}]"]`);
+                        if (inputElement) {
+                            inputElement.files = dataTransfer.files;
 
-                            $('#choose_color_image')[0].files = dataTransfer.files;
-                        };
-
-                        reader.readAsDataURL(blob);
+                            let formData = new FormData();
+                            formData.append(`image[${selectedColorId}]`, file);
+                            
+                            console.log("File set in input:", inputElement.files[0]);
+                        } else {
+                            console.error('File input not found for:', selectedColorId);
+                        }
                     })
                     .catch(error => {
                         console.error('Error fetching image:', error);
                     });
             }
+
+
 
             let selectedColor = null;
             let article = null;
@@ -313,12 +321,12 @@
             // Handle image selection in the Google Images modal
             $('#googleImagesModal').on('click', 'img', function() {
                 const imageUrl = $(this).data('image-url');
+                fetchImageBinary(imageUrl, selectedColor.id)
                 $('#googleImagesModal img').removeClass('selected-image');
                 $(this).addClass('selected-image');
-                fetchImageBinary(imageUrl);
             });
 
-            $('#uploadImageButton').click(function() {
+           /*  $('#uploadImageButton').click(function() {
                 const fileInput = $('#choose_color_image')[0];
                 const file = fileInput.files[0];
 
@@ -343,7 +351,7 @@
                     }
                 });
             });
-
+ */
         });
     </script>
 @endpush
