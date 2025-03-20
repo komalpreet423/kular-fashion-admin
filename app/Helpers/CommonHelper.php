@@ -3,9 +3,13 @@
 use App\Models\Setting;
 
 if(!function_exists('uploadFile')) {
-    function uploadFile($file,  $path) {   
+    function uploadFile($file,  $path, $fileName = null) {
         if ($file) {
-            $imageName = uniqid() . '.' . $file->getClientOriginalExtension();
+            if(!$fileName){
+                $fileName = uniqid();
+            }
+
+            $imageName = $fileName . '.' . $file->getClientOriginalExtension();
             $imagePath = $path . $imageName;
             $file->move(public_path($path), $imageName);
 

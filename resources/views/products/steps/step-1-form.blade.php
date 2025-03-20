@@ -76,7 +76,8 @@
 
     <div class="col-sm-6 col-md-2">
         <div class="mb-3">
-            <x-form-input type="file" name="image" label="Image" accept="image/*" />
+            <x-form-input name="supplier_ref" value="{{ $product->supplier_ref ?? '' }}"
+                readonly="{{ $isEditing ?? false }}" label="Supplier Ref" placeholder="Enter Supplier Ref" />
         </div>
     </div>
 
@@ -160,12 +161,6 @@
     </div>
     <div class="col-sm-6 col-md-2">
         <div class="mb-3">
-            <x-form-input name="supplier_ref" value="{{ $product->supplier_ref ?? '' }}"
-                readonly="{{ $isEditing ?? false }}" label="Supplier Ref" placeholder="Enter Supplier Ref" />
-        </div>
-    </div>
-    <div class="col-sm-6 col-md-2">
-        <div class="mb-3">
             <label for="status" class="form-label">Season</label>
             <select name="season" id="season" @disabled($isEditing ?? false) @class(['form-control', 'is-invalid' => $errors->has('season')])>
                 <option value="Summer" @selected(($product->season ?? setting('default_season')) === 'Summer')>Summer
@@ -223,16 +218,6 @@
                 <option value="Inactive" @selected(($product->status ?? '') === 'Inactive')>Inactive</option>
             </select>
         </div>
-    </div>
-    <div class="col-sm-6 col-md-2">
-        @if (isset($product->image_path) || isset($product->image))
-            <img src="{{ asset($product->image_path ?? $product->image) }}" id="preview-product"
-                class="img-preview img-fluid w-100"
-                onerror="this.onerror=null; this.src='{{ asset(setting('default_product_image')) }}';">
-        @else
-            <img src="{{ asset(setting('default_product_image')) }}" id="preview-product"
-                class="img-preview img-fluid w-100" name="image">
-        @endif
     </div>
 </div>
 
