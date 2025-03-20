@@ -97,6 +97,8 @@
                         return response.blob();
                     })
                     .then(blob => {
+                        $('#previewImage').attr('src',imageUrl).show();
+
                         const fileName = "image.jpg"; 
                         const file = new File([blob], fileName, { type: blob.type });
 
@@ -324,6 +326,7 @@
                 fetchImageBinary(imageUrl, selectedColor.id)
                 $('#googleImagesModal img').removeClass('selected-image');
                 $(this).addClass('selected-image');
+                $('#googleImagesModal').modal('hide');
             });
 
            /*  $('#uploadImageButton').click(function() {
@@ -350,8 +353,7 @@
                         console.error('Upload error:', error);
                     }
                 });
-            });
- */
+            }); */
         });
     </script>
 @endpush
