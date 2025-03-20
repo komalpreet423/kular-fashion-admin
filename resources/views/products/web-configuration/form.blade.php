@@ -203,9 +203,8 @@
                 <label for="colorForImages">Select Color</label>
                 <select id="colorForImages" class="form-control">
                     <option value="0">Select Color</option>
-
                     @foreach ($product->colors as $color)
-                    <option value="{{ $color->id }}"> {{ $color->colorDetail->name }} </option>
+                    <option value="{{ $color->id }}" @selected(count($product->colors)===1)> {{ $color->colorDetail->name }} </option>
                     @endforeach
                 </select>
             </div>
