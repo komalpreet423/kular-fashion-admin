@@ -58,8 +58,8 @@
         <div class="mb-3">
             <label for="brand_id">Brand <span class="text-danger">*</span></label>
             <select name="brand_id" id="brand_id" @disabled($isEditing ?? false)
-                class="form-control{{ $errors->has('brand_id') ? ' is-invalid' : '' }}">
-                <option value="" disabled>Select brand</option>
+                @class(["form-control", 'is-invalid' => $errors->has('brand_id')])>
+                <option value="" disabled selected>Select brand</option>
                 @foreach ($brands as $brand)
                     <option value="{{ $brand->id }}" data-margin="{{ $brand->margin }}"
                         @selected(old('brand_id', $product->brand_id ?? '') == $brand->id)>
@@ -318,27 +318,7 @@
         }
 
         $(document).ready(function() {
-            $('#product_type').select2({
-                width: '100%',
-            });
-
-            $('#season').select2({
-                width: '100%',
-            });
-
-            $('#brand_id').select2({
-                width: '100%',
-            });
-
-            $('#department_id').select2({
-                width: '100%',
-            });
-
-            $('#tags').select2({
-                width: '100%',
-            });
-
-            $('#size_scale_id').select2({
+            $('#product_type, #department_id, #season, #brand_id, #tags, #size_scale_id').select2({
                 width: '100%',
             });
 

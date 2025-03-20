@@ -170,17 +170,17 @@
                                                                     </div>
                                                                     <div class="col-sm-6 col-md-4">
                                                                         <div class="mb-3">
-                                                                            <label for="colors-{{ $index }}">Select
-                                                                                Color <span
-                                                                                    class="text-danger">*</span></label>
+                                                                            <label for="colors-{{ $index }}">
+                                                                                Select Color
+                                                                                <span class="text-danger">*</span>
+                                                                            </label>
                                                                             <select name="colors[{{ $index }}]"
                                                                                 id="colors-{{ $index }}"
                                                                                 @class([
                                                                                     'form-control',
                                                                                     'is-invalid' => $errors->has("colors.$index"),
                                                                                 ])>
-                                                                                <option value=""
-                                                                                    {{ old("colors.$index") === null ? 'selected' : '' }}>
+                                                                                <option value="" @selected(old("colors.$index") === null)>
                                                                                     Select Color</option>
                                                                                 @foreach ($colors as $color)
                                                                                     <option value="{{ $color->id }}"
@@ -298,7 +298,7 @@
                                     $(this).attr('disabled', false).show();
                                 }
                             });
-                            $dropdown.trigger('change.select2'); 
+                            $dropdown.trigger('change.select2');
                         });
                     }
 

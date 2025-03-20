@@ -418,12 +418,15 @@ class ProductController extends Controller
 
             $color_id = $productData['colors'][$index];
 
+            //dd($productData);
             if ($request->hasFile("image") && isset($request->file("image")[$color_id])) {
                 $file = $request->file('image')[$color_id];
-                $imageName = $product->article_code.$productColor->colorDetail->code;
+                $imageName = $product->article_code . $productColor->colorDetail->code;
                 $imagePath = uploadFile($file, 'uploads/pos/product-colors/', $imageName);
-                $productColor->image_path = $imagePath;
-                $productColor->save();
+                
+                $productColor->update([
+                    "image_path" => $imagePath,
+                ]);
             }
 
             foreach ($productData['variantData']['quantity'][$color_id] as $sizeId => $quantity) {
@@ -437,7 +440,6 @@ class ProductController extends Controller
                     'total_quantity' => $quantity,
                 ]);
             }
-            
         }
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');
@@ -502,7 +504,7 @@ class ProductController extends Controller
                     if ($request->hasFile("image") && isset($request->file("image")[$colorId])) {
                         $file = $request->file('image')[$colorId];
 
-                        $imageName = $product->article_code.$productColor->colorDetail->code;
+                        $imageName = $product->article_code . $productColor->colorDetail->code;
                         $imagePath = uploadFile($file, 'uploads/pos/product-colors/', $imageName);
                         $productColor->image_path = $imagePath;
                         $productColor->save();
