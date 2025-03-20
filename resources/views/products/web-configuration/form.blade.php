@@ -283,6 +283,7 @@
 
 <div class="card form-footer">
     <div class="card-body">
-        <button type="submit" class="btn btn-primary waves-effect waves-light">Save Changes</button>
+        <button type="submit" class="btn btn-primary waves-effect waves-light"><i class="fa fa-save me-2"></i>Save Changes</button>
+        <a href="{{ setting('web_url') }}/product/{{$product->slug}}" class="btn btn-success waves-effect waves-light" target="_blank"><i class="fa fa-eye me-2"></i>View Product</a>
     </div>
 </div>
