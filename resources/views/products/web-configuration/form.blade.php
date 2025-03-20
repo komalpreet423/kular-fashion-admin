@@ -95,29 +95,33 @@
 <div class="card">
     <div class="card-body">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <h4 class="card-title">Sizes & Prices</h4>
 
                 <table class="table table-striped table-sm">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Size</th>
-                            <th>Price</th>
-                            <th>Sale Price</th>
+                            @foreach ($product->sizes as $index => $size)
+                            <th>{{ $size->sizeDetail->size }}</th>
+                            @endforeach
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($product->sizes as $index => $size)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $size->sizeDetail->size }}</td>
-                            <td><input type="text" name="sizes[{{ $size->id }}][web_price]" class="form-control"
-                                    value="{{ $size->web_price }}"></td>
-                            <td><input type="text" name="sizes[{{ $size->id }}][web_sale_price]" class="form-control"
-                                    value="{{ $size->web_sale_price }}"></td>
+                            <th>Price</th>
+                            @foreach ($product->sizes as $index => $size)
+                            <th><input type="text" name="sizes[{{ $size->id }}][web_price]" class="form-control"
+                                value="{{ $size->web_price }}"></th>
+                            @endforeach
                         </tr>
-                        @endforeach
+                        <tr>
+                            <th>Sale Price</th>
+                            @foreach ($product->sizes as $index => $size)
+                            <td><input type="text" name="sizes[{{ $size->id }}][web_sale_price]" class="form-control"
+                                value="{{ $size->web_sale_price }}"></td>
+                            @endforeach
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -278,4 +282,8 @@
 <input type="hidden" name="removed_color_images">
 <input type="hidden" name="removed_product_images">
 
-<button type="submit" class="btn btn-primary waves-effect waves-light mb-2">Save Changes</button>
+<div class="card form-footer">
+    <div class="card-body">
+        <button type="submit" class="btn btn-primary waves-effect waves-light">Save Changes</button>
+    </div>
+</div>
