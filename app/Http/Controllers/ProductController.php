@@ -420,7 +420,8 @@ class ProductController extends Controller
 
             if ($request->hasFile("image") && isset($request->file("image")[$color_id])) {
                 $file = $request->file('image')[$color_id];
-                $imagePath = uploadFile($file, 'uploads/pos/product-colors/');
+                $imageName = $product->article_code.$productColor->colorDetail->code;
+                $imagePath = uploadFile($file, 'uploads/pos/product-colors/', $imageName);
                 $productColor->image_path = $imagePath;
                 $productColor->save();
             }
@@ -436,6 +437,7 @@ class ProductController extends Controller
                     'total_quantity' => $quantity,
                 ]);
             }
+            
         }
 
         return redirect()->route('products.index')->with('success', 'Product created successfully.');

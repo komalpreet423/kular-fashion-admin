@@ -11,8 +11,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <x-form-input type="file" accept="image/*" id="choose_color_image"
-                                name="choose_color_image" label="Choose Image" data-selected-id="{{ $color['id'] }}"
-                                required />
+                                name="choose_color_image" label="Choose Image" required />
                         </div>
                         <div class="col-md-6 mt-4">
                             <button type="button" class="btn btn-google w-100 search-image-modal">
@@ -54,22 +53,24 @@
                 fetch(imageUrl)
                     .then(response => {
                         if (!response.ok) {
+                            $(`#preview-color-image-${selectedColorId}`).addClass('border border-danger border-3');
                             throw new Error(`HTTP error! Status: ${response.status}`);
                         }
                         return response.blob();
                     })
                     .then(blob => {
-                        $('#previewImage').attr('src', imageUrl).show();
-
-                        const fileName = "image.jpg";
+                        const mimeType = blob.type;
+                        const fileExtension = mimeType.split('/')[1]; 
+                        const fileName = `image.${fileExtension}`;
                         const file = new File([blob], fileName, {
-                            type: blob.type
+                            type: fileExtension
                         });
 
                         const dataTransfer = new DataTransfer();
                         dataTransfer.items.add(file);
 
                         $(`[name="image[${selectedColorId}]"]`)[0].files = dataTransfer.files;
+                        $(`#preview-color-image-${selectedColorId}`).removeClass('border border-danger border-3');
 
                         let formData = new FormData();
                         formData.append(`image[${selectedColorId}]`, file);
@@ -88,11 +89,9 @@
 
                 previewImage(event, `color-image-${selectedColor.id}`);
 
-                const inputName = $(this).data('selected-id');
-
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
-                $(`[name="image[${inputName}]"]`)[0].files = dataTransfer.files;
+                $(`[name="image[${selectedColor.id}]"]`)[0].files = dataTransfer.files;
 
                 let colorIdsInput = $('[name="color_images_to_be_deleted"]');
                 let currentValues = colorIdsInput.val().split(',').filter(Boolean);
@@ -114,8 +113,11 @@
                 let parentElement = $(this).closest('[data-color-detail]');
                 selectedColor = parentElement.data('color-detail');
 
-                $('#choose_color_image').attr('data-selected-id', selectedColor.id);
+                if(!selectedColor.id && selectedColor.color_id){
+                    selectedColor.id = selectedColor.color_id;
+                }
 
+                console.log('selectedColor', selectedColor)
                 let colorBox =
                     `<div class="d-inline-block px-3" style="background: ${selectedColor.ui_color_code};"></div>`;
 

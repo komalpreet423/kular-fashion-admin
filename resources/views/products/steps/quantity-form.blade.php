@@ -28,7 +28,7 @@
 
                 <tr data-id="rm-{{ $color['id'] }}" data-color-detail='{{ json_encode($color) }}'
                     data-color-image="{{ isset($product) ? $product->colors->where('color_id', $color['id'])->first()->image_path : '' }}">
-                    <th class="d-flex align-items-center justify-content-center text-center justify-content-between">
+                    <th class="d-flex align-items-center text-center justify-content-between">
                         <div class="d-flex flex-column align-items-center">
                             <div class="me-1 d-color-code color-selector"
                                 style="background: {{ $color['ui_color_code'] }}"></div>

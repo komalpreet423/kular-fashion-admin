@@ -133,13 +133,27 @@
                             $('#color_select').trigger('chosen:updated');
 
                             let uniqueId = $('.quantities-table [data-id]').length + 1;
-                            let $newRow = $(`<tr data-id="rm-${response.data.color_id}" data-color-detail='${JSON.stringify(response.data)}'></tr>`);
+                            let $newRow = $(
+                                `<tr data-id="rm-${response.data.color_id}" data-color-detail='${JSON.stringify(response.data)}' data-color-image=""></tr>`
+                                );
 
                             let $newTh = $(
-                                '<th class="d-flex align-items-center justify-content-center flex-column text-center change-color-image-modal"></th>'
+                                '<th class="d-flex align-items-center text-center justify-content-between"></th>'
                             ).html(
-                                `<div class="me-1 d-color-code color-selector" style="background: ${response.data.ui_color_code}"></div>
-                                    <label class="font-size-12 fw-bold">${response.data.color_name}(${response.data.color_code})</label>`
+                                `<div class="d-flex flex-column align-items-center">
+                                    <div class="me-1 d-color-code color-selector" style="background: ${response.data.ui_color_code}"></div>
+                                    <span class="font-size-12 fw-bold text-decoration-none">${response.data.color_name}(${response.data.color_code})</span>
+                                </div>
+                                <div class="color-swatch-container avatar-sm change-color-image-modal">
+                                    <div class="avatar-sm">
+                                        <img src="{{ asset('assets/images/default.webp') }}" alt="Color Image" class="avatar-sm" id="preview-color-image-${response.data.color_id}">
+                                        <div class="overlay">
+                                            <i class="mdi mdi-camera-outline"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <input type="file" name="image[${response.data.color_id}]" class="d-none"> `
                             );
                             $newRow.append($newTh);
 
