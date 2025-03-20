@@ -50,7 +50,7 @@
             let defaultImage = '{{ asset("assets/images/default.webp") }}';
 
             function fetchBinaryImage(imageUrl, selectedColorId) {
-                fetch(imageUrl)
+                fetch(imageUrl, { mode: 'no-cors' })
                     .then(response => {
                         if (!response.ok) {
                             $(`#preview-color-image-${selectedColorId}`).addClass('border border-danger border-3');
@@ -76,6 +76,7 @@
                         formData.append(`image[${selectedColorId}]`, file);
                     })
                     .catch(error => {
+                        $(`#preview-color-image-${selectedColorId}`).addClass('border border-danger border-3');
                         console.error('Error fetching image:', error);
                     });
             }
