@@ -49,13 +49,15 @@ class ProductController extends Controller
                 $brands = explode(',', $request->input('brands'));
                 $query->whereIn('brand_id', $brands);
             }
+            
             if ($request->has('product_ids')) {
                 $product_ids = explode(',', $request->input('product_ids'));
                 $query->whereIn('id', $product_ids);
             }
 
-            if ($request->has('product_types')) {
+            if ($request->has('product_types') && !empty($request->input('product_types'))) {
                 $product_types = explode(',', $request->input('product_types'));
+
                 $query->whereHas('productType', function ($q) use ($product_types) {
                     $q->whereIn('id', $product_types);
                 });
@@ -75,6 +77,7 @@ class ProductController extends Controller
                     $q->whereIn('color_id', $colors);
                 });
             }
+
 
             if ($request->has('min_price') && $request->has('max_price')) {
                 $minPrice = $request->input('min_price');

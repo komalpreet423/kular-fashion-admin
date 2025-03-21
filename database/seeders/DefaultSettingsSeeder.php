@@ -38,6 +38,10 @@ class DefaultSettingsSeeder extends Seeder
             [
                 'key' => 'web_contact_email',
                 'value' => 'info@kularfashion.com'
+            ],
+            [
+                'key' => 'web_url',
+                'value' => 'http://localhost:3000/'
             ]
         ];
         

@@ -31,7 +31,7 @@
     </div>
 
     @include('products.steps.quantity-form-script')
-    <x-include-plugins :plugins="['select2']"></x-include-plugins>
+    <x-include-plugins :plugins="['select2', 'imagePreview']"></x-include-plugins>
 @endsection
 
 @push('scripts')

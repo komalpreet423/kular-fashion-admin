@@ -37,10 +37,8 @@
                                                                 @else
                                                                 <img src="" id="preview-{{ $key }}" class="img-fluid mt-2 w-150" hidden>
                                                             @endif
-                                                            
                                                         </div>
                                                     </div>
-                                               
                                             </div>
                                         </div>
                                     @endforeach

@@ -232,3 +232,11 @@ table tbody tr.even {
 .small-toggle-button input[switch]:checked+label:after {
     left: 33px;
 }
+
+.form-footer{
+    position: fixed;
+    bottom: 0;
+    width: 50%;
+    z-index: 999;
+    margin-bottom: 0;
+}
