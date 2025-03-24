@@ -9,26 +9,8 @@
         <div class="mb-3">
             <x-form-input name="manufacture_code" value="{{ $product->manufacture_code ?? request()->get('mfg_code') }}"
                 label="Manufacture Code" placeholder="Enter Manufacture Code" required="true"
-                readonly="{{ $isEditing ?? false }}" />
-        </div>
-    </div>
-
-    <div class="col-sm-6 col-md-2">
-        <div class="mb-3">
-            <label for="department_id">Department<span class="text-danger">*</span></label>
-            <select name="department_id" id="department_id" @disabled($isEditing ?? false) @class([
-                'form-control',
-                'is-invalid' => $errors->has('department_id'),
-            ])>
-                @foreach ($departments as $department)
-                    <option value="{{ $department->id }}" @selected(($product->department_id ?? '') == $department->id)>
-                        {{ $department->name }}
-                    </option>
-                @endforeach
-            </select>
-            @error('department_id')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
+                readonly="{{ $isEditing ?? false }}"/>
+                <span id="manufacture_err_code" style="color:red; display:none;"></span>    
         </div>
     </div>
 
@@ -72,13 +54,6 @@
             @enderror
         </div>
         <input type="hidden" id="brand_margin" value="{{ $product->brand->margin ?? 50 }}">
-    </div>
-
-    <div class="col-sm-6 col-md-2">
-        <div class="mb-3">
-            <x-form-input name="supplier_ref" value="{{ $product->supplier_ref ?? '' }}"
-                readonly="{{ $isEditing ?? false }}" label="Supplier Ref" placeholder="Enter Supplier Ref" />
-        </div>
     </div>
 
     <div class="col-sm-6 col-md-2">
@@ -133,48 +108,10 @@
         </div>
     </div>
 
-    @php
-        $selectedTags = old('tags', $productTags ?? []);
-    @endphp
-    <div class="col-sm-6 col-md-2">
-        <div class="mb-3">
-            <label for="tags">Tags</label>
-            <select name="tags[]" id="tags" @class(['form-control', 'is-invalid' => $errors->has('tags')]) multiple>
-                <option value="" disabled>Select tag</option>
-                @foreach ($tags as $tag)
-                    <option value="{{ $tag->id }}" @selected(in_array($tag->id, $selectedTags))>
-                        {{ $tag->name }}
-                    </option>
-                @endforeach
-            </select>
-            @error('tags')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
-        </div>
-    </div>
-
     <div class="col-sm-6 col-md-4">
         <div class="mb-3">
             <x-form-input name="short_description" value="{{ $product->short_description ?? '' }}"
                 label="Short Description" placeholder="Enter Short Description" required="true" maxlength="22" />
-        </div>
-    </div>
-    <div class="col-sm-6 col-md-2">
-        <div class="mb-3">
-            <label for="status" class="form-label">Season</label>
-            <select name="season" id="season" @disabled($isEditing ?? false) @class(['form-control', 'is-invalid' => $errors->has('season')])>
-                <option value="Summer" @selected(($product->season ?? setting('default_season')) === 'Summer')>Summer
-                </option>
-                <option value="Winter" @selected(($product->season ?? setting('default_season')) === 'Winter')>Winter
-                </option>
-                <option value="Autumn" @selected(($product->season ?? setting('default_season')) === 'Autumn')>Autumn
-                </option>
-                <option value="Spring" @selected(($product->season ?? setting('default_season')) === 'Spring')>Spring
-                </option>
-            </select>
-            @error('season')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
         </div>
     </div>
 
@@ -209,7 +146,24 @@
                 value="{{ now()->format('d-m-Y') }}" label="Last In Date" placeholder="Enter Last In Date" />
         </div>
     </div>
-
+    <div class="col-sm-6 col-md-2">
+        <div class="mb-3">
+            <label for="status" class="form-label">Season</label>
+            <select name="season" id="season" @disabled($isEditing ?? false) @class(['form-control', 'is-invalid' => $errors->has('season')])>
+                <option value="Summer" @selected(($product->season ?? setting('default_season')) === 'Summer')>Summer
+                </option>
+                <option value="Winter" @selected(($product->season ?? setting('default_season')) === 'Winter')>Winter
+                </option>
+                <option value="Autumn" @selected(($product->season ?? setting('default_season')) === 'Autumn')>Autumn
+                </option>
+                <option value="Spring" @selected(($product->season ?? setting('default_season')) === 'Spring')>Spring
+                </option>
+            </select>
+            @error('season')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
     <div class="col-sm-6 col-md-2">
         <div class="mb-3">
             <label for="product-status" class="form-label">Status</label>
@@ -217,6 +171,50 @@
                 <option value="Active" @selected(($product->status ?? '') === 'Active')>Active</option>
                 <option value="Inactive" @selected(($product->status ?? '') === 'Inactive')>Inactive</option>
             </select>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-md-2">
+        <div class="mb-3">
+            <label for="department_id">Department<span class="text-danger">*</span></label>
+            <select name="department_id" id="department_id" @disabled($isEditing ?? false) @class([
+                'form-control',
+                'is-invalid' => $errors->has('department_id'),
+            ])>
+                @foreach ($departments as $department)
+                    <option value="{{ $department->id }}" @selected(($product->department_id ?? '') == $department->id)>
+                        {{ $department->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('department_id')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
+    @php
+        $selectedTags = old('tags', $productTags ?? []);
+    @endphp
+    <div class="col-sm-6 col-md-2">
+        <div class="mb-3">
+            <label for="tags">Tags</label>
+            <select name="tags[]" id="tags" @class(['form-control', 'is-invalid' => $errors->has('tags')]) multiple>
+                <option value="" disabled>Select tag</option>
+                @foreach ($tags as $tag)
+                    <option value="{{ $tag->id }}" @selected(in_array($tag->id, $selectedTags))>
+                        {{ $tag->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('tags')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-2">
+        <div class="mb-3">
+            <x-form-input name="supplier_ref" value="{{ $product->supplier_ref ?? '' }}"
+                readonly="{{ $isEditing ?? false }}" label="Supplier Ref" placeholder="Enter Supplier Ref" />
         </div>
     </div>
 </div>
@@ -249,13 +247,31 @@
 
 <div class="row mb-2">
     <div class="col-lg-6 mb-2">
-        <button type="submit" class="btn btn-primary w-md">Continue</button>
+        <button type="submit" class="btn btn-primary w-md" id="first-submit">Continue</button>
     </div>
 </div>
 
 <x-include-plugins :plugins="['select2', 'image', 'datePicker']"></x-include-plugins>
 @push('scripts')
     <script>
+        $(document).on('keyup','#manufacture_code',function(){
+            var mfgCode = $(this).val();
+            $.ajax({
+                url : `{{ route('products.check-mfgcode') }}/`+mfgCode,
+                type : 'GET',
+                success : function(resp){
+                    if(resp.success){
+                        $('#manufacture_err_code').text(resp.message).show();
+                        $('#first-submit').prop('disabled',true);
+                    }else{
+                        $('#manufacture_err_code').hide();
+                        $('#first-submit').prop('disabled',false);
+                    }
+                },error : function(err){
+                    console.log(err);
+                }
+            });
+        });
         $(function() {
             flatpickr('.sale-date-picker', {
                 dateFormat: "d-m-Y",

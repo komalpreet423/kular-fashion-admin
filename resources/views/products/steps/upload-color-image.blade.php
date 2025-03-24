@@ -20,6 +20,9 @@
                             </button>
                         </div>
                     </div>
+                    <div class="row mt-3">
+                        <img src="" id="image-preview-popup" style="display:none" width="30 0" height="300">
+                    </div>
                 </div>
                 <button type="button" class="btn btn-danger d-none" id="deleteImageButton">
                     <i class="fa fa-trash me-2"></i>Remove
@@ -114,11 +117,14 @@
                 let parentElement = $(this).closest('[data-color-detail]');
                 selectedColor = parentElement.data('color-detail');
 
+                selectedImage = $(this).find('img').attr('src');
+                $('#image-preview-popup').attr('src',selectedImage).show();
+
                 if(!selectedColor.id && selectedColor.color_id){
                     selectedColor.id = selectedColor.color_id;
                 }
 
-                console.log('selectedColor', selectedColor)
+                //console.log('selectedColor', selectedColor)
                 let colorBox =
                     `<div class="d-inline-block px-3" style="background: ${selectedColor.ui_color_code};"></div>`;
 
