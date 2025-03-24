@@ -4,42 +4,45 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Cart;
 
 class CartController extends Controller
 {
     public function addToCart(Request $request)
     {
-        $request->validate([
-            'user_id' => 'nullable|exists:users,id',
-            'cart_id' => 'nullable|exists:cart,id',
-            'product_id' => 'required|exists:products,id',
-            'variant_id' => 'nullable|exists:variants,id',
-            'color_id' => 'nullable|exists:colors,id',
-            'size_id' => 'nullable|exists:sizes,id',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-        ]);
 
-        if ($request->cart_id) {
-            $cartItem = Cart::findOrFail($request->cart_id);
+    
+        if (!empty($request->cart_id)) {
+            $cartItem = Cart::find($request->cart_id);
+            if (!$cartItem) {
+                return response()->json(['message' => 'Cart not found'], 404);
+            }
             $cartItem->update($request->only(['quantity', 'variant_id', 'color_id', 'size_id', 'price']));
         } else {
-            $cartItem = Cart::create($request->only(['user_id', 'product_id', 'variant_id', 'color_id', 'size_id', 'quantity', 'price']));
+            $cartItem = Cart::create(['user_id' => $request->user_id ?? 0, 
+                                    'product_id' => $request->product_id, 
+                                    'variant_id'=> $request->variant_id, 
+                                    'color_id' => $request->color_id, 
+                                    'size_id' => $request->size_id, 
+                                    'quantity' => $request->quantity, 
+                                    'price'  => $request->price 
+                                ]);
         }
-
+    
         return response()->json(['message' => 'Cart updated', 'cart' => $cartItem]);
     }
     
+    
     public function removeItem($id)
     {
-        $cart = session()->get('cart', []);
-
-        if (isset($cart[$id])) {
-            unset($cart[$id]);
-            session()->put('cart', $cart);
-            return response()->json(['message' => 'Item removed', 'cart' => $cart]);
+        $cartItem = Cart::find($id);
+        
+        if (!$cartItem) {
+            return response()->json(['message' => 'Item not found'], 404);
         }
 
-        return response()->json(['message' => 'Item not found'], 404);
+        $cartItem->delete();
+        return response()->json(['message' => 'Item removed successfully']);
     }
 }
