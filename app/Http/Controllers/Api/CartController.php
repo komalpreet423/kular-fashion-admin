@@ -9,23 +9,25 @@ class CartController extends Controller
 {
     public function addToCart(Request $request)
     {
-        $cart = session()->get('cart', []);
+        $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+            'cart_id' => 'nullable|exists:cart,id',
+            'product_id' => 'required|exists:products,id',
+            'variant_id' => 'nullable|exists:variants,id',
+            'color_id' => 'nullable|exists:colors,id',
+            'size_id' => 'nullable|exists:sizes,id',
+            'quantity' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+        ]);
 
-        $itemId = $request->input('id');
-
-        if (isset($cart[$itemId])) {
-            $cart[$itemId]['quantity'] += $request->input('quantity', 1);
+        if ($request->cart_id) {
+            $cartItem = Cart::findOrFail($request->cart_id);
+            $cartItem->update($request->only(['quantity', 'variant_id', 'color_id', 'size_id', 'price']));
         } else {
-            $cart[$itemId] = [
-                "name" => $request->input('name'),
-                "price" => $request->input('price'),
-                "quantity" => $request->input('quantity', 1),
-            ];
+            $cartItem = Cart::create($request->only(['user_id', 'product_id', 'variant_id', 'color_id', 'size_id', 'quantity', 'price']));
         }
 
-        session()->put('cart', $cart);
-
-        return response()->json(['message' => 'Item added to cart', 'cart' => $cart]);
+        return response()->json(['message' => 'Cart updated', 'cart' => $cartItem]);
     }
     
     public function removeItem($id)

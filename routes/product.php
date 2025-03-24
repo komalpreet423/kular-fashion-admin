@@ -22,6 +22,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
 
     // Bulk Edit Product
     Route::post('products/bulk-edit', [ProductController::class, 'bulkUpdate'])->name('products.bulk-edit');
+    
+    Route::get('products/check-mfg-code/{mfgCode?}', [ProductController::class, 'checkMfgCode'])->name('products.check-mfgcode');
 
     Route::get('products/edit/web-configuration/{product}', [ProductController::class, 'editWebConfigration'])->name('products.edit.web-configuration');
     Route::put('products/update/web-configuration/{product}', [ProductController::class, 'updateWebConfigration'])->name('products.update.web-configuration');

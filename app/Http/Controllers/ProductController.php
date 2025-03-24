@@ -1436,4 +1436,13 @@ class ProductController extends Controller
             return response()->json(['success' => true, 'message' => 'Product Delete Successfully']);
         }
     }
+    public function checkMfgCode($mfgCode = null){
+        $products = Product::where('manufacture_code',$mfgCode)->first();
+
+        if($products){
+            return response()->json(["success" => true, "message" => "Manufacture code already exist"]);
+        }else{
+            return response()->json(["success" => false, "message" => "true"]);
+        }
+    }
 }
