@@ -20,6 +20,7 @@
             </select>
         </div>
         <div class="col-4">
+            <label>Scan Barcode</label>
             <BarCodeBox :item-to-be-add="itemToBeAdd" :from-store="fromStore" @transfer-item="transferItem" />
         </div>
     </div>
@@ -177,7 +178,7 @@ export default {
                     }
                 });
 
-                if(!this.forceAdd){
+                if (!this.forceAdd) {
                     return;
                 }
             }
