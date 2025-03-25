@@ -23,6 +23,11 @@
             <label>Scan Barcode</label>
             <BarCodeBox :item-to-be-add="itemToBeAdd" :from-store="fromStore" @transfer-item="transferItem" />
         </div>
+        <div class="col-4">
+            <div class="mt-4 bg-success text-white p-2 text-center">
+                Prev Barcode: {{ prevBarcode }}
+            </div>
+        </div>
     </div>
     <div class="row mt-2">
         <div class="col-md-12">
@@ -71,7 +76,8 @@ export default {
             fromStore: this.currentUserStore,
             toStore: null,
             itemToBeAdd: {},
-            items: sortedItems
+            items: sortedItems,
+            prevBarcode: sortedItems.length > 0 ? sortedItems[0].barcode : ''
         };
     },
     watch: {
@@ -182,9 +188,12 @@ export default {
                     return;
                 }
             }
+
+            this.prevBarcode = item.barcode;
+
             let highestSno = products.length > 0 ? Math.max(...products.map(product => product.sno)) : 0;
             item.quantity = 1;
-            item.scanned_barcode = item.scanned_barcode || item.manufacture_barcode;
+            item.scanned_barcode = item.barcode || item.manufacture_barcode;
             item.sno = highestSno + 1;
             products.push(item);
             products.sort((a, b) => b.sno - a.sno);
