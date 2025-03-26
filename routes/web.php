@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\ProductImportExportController;
 use App\Http\Controllers\CouponDiscountController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\CategoryController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -61,6 +62,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'purchase-orders' => PurchaseOrderController::class,
         'collections' => CollectionController::class,
         'coupons' => CouponController::class,
+        'categories'=> CategoryController::class
     ]);
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');
@@ -105,6 +107,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/tax-status', [TaxController::class, 'taxStatus'])->name('tax-status');
     Route::post('/product-status', [ProductController::class, 'productStatus'])->name('product-status');
     Route::post('/tag-status', [TagController::class, 'tagStatus'])->name('tag-status');
+    Route::post('/categories/update-status', [CategoryController::class, 'updateStatus'])->name('categories.updateStatus');
 
     Route::get('/get-states/{countryId}', [SupplierController::class, 'getStates']);
     Route::get('/get-product-type/{departmentId}', [ProductController::class, 'getDepartment']);

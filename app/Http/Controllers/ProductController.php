@@ -1440,7 +1440,7 @@ class ProductController extends Controller
         $products = Product::where('manufacture_code',$mfgCode)->first();
 
         if($products){
-            return response()->json(["success" => true, "message" => "Manufacture code already exist"]);
+            return response()->json(["success" => true, "message" => "This code already existing"]);
         }else{
             return response()->json(["success" => false, "message" => "true"]);
         }
