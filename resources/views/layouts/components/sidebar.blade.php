@@ -108,6 +108,9 @@
                             @can('view brands')
                                 <li><a href="{{ route('brands.index') }}">Brands</a></li>
                             @endcan
+                            {{-- @can('view categories') --}}
+                                <li><a href="{{ route('categories.index') }}">Categories</a></li>
+                            {{-- @endcan --}}
 
                             @can('view colors')
                                 <li><a href="{{ route('colors.index') }}">Colors</a></li>
