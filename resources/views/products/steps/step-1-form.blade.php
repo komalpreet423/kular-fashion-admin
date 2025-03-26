@@ -10,7 +10,7 @@
             <x-form-input name="manufacture_code" value="{{ $product->manufacture_code ?? request()->get('mfg_code') }}"
                 label="Manufacture Code" placeholder="Enter Manufacture Code" required="true"
                 readonly="{{ $isEditing ?? false }}"/>
-                <span id="manufacture_err_code" style="color:red; display:none;"></span>    
+                <span id="manufacture_err_code" class="d-block invalid-feedback"></span>    
         </div>
     </div>
 
