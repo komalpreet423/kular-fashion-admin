@@ -24,7 +24,7 @@
             <BarCodeBox :item-to-be-add="itemToBeAdd" :from-store="fromStore" @transfer-item="transferItem" />
         </div>
         <div class="col-4">
-            <div class="mt-4 bg-success text-white p-2 text-center">
+            <div class="mt-4 bg-success text-white p-2 text-center" v-if="prevBarcode">
                 Prev Barcode: {{ prevBarcode }}
             </div>
         </div>
