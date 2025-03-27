@@ -28,6 +28,7 @@ use App\Http\Controllers\ProductImportExportController;
 use App\Http\Controllers\CouponDiscountController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PickListController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -62,7 +63,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'purchase-orders' => PurchaseOrderController::class,
         'collections' => CollectionController::class,
         'coupons' => CouponController::class,
-        'categories'=> CategoryController::class
+        'categories'=> CategoryController::class,
+        'pick-list'=> PickListController::class
     ]);
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');

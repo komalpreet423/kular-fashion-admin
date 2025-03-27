@@ -1,5 +1,6 @@
 <script>
     $(function() {
+
         $('.search-image-modal').click(function() {
             $('#googleImagesModal').modal('show');
             initialize();
@@ -366,7 +367,7 @@
                     console.error("Error fetching image:", error);
                 });
         }
-
+        $("#colorForImages").trigger("change");
 
     });
 </script>
