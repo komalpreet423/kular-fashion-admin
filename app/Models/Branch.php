@@ -24,4 +24,8 @@ class Branch extends Model
     {
         return $this->hasMany(StoreInventory::class, 'store_id');
     }
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
