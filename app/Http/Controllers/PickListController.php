@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class PickListController extends Controller
 {
@@ -15,21 +16,25 @@ class PickListController extends Controller
      */
     public function index(Request $request)
     {
+        $defaultDate = $request->date ?? now()->subDay()->format('Y-m-d');
+        $defaultBranch = $request->branch ?? Auth::user()->branch_id;
+
         $query = OrderItem::with(['product.department', 'product.productType', 'branch']);
 
-        if ($request->has('branch') && $request->branch != '') {
-            $query->where('branch_id', $request->branch);
+        if (!empty($defaultBranch)) {
+            $query->where('branch_id', $defaultBranch);
         }
 
-        if ($request->has('date') && !empty($request->date)) {
-            $query->whereDate('created_at', $request->date);
+        if (!empty($defaultDate)) {
+            $query->whereDate('created_at', $defaultDate);
         }
 
         $orderItems = $query->latest('created_at')->get();
-        $branches = Branch::all(); 
+        $branches = Branch::all();
 
-        return view('pick-list.index', compact('orderItems', 'branches'));
+        return view('pick-list.index', compact('orderItems', 'branches', 'defaultDate', 'defaultBranch'));
     }
+
 
 
     /**
