@@ -33,11 +33,16 @@ Route::get('/collections', [CollectionApiController::class, 'collections']);
 Route::get('/collection/{id}', [CollectionApiController::class, 'showCollection']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('products/{product}', [ProductController::class, 'showProduct'])->name('products.show');
+    Route::post('products/{product}', [ProductController::class, 'showProduct'])->name('productss.show');
     Route::post('/apply-coupon', [CouponController::class, 'applyCoupon']);
 
-    Route::post('/addresses', [UserAddressController::class, 'store']);
+    Route::post('/addresses/create', [UserAddressController::class, 'store']);
+    Route::get('/addresses', [UserAddressController::class, 'index']);
+    Route::get('/addresses/default', [UserAddressController::class, 'show']);
+    Route::put('/addresses/update', [UserAddressController::class, 'update']);
+    Route::delete('/addresses/delete', [UserAddressController::class, 'destroy']);
 });
+
 
 
 Route::prefix('cart')->group(function () {
