@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supplier_id')->index();
+            $table->unsignedBigInteger('supplier_id')->index()->nullable();
             $table->string('order_no', 75);
             $table->date('supplier_order_date')->nullable();
             $table->date('delivery_date')->nullable();

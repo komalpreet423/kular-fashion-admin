@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->index(); 
+            $table->unsignedBigInteger('user_id')->index();
             $table->string('first_name', 25);
             $table->string('last_name', 25)->nullable();
             $table->string('address_line1');
@@ -18,8 +18,8 @@ return new class extends Migration {
             $table->string('state', 75);
             $table->string('zip_code', 12);
             $table->string('phone_number', 15);
-            $table->unsignedBigInteger('country_id')->index();
-            $table->unsignedBigInteger('state_id')->index();
+            $table->unsignedBigInteger('country_id')->index()->nullable();
+            $table->unsignedBigInteger('state_id')->index()->nullable();
             $table->boolean('is_default')->default(false)->index();
             $table->softDeletes();
             $table->timestamps();
