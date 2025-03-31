@@ -224,12 +224,14 @@
                         }
                     } else {
                         const alertHTML = `
-                            <div class="alert alert-danger fade show mt-2" role="alert">
+                            <div class="alert alert-danger fade show mt-2" role="alert" id="alert-msg">
                                 <strong>Oops!</strong> Search results not found.
                             </div>
                         `;
-                        $('#googleImagesModal .modal-body').append(alertHTML);
-
+                        var msgCount = $('div#alert-msg').length;
+                        if(msgCount == 0){
+                            $('#googleImagesModal .modal-body').append(alertHTML);
+                        }
                         $('#loadMoreButton').hide();
                     }
                 }).fail(function(apiErr) {
@@ -271,6 +273,14 @@
                 const searchQuery =
                     `${article.brand?.name || ''} ${article.manufacture_code} ${article.short_description} ${article.product_type?.name || ''}`;
                 $('#google_search_keyword').val(searchQuery);
+
+                $('#google_search_keyword').keydown(function(event) {
+                    if (event.keyCode == 13) {
+                        event.preventDefault();
+                        $('.search-by-keyword').click(); 
+                        return false;
+                    }
+                });
 
                 // Search button click event
                 $('.search-by-keyword').click(function() {
