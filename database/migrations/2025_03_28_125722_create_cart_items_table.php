@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cart_id')->index();
             $table->unsignedBigInteger('user_id')->index();
             $table->unsignedBigInteger('variant_id')->index();
+            $table->unsignedBigInteger('quantity');
             $table->softDeletes();
             $table->timestamps();
 
