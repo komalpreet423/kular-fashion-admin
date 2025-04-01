@@ -82,7 +82,7 @@
                                             <h6 class="m-0">{{ $color->colorDetail->name }} ({{ $color->colorDetail->code }})</h6>
 
                                             @if ($color->image_path)
-                                            <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')"> <!-- CHANGED -->
+                                            <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
                                             @endif
 
                                         </th>
@@ -118,6 +118,9 @@
                                             </div>
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
+                                            @if ($color->image_path)
+                                            <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
+                                            @endif
                                         </th>
                                         @foreach ($product->sizes as $size)
                                         <td>{{ $size->totalQuantity($color->id) }}</td>
@@ -264,6 +267,9 @@
                                             </div>
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
+                                            @if ($color->image_path)
+                                            <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
+                                            @endif
                                         </th>
                                         @foreach ($product->sizes as $size)
                                         <td>{{ $size->totalQuantity($color->id) }}</td>
