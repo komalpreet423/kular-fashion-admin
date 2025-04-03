@@ -93,6 +93,9 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('pick-list.index') }}">Pick List</a></li>
                     </ul>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ route('best-brands-overall.index') }}">Best Brands Overall</a></li>
+                    </ul>
                 </li>
 
                 @canany(['view departments', 'view product types', 'view brands', 'view colors', 'view size scales',

@@ -5,6 +5,7 @@ require __DIR__ . '/pos.php';
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BestBrandOverallController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ProductTypeController;
@@ -64,7 +65,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'collections' => CollectionController::class,
         'coupons' => CouponController::class,
         'categories'=> CategoryController::class,
-        'pick-list'=> PickListController::class
+        'pick-list'=> PickListController::class,
+        'best-brands-overall'=>BestBrandOverallController::class
     ]);
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');
