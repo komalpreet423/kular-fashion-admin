@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Best Brands Overall')
+@section('title', 'Weekely Turnover')
 
 @section('header-button')
 <div class="d-inline-block me-2">
@@ -38,9 +38,9 @@
         align-items: center;
     }
     /* Center align all table headers and cells */
-    #best-brand-overall-report-table thead th,
-    #best-brand-overall-report-table tbody td,
-    #best-brand-overall-report-table tfoot td {
+    #weekely-turnover-report-table thead th,
+    #weekely-turnover-report-table tbody td,
+    #weekely-turnover-report-table tfoot td {
         text-align: center;
         vertical-align: middle;
     }
@@ -59,7 +59,7 @@
                 <div class="card">
                     <div class="card-body">
                         <form id="filterForm" method="GET">
-                            @include('best-brands-overall.form')
+                            @include('best-brands-per-product-type.form')
                         </form>
                     </div>
                 </div>
@@ -76,13 +76,12 @@
                                 <button type="button" class="btn btn-danger" id="exportPdf">PDF</button>
                             </div>
                         </div>
-                        <table id="best-brand-overall-report-table" data-selected-best-brand-overall-reports="" data-unselected-best-brand-overall-reports=""
+                        <table id="weekely-turnover-report-table" data-selected-weekely-turnover-reports="" data-unselected-weekely-turnover-reports=""
                             class="table table-bordered dt-responsive nowrap w-100 table-striped">
                             <thead>
                                 <tr>
-                                    <th>Rank <i class="fas fa-sort"></i></th>
-                                    <th>Supplier <i class="fas fa-sort"></i></th>
-                                    <th>Qty Sold <i class="fas fa-sort"></i></th>
+                                    <th>Branch Name <i class="fas fa-sort"></i></th>
+                                    <th>Sales Unit <i class="fas fa-sort"></i></th>
                                     <th>Sales Value <i class="fas fa-sort"></i></th>
                                 </tr>
                             </thead>
@@ -92,10 +91,7 @@
                                 @if(!empty($filteredData) && count($filteredData) > 0)
                                     @foreach($filteredData as $key => $item)
                                     <tr>
-                                        <td data-order="{{ preg_replace('/[^0-9]/', '', $item['rank'] ?? '') }}">
-                                            {{ !empty($item['rank']) ? strtoupper($item['rank']) : 'N/A' }}
-                                        </td>
-                                        <td>{{ $item['brand_name'] ?? 'N/A' }}</td>
+                                        <td>{{ $item['branch_name'] ?? 'N/A' }}</td>
                                         <td>{{ $item['total_quantity'] ?? 'N/A' }}</td>
                                         <td>{{ $item['sales_value'] ?? 'N/A' }}</td>
                                     </tr>
@@ -125,23 +121,20 @@
     let dataTable;
 
     $(document).ready(function () {
-        dataTable = $('#best-brand-overall-report-table').DataTable({
+        dataTable = $('#weekely-turnover-report-table').DataTable({
             ordering: true,
             order: [],
             pageLength: 10,
-            columns: [
-                {
-                    title: "Rank",
-                    data: "rank", // <-- This ensures correct mapping
-                    render: function (data, type, row) {
-                        const rank = data ?? 'N/A';
-                        const numericRank = (rank ?? '').replace(/[^0-9]/g, '');
-                        return `<span data-order="${numericRank}">${rank}</span>`;
-                    }
-                },
-                { title: "Supplier", data: "brand_name" },
-                { title: "Qty Sold", data: "total_quantity" },
+            columns: [                
+                { title: "Branch Name", data: "branch_name" },
+                { title: "Sales Unit", data: "total_quantity" },
                 { title: "Sales Value", data: "sales_value" }
+            ],
+            columnDefs: [
+                {
+                    targets: 2, // "Rank" column index
+                    orderable: false
+                }
             ],
             lengthMenu: [10, 25, 50, 100],
             language: {
@@ -153,7 +146,7 @@
             buttons: [
                 {
                     extend: 'copyHtml5',
-                    title: 'Best Brands Overall',
+                    title: 'Weekely Turnover',
                     exportOptions: {
                         columns: ':visible'
                     },
@@ -161,7 +154,7 @@
                 },
                 {
                     extend: 'excelHtml5',
-                    title: 'Best Brands Overall',
+                    title: 'Weekely Turnover',
                     exportOptions: {
                         columns: ':visible'
                     },
@@ -169,7 +162,7 @@
                 },
                 {
                     extend: 'pdfHtml5',
-                    title: 'Best Brands Overall',
+                    title: 'Weekely Turnover',
                     orientation: 'portrait',
                     pageSize: 'A4',
                     exportOptions: {
@@ -212,7 +205,7 @@
     $('#applyFilterBtn').on('click', function () {
         const formData = $('#filterForm').serialize();
         $.ajax({
-            url: "{{ route('best.brands.filter') }}",
+            url: "{{ route('weekely-turnover.filter') }}",
             method: 'POST',
             data: formData,
             headers: {
@@ -225,7 +218,7 @@
                 $('#applyFilterBtn').attr('disabled', false).text('Apply Filter');
             },
             success: function (response) {
-                const table = $('#best-brand-overall-report-table').DataTable();
+                const table = $('#weekely-turnover-report-table').DataTable();
                 table.clear();
 
                 response.data.forEach((item) => {

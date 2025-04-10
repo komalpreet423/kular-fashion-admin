@@ -87,14 +87,14 @@
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="bx bx-list-ul"></i>
+                        <i class="bx bxs-package"></i>
                         <span>Reports</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('pick-list.index') }}">Pick List</a></li>
-                    </ul>
-                    <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('best-brands-overall.index') }}">Best Brands Overall</a></li>
+                        <li><a href="{{ route('best-brands-per-product-type.index') }}">Best Brands Per Product Type</a></li>
+                        <li><a href="{{ route('weekely-turnover.index') }}">Weekely Turnover</a></li>
                     </ul>
                 </li>
 

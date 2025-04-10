@@ -80,10 +80,13 @@
     <div class="col-lg-4 d-flex align-items-end justify-content-end">
         <div>
             <button type="button" class="btn btn-primary me-2" id="applyFilterBtn">Apply Filter</button>
-            <a href="{{ route('best-brands-overall.index') }}" class="btn btn-secondary">
+            <a href="{{ route('best-brands-per-product-type.index') }}" class="btn btn-secondary">
                 <i class="bx bx-reset"></i> Reset
             </a>
         </div>
     </div>
 
 </div>
+
+
+
