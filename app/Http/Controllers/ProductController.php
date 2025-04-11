@@ -454,7 +454,7 @@ class ProductController extends Controller
         $branches = Branch::with(['inventory' => function ($query) use ($product) {
             $query->where('product_id', $product->id);
         }])->get();
-
+        
         return view('products.show', compact('product', 'branches'));
     }
 
@@ -1074,14 +1074,19 @@ class ProductController extends Controller
     public function productValidate(Request $request, $barcode)
     {
         $fromStoreId = (int) ($request->from ?? 1);
-        $products = ProductQuantity::with('product.brand', 'product.department', 'sizes.sizeDetail', 'colors.colorDetail')->get();
+        $products = ProductQuantity::with('product', 'product.brand', 'product.department', 'sizes.sizeDetail', 'colors.colorDetail')->get();
 
         foreach ($products as $product) {
-            $article_code = $product->product->article_code;
+            if (is_null($product->product)) {
+                continue;
+            }
+
+            $article_code = $product->product->article_code ?? '';
             $color_code = $product->colors->colorDetail->code;
             $new_code = $product->sizes->sizeDetail->new_code;
             $article_code = $article_code . $color_code . $new_code;
             $checkCode = $this->generateCheckDigit($article_code);
+
             $generated_code = $article_code . $checkCode;
 
 
@@ -1440,7 +1445,7 @@ class ProductController extends Controller
         $products = Product::where('manufacture_code',$mfgCode)->first();
 
         if($products){
-            return response()->json(["success" => true, "message" => "Manufacture code already exist"]);
+            return response()->json(["success" => true, "message" => "This code already existing"]);
         }else{
             return response()->json(["success" => false, "message" => "true"]);
         }

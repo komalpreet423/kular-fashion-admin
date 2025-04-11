@@ -5,6 +5,9 @@ require __DIR__ . '/pos.php';
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BestBrandOverallController;
+use App\Http\Controllers\BestBrandsPerProductTypeController;
+use App\Http\Controllers\WeekelyTurnoverController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\ProductTypeController;
@@ -27,6 +30,8 @@ use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\ProductImportExportController;
 use App\Http\Controllers\CouponDiscountController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PickListController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -61,10 +66,15 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'purchase-orders' => PurchaseOrderController::class,
         'collections' => CollectionController::class,
         'coupons' => CouponController::class,
+        'categories' => CategoryController::class,
+        'pick-list' => PickListController::class,
+        'best-brands-overall' => BestBrandOverallController::class,
+        'best-brands-per-product-type' => BestBrandsPerProductTypeController::class,
+        'weekely-turnover' => WeekelyTurnoverController::class
     ]);
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');
-    
+
     Route::get('inventory-transfer-view/{id}', [InventoryTransferController::class, 'inventoryTransferShow'])->name('inventory-transfer-view');
     Route::get('product-validate/{barcode}', [ProductController::class, 'productValidate']);
     Route::post('/inventory-transfer-items', [InventoryTransferController::class, 'inventoryTransferItems']);
@@ -105,6 +115,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/tax-status', [TaxController::class, 'taxStatus'])->name('tax-status');
     Route::post('/product-status', [ProductController::class, 'productStatus'])->name('product-status');
     Route::post('/tag-status', [TagController::class, 'tagStatus'])->name('tag-status');
+    Route::post('/categories/update-status', [CategoryController::class, 'updateStatus'])->name('categories.updateStatus');
 
     Route::get('/get-states/{countryId}', [SupplierController::class, 'getStates']);
     Route::get('/get-product-type/{departmentId}', [ProductController::class, 'getDepartment']);
@@ -135,4 +146,9 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/check-manufacture-code/{manufactureCode}', [ProductController::class, 'checkManufactureCode'])->name('check.manufacture.code');
     Route::get('/get-size-range', [PurchaseOrderController::class, 'getSizeRange']);
 
+    //Best Brands overall routes
+    Route::post('/best-brands-overall/filter', [BestBrandOverallController::class, 'filterData'])->name('best.brands.filter');
+    Route::get('/best-brands-overall/export/{type}', [BestBrandOverallController::class, 'exportData'])->name('best.brands.export');
+    Route::post('/best-brands-per-product-type/filter', [BestBrandsPerProductTypeController::class, 'filterData'])->name('best.brands.per.product.type.filter');
+    Route::post('/weekely-turnover/filter', [WeekelyTurnoverController::class, 'filterData'])->name('weekely-turnover.filter');
 });

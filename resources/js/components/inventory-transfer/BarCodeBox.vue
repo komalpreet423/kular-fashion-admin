@@ -1,7 +1,7 @@
 <template>
     <div class="search-box mb-2">
         <div class="position-relative">
-            <input type="number" v-model="query" class="form-control mt-4" placeholder="Enter barcode" autofocus
+            <input type="number" v-model="query" class="form-control" placeholder="Enter barcode" autofocus
                 @input="addToCart" ref="barcodeInput">
             <i class="bx bx-barcode search-icon"></i>
         </div>

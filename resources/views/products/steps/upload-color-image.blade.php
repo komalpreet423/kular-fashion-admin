@@ -224,12 +224,14 @@
                         }
                     } else {
                         const alertHTML = `
-                            <div class="alert alert-danger fade show mt-2" role="alert">
+                            <div class="alert alert-danger fade show mt-2" role="alert" id="alert-msg">
                                 <strong>Oops!</strong> Search results not found.
                             </div>
                         `;
-                        $('#googleImagesModal .modal-body').append(alertHTML);
-
+                        var msgCount = $('div#alert-msg').length;
+                        if(msgCount == 0){
+                            $('#googleImagesModal .modal-body').append(alertHTML);
+                        }
                         $('#loadMoreButton').hide();
                     }
                 }).fail(function(apiErr) {
@@ -272,6 +274,14 @@
                     `${article.brand?.name || ''} ${article.manufacture_code} ${article.short_description} ${article.product_type?.name || ''}`;
                 $('#google_search_keyword').val(searchQuery);
 
+                $('#google_search_keyword').keydown(function(event) {
+                    if (event.keyCode == 13) {
+                        event.preventDefault();
+                        $('.search-by-keyword').click(); 
+                        return false;
+                    }
+                });
+
                 // Search button click event
                 $('.search-by-keyword').click(function() {
                     const searchKeyword = $('#google_search_keyword').val();
@@ -303,6 +313,24 @@
                 $('#chooseColorImageModal').modal('hide');
 
                 $(`[data-id="rm-${selectedColor.id}"]`).attr('data-color-image', imageUrl);
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.color_qty').on('keyup', function () {
+                const main_id = $(this).attr('id').split('_')[2];
+                let total = 0;
+
+                $('input[id^="color_qty_'+main_id+'_"]').each(function () {
+                    const value = parseFloat($(this).val());
+                    if (!isNaN(value)) {
+                        total += value;
+                    }
+                });
+
+                $('#color_qty_sum_' + main_id).text(total);
             });
         });
     </script>

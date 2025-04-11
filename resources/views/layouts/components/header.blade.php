@@ -1,5 +1,7 @@
 <header id="page-topbar">
-    <div class="navbar-header">
+    <div class="navbar-header" style="
+    background-image: linear-gradient(90deg,rgb(142, 243, 188) 50%, white 50%);
+    background-repeat: repeat-y;">
         <div class="d-flex">
             <div class="navbar-brand-box">
                 <a href="{{ route('dashboard') }}" class="logo logo-dark">
@@ -41,21 +43,15 @@
             </div>
 
             <div class="dropdown d-inline-block">
-                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown"
-                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="rounded-circle header-profile-user" src="{{ asset('assets/images/user.jpg') }}"
-                        alt="Header Avatar">
+                <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img class="rounded-circle header-profile-user" src="{{ asset('assets/images/user.jpg') }}" alt="Header Avatar">
                     <span class="d-none d-xl-inline-block ms-1">{{ Auth::user()->name }}</span>
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="{{ route('profile.edit') }}"><i
-                            class="bx bx-user font-size-16 align-middle me-1"></i> <span
-                            key="t-profile">Profile</span></a>
+                    <a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bx bx-user font-size-16 align-middle me-1"></i> <span key="t-profile">Profile</span></a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"><i
-                            class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span
-                            key="t-logout">Logout</span></a>
+                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i> <span key="t-logout">Logout</span></a>
                 </div>
             </div>
         </div>
