@@ -176,14 +176,25 @@
                         <table class="table mb-0 table-bordered table-sm">
                             <tbody>
                                 <tr>
+<<<<<<< HEAD
                                     @foreach ($product->sizes as $size)
                                     <th>{{ $size->sizeDetail->size }}</th>
                                     @endforeach
                                     <th scope="row" class="text-end">Size</th>
+=======
+                                    <th scope="row">Size</th>
+                                    @foreach ($product->sizes as $size)
+                                    <th>{{ $size->sizeDetail->size }}</th>
+                                    @endforeach
+>>>>>>> ad879155e79d3ce16d6205e5f5b19defd7804927
                                 </tr>
 
                                 @foreach ($branches as $branch)
                                 <tr>
+<<<<<<< HEAD
+=======
+                                    <th class="d-flex">{{ $branch->name }}</th>
+>>>>>>> ad879155e79d3ce16d6205e5f5b19defd7804927
                                     @foreach ($product->sizes as $size)
                                     <td>
                                         @if ($branch->id === 1)
@@ -193,6 +204,7 @@
                                         @endif
                                     </td>
                                     @endforeach
+<<<<<<< HEAD
                                     <th class="d-flex align-items-center justify-content-end">{{ $branch->name }}</th>
                                 </tr>
                                 @endforeach
@@ -201,6 +213,15 @@
                                     <td>{{ $size->totalQuantity($color->id) }}</td>
                                     @endforeach
                                     <th class="text-success text-end">Goods In</th>
+=======
+                                </tr>
+                                @endforeach
+                                <tr>
+                                    <th class="text-success">Goods In</th>
+                                    @foreach ($product->sizes as $size)
+                                    <td>{{ $size->totalQuantity($color->id) }}</td>
+                                    @endforeach
+>>>>>>> ad879155e79d3ce16d6205e5f5b19defd7804927
                                 </tr>
                             </tbody>
                         </table>
