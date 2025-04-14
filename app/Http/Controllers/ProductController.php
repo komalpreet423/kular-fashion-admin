@@ -454,7 +454,7 @@ class ProductController extends Controller
         $branches = Branch::with(['inventory' => function ($query) use ($product) {
             $query->where('product_id', $product->id);
         }])->get();
-
+        
         return view('products.show', compact('product', 'branches'));
     }
 

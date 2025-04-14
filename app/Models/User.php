@@ -27,6 +27,8 @@ class User extends Authenticatable
         'date_of_birth',
         'password',
         'branch_id',
+        'otp',
+        'otp_expires_at'
     ];
 
     /**

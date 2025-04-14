@@ -28,6 +28,10 @@ Route::post('/collections/check-name', [CollectionController::class, 'checkColle
 
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/register', [LoginController::class, 'register']);
+Route::post('/send-otp', [LoginController::class, 'send_otp']);
+Route::post('/verify-otp', [LoginController::class, 'verify_otp']);
+Route::post('/reset-password', [LoginController::class, 'reset_password']);
+
 Route::get('/brands', [BrandController::class, 'brands'])->name('brand.index');
 Route::get('/departments', [DepartmentController::class, 'departments'])->name('department.index');
 Route::get('/product-types', [ProductTypeController::class, 'producTypes'])->name('productType.index');

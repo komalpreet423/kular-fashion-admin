@@ -316,4 +316,22 @@
             });
         });
     </script>
+
+    <script>
+        $(document).ready(function () {
+            $('.color_qty').on('keyup', function () {
+                const main_id = $(this).attr('id').split('_')[2];
+                let total = 0;
+
+                $('input[id^="color_qty_'+main_id+'_"]').each(function () {
+                    const value = parseFloat($(this).val());
+                    if (!isNaN(value)) {
+                        total += value;
+                    }
+                });
+
+                $('#color_qty_sum_' + main_id).text(total);
+            });
+        });
+    </script>
 @endpush

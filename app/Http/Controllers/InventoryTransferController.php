@@ -90,14 +90,14 @@ class InventoryTransferController extends Controller
             $productQuantityId = $value['product_quantity_id'];
             $quantity = $value['quantity'];
 
-            $productQuantity = ProductQuantity::find($productQuantityId);
+            $productQuantity = ProductQuantity::where('id', $productQuantityId)->with('sizes.sizeDetail', 'colors.colorDetail')->first();
 
             InventoryItem::create([
                 'inventroy_transfer_id' => $inventoryTransfer->id,
                 'product_id'            => $productQuantity->product_id,
                 'product_quantity_id'   => $productQuantityId,
-                'product_color_id'      => $productQuantity->product_color_id,
-                'product_size_id'       => $productQuantity->product_size_id,
+                'product_color_id'      => $productQuantity->colors->colorDetail->id,
+                'product_size_id'       => $productQuantity->sizes->sizeDetail->id,
                 'brand_id'              => $value['brand_id'],
                 'quantity'              => $quantity,
             ]);

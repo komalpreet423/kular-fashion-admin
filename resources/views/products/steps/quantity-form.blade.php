@@ -20,7 +20,7 @@
             }
         @endphp
 
-        @foreach ($savedColors as $color)
+        @foreach ($savedColors as $colorKey => $color)
             @if ($color)
                 @php
                     $total_in = 0;
@@ -66,15 +66,19 @@
                             <input type="number" min="0"
                                 name="quantity[{{ $color['id'] }}][{{ $size->id }}]"
                                 value="{{ isset($quantityData) && is_array($quantityData) && isset($quantityData[$color['id']]) ? (int) $quantityData[$color['id']] : 0 }}"
-                                class="form-control">
+                                class="form-control color_qty" id="color_qty_{{$colorKey}}_{{$key}}">
                             @isset($product)
                                 <h6 class="mt-1 mb-0 font-size-12">Total in: <b>{{ $quantity }}</b></h6>
                             @endisset
                         </td>
                     @endforeach
 
+                    {{-- @isset($product)
+                        <td class="fs-5 text-center" id="color_qty_sum_{{$colorKey}}">{{ $total_in }}</td>
+                    @endisset --}}
+
                     @isset($product)
-                        <td class="fs-5 text-center">{{ $total_in }}</td>
+                        <td class="fs-5 text-center" id="color_qty_sum_{{$colorKey}}">0</td>
                     @endisset
 
                     <td @class(['actionColumn', 'd-none' => count($savedColors) <= 1])>

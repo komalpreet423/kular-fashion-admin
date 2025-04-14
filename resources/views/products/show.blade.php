@@ -66,30 +66,29 @@
                             <table class="table mb-0 table-bordered table-sm">
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Size</th>
                                         @foreach ($product->sizes as $size)
                                         <th>{{ $size->sizeDetail->size }}</th>
                                         @endforeach
+                                        <th scope="row" class="text-end">Size</th>
                                     </tr>
 
                                     @foreach ($product->colors as $color)
                                     <tr>
-                                        <th class="d-flex align-items-center">
+                                        @foreach ($product->sizes as $size)
+                                        <td>{{ $size->quantity($color->id) }}</td>
+                                        @endforeach
+                                        <th class="d-flex align-items-center justify-content-end">
+
+                                            <h6 class="m-0">{{ $color->colorDetail->name }} ({{ $color->colorDetail->code }})</h6>
 
                                             <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;">
                                             </div>
-
-                                            <h6 class="m-0">{{ $color->colorDetail->name }} ({{ $color->colorDetail->code }})</h6>
 
                                             @if ($color->image_path)
                                             <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
                                             @endif
 
                                         </th>
-
-                                        @foreach ($product->sizes as $size)
-                                        <td>{{ $size->quantity($color->id) }}</td>
-                                        @endforeach
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -105,26 +104,26 @@
                             <table class="table mb-0 table-bordered table-sm">
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Size</th>
                                         @foreach ($product->sizes as $size)
                                         <th>{{ $size->sizeDetail->size }}</th>
                                         @endforeach
+                                        <th scope="row" class="text-end">Size</th>
                                     </tr>
 
                                     @foreach ($product->colors as $color)
                                     <tr>
-                                        <th class="d-flex">
-                                            <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}">
-                                            </div>
+                                        @foreach ($product->sizes as $size)
+                                        <td>{{ $size->totalQuantity($color->id) }}</td>
+                                        @endforeach
+                                        <th class="d-flex align-items-center justify-content-end">
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
+                                            <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}">
+                                            </div>
                                             @if ($color->image_path)
                                             <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
                                             @endif
                                         </th>
-                                        @foreach ($product->sizes as $size)
-                                        <td>{{ $size->totalQuantity($color->id) }}</td>
-                                        @endforeach
                                     </tr>
                                     @endforeach
 
@@ -177,15 +176,25 @@
                         <table class="table mb-0 table-bordered table-sm">
                             <tbody>
                                 <tr>
+<<<<<<< HEAD
+                                    @foreach ($product->sizes as $size)
+                                    <th>{{ $size->sizeDetail->size }}</th>
+                                    @endforeach
+                                    <th scope="row" class="text-end">Size</th>
+=======
                                     <th scope="row">Size</th>
                                     @foreach ($product->sizes as $size)
                                     <th>{{ $size->sizeDetail->size }}</th>
                                     @endforeach
+>>>>>>> ad879155e79d3ce16d6205e5f5b19defd7804927
                                 </tr>
 
                                 @foreach ($branches as $branch)
                                 <tr>
+<<<<<<< HEAD
+=======
                                     <th class="d-flex">{{ $branch->name }}</th>
+>>>>>>> ad879155e79d3ce16d6205e5f5b19defd7804927
                                     @foreach ($product->sizes as $size)
                                     <td>
                                         @if ($branch->id === 1)
@@ -195,6 +204,16 @@
                                         @endif
                                     </td>
                                     @endforeach
+<<<<<<< HEAD
+                                    <th class="d-flex align-items-center justify-content-end">{{ $branch->name }}</th>
+                                </tr>
+                                @endforeach
+                                <tr>
+                                    @foreach ($product->sizes as $size)
+                                    <td>{{ $size->totalQuantity($color->id) }}</td>
+                                    @endforeach
+                                    <th class="text-success text-end">Goods In</th>
+=======
                                 </tr>
                                 @endforeach
                                 <tr>
@@ -202,6 +221,7 @@
                                     @foreach ($product->sizes as $size)
                                     <td>{{ $size->totalQuantity($color->id) }}</td>
                                     @endforeach
+>>>>>>> ad879155e79d3ce16d6205e5f5b19defd7804927
                                 </tr>
                             </tbody>
                         </table>
@@ -217,28 +237,33 @@
                         <table class="table mb-0 table-bordered table-sm">
                             <tbody>
                                 <tr>
-                                    <th scope="row">Size</th>
                                     @foreach ($product->sizes as $size)
                                     <th>{{ $size->sizeDetail->size }}</th>
                                     @endforeach
+                                    <th scope="row" class="text-end">Size</th>
                                 </tr>
 
                                 @foreach ($product->colors as $color)
                                 <tr>
-                                    <th class="d-flex align-items-center">
-                                        <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;">
-                                        </div>
+                                    @foreach ($product->sizes as $size)
+                                    <td>
+                                        @if ($branch->id === 1)
+                                            {{ $size->quantity($color->id) }}
+                                        @else
+                                            {{ $size->inventoryAvailableQuantity($color->id, $branch->id) }}
+                                        @endif
+                                    </td>
+                                    @endforeach
+                                    <th class="d-flex align-items-center justify-content-end">
 
                                         <h6 class="m-0">{{ $color->colorDetail->name }} ({{ $color->colorDetail->code }})</h6>
+                                        <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;">
+                                        </div>
 
                                         @if ($color->image_path)
                                         <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
                                         @endif
                                     </th>
-
-                                    @foreach ($product->sizes as $size)
-                                    <td>{{ $size->inventoryAvailableQuantity($color->id, $branch->id) }}</td>
-                                    @endforeach
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -254,26 +279,26 @@
                             <table class="table mb-0 table-bordered table-sm">
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Size</th>
                                         @foreach ($product->sizes as $size)
                                         <th>{{ $size->sizeDetail->size }}</th>
                                         @endforeach
+                                        <th scope="row" class="text-end">Size</th>
                                     </tr>
 
                                     @foreach ($product->colors as $color)
                                     <tr>
-                                        <th class="d-flex">
-                                            <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}">
-                                            </div>
+                                        @foreach ($product->sizes as $size)
+                                        <td>{{ $size->totalQuantity($color->id) }}</td>
+                                        @endforeach
+                                        <th class="d-flex align-items-center justify-content-end">
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
+                                            <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}">
+                                            </div>
                                             @if ($color->image_path)
                                             <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
                                             @endif
                                         </th>
-                                        @foreach ($product->sizes as $size)
-                                        <td>{{ $size->totalQuantity($color->id) }}</td>
-                                        @endforeach
                                     </tr>
                                     @endforeach
                                 </tbody>
