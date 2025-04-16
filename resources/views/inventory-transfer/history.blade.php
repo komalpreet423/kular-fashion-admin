@@ -33,7 +33,7 @@
                                             <td>{{ $transfer->sentTo->name }}</td>
                                             <td>{{ $transfer->sentBy->name }}</td>
                                             <td>{{ count($transfer->inventoryItems) }}</td>
-                                            <td>{{ date('m-d-Y', strtotime($transfer->created_at)) }}</td>
+                                            <td>{{ date('m-d-Y h:i:s', strtotime($transfer->created_at)) }}</td>
                                             <td>
                                                 <a href="{{ route('inventory-transfer-view', ['id' => $transfer->id]) }}"
                                                     class="btn btn-secondary btn-sm  py-0 px-1">
@@ -62,10 +62,10 @@
 
                 columnDefs: [{
                     type: 'string',
-                    targets: 1
+                    targets: 0
                 }],
                 order: [
-                    [1, 'asc']
+                    [0, 'desc']
                 ],
                 drawCallback: function(settings) {
                     $('#datatable th, #datatable td').addClass('p-1');

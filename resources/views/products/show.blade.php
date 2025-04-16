@@ -78,8 +78,8 @@
 
                                             <h6 class="m-0">{{ $color->colorDetail->name }} ({{ $color->colorDetail->code }})</h6>
 
-                                            <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;">
-                                            </div>
+                                            {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;">
+                                            </div> --}}
 
                                             @if ($color->image_path)
                                             <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
@@ -114,7 +114,7 @@
                                         <th class="d-flex align-items-center">
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
-                                            <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}"></div>
+                                            {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}"></div> --}}
                                             @if ($color->image_path)
                                             <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
                                             @endif
@@ -225,7 +225,7 @@
                                     <th class="d-flex align-items-center">
 
                                         <h6 class="m-0">{{ $color->colorDetail->name }} ({{ $color->colorDetail->code }})</h6>
-                                        <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;">
+                                        {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;"> --}}
                                         </div>
 
                                         @if ($color->image_path)
@@ -267,7 +267,7 @@
                                         <th class="d-flex align-items-center">
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
-                                            <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}">
+                                            {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}"> --}}
                                             </div>
                                             @if ($color->image_path)
                                             <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
