@@ -43,6 +43,7 @@
                                         <th>Brand</th>
                                         <th>Color</th>
                                         <th>Size</th>
+                                        <th>Short Description</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,6 +56,7 @@
                                                 <td>{{ $item->brand->name ?? 'N/A' }}</td>
                                                 <td>{{ $item->productColor->name ?? 'N/A' }}</td>
                                                 <td>{{ $item->productSize->size ?? 'N/A' }}</td>
+                                                <td>{{ $item->product->short_description ?? 'N/A' }}</td>
                                             </tr>
                                         @endfor
                                     @endforeach

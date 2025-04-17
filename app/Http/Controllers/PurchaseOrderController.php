@@ -23,7 +23,7 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-        $purchaseOrders = PurchaseOrder::with('supplier','purchaseOrderProduct')->get();
+        $purchaseOrders = PurchaseOrder::with('supplier', 'purchaseOrderProduct')->get();
 
         return view('purchase-orders.index', compact('purchaseOrders'));
     }
@@ -51,7 +51,7 @@ class PurchaseOrderController extends Controller
             'supplier_order_date' => 'required|date',
             'delivery_date' => 'required|date',
             'supplier' => 'required|exists:suppliers,id',
-    
+
             'products' => 'required|array|min:1',
             'products.*.product_code' => 'required|string|max:255',
             'products.*.short_description' => 'required|string|max:500',
@@ -65,46 +65,54 @@ class PurchaseOrderController extends Controller
         ], [
             'supplier_order_no.required' => 'The supplier order number is mandatory',
             'supplier_order_no.max' => 'The supplier order number must not exceed 255 characters',
-        
+
             'supplier_order_date.required' => 'The supplier order date is required',
             'supplier_order_date.date' => 'The supplier order date must be a valid date',
-        
+
             'delivery_date.required' => 'The delivery date is required',
             'delivery_date.date' => 'The delivery date must be a valid date',
-        
+
             'supplier.required' => 'You must select a supplier',
             'supplier.exists' => 'The selected supplier is invalid',
-        
+
             'products.required' => 'At least one product is required',
             'products.array' => 'The products field must be an array',
             'products.min' => 'You must add at least one product',
-        
+
             'products.*.product_code.required' => 'The product code is required for each product',
             'products.*.product_code.max' => 'The product code must not exceed 255 characters',
-        
+
             'products.*.short_description.required' => 'A short description is required for each product',
             'products.*.short_description.max' => 'The short description must not exceed 500 characters',
-        
+
             'products.*.product_type.required' => 'The product type is required',
             'products.*.product_type.exists' => 'The selected product type is invalid',
-        
+
             'products.*.size_scale.required' => 'The size scale is required',
             'products.*.size_scale.exists' => 'The selected size scale is invalid',
-        
+
             'products.*.min_size.required' => 'The minimum size is required',
             'products.*.min_size.exists' => 'The selected minimum size is invalid',
-        
+
             'products.*.max_size.required' => 'The maximum size is required',
             'products.*.max_size.exists' => 'The selected maximum size is invalid',
-        
+
             'products.*.delivery_date.required' => 'The delivery date is required for each product',
             'products.*.delivery_date.date' => 'The delivery date must be a valid date',
-        
+
             'products.*.price.required' => 'The price is required for each product',
             'products.*.price.numeric' => 'The price must be a valid number',
             'products.*.price.between' => 'The price must be between 0 and 999,999.99',
+
+            'products.*.variants' => 'required|array|min:1',
+            'products.*.variants.*.supplier_color_code' => 'required|string',
+            'products.*.variants.*.supplier_color_name' => 'required|string',
+            'products.*.variants.*.color_id' => 'required|exists:colors,id',
+            'products.*.variants.*.size' => 'required|array|min:1',
+            'products.*.variants.*.size.*' => 'required|numeric|min:0',
+
         ]);
-       
+
         $purchaseOrder = PurchaseOrder::create([
             'order_no' => $request->supplier_order_no,
             'supplier_order_date' => Carbon::createFromFormat('d-m-Y', $request->supplier_order_date),
@@ -112,7 +120,7 @@ class PurchaseOrderController extends Controller
             'supplier_id'   => $request->supplier,
         ]);
 
-        if($purchaseOrder) {
+        if ($purchaseOrder) {
             foreach ($request->products as $productData) {
                 $productDetail = PurchaseOrderProduct::create([
                     'product_code' => $productData['product_code'],
@@ -125,24 +133,25 @@ class PurchaseOrderController extends Controller
                     'short_description' => $productData['short_description'],
                     'purchase_order_id' => $purchaseOrder->id,
                 ]);
-                
-                
-                foreach ($productData['variants'] as $variantData) {
-                    $purchaseOrderVariant = PurchaseOrderVariant::create([
-                        'purchase_product_id' => $productDetail->id,
-                        'supplier_color_code' => $variantData['supplier_color_code'],
-                        'supplier_color_name' => $variantData['supplier_color_name'],
-                        'color_id' => $variantData['color_id']
-                    ]);
-                    foreach ($variantData['size'] as $key => $sizes) {
-                        PurchaseOrderVariantSize::create([
-                            'purchase_product_variant_id' => $purchaseOrderVariant->id,
-                            'size_id' => $key,
-                            'quantity' => $sizes,
+
+                if (isset($productData['variants']) && is_array($productData['variants'])) {
+                    foreach ($productData['variants'] as $variantData) {
+                        $purchaseOrderVariant = PurchaseOrderVariant::create([
+                            'purchase_product_id' => $productDetail->id,
+                            'supplier_color_code' => $variantData['supplier_color_code'],
+                            'supplier_color_name' => $variantData['supplier_color_name'],
+                            'color_id' => $variantData['color_id']
                         ]);
+
+                        foreach ($variantData['size'] as $key => $sizes) {
+                            PurchaseOrderVariantSize::create([
+                                'purchase_product_variant_id' => $purchaseOrderVariant->id,
+                                'size_id' => $key,
+                                'quantity' => $sizes,
+                            ]);
+                        }
                     }
                 }
-                
             }
         }
 
@@ -234,8 +243,15 @@ class PurchaseOrderController extends Controller
             'products.*.price.required' => 'The price is required for each product',
             'products.*.price.numeric' => 'The price must be a valid number',
             'products.*.price.between' => 'The price must be between 0 and 999,999.99',
-        ]);
 
+            'products.*.variants' => 'required|array|min:1',
+            'products.*.variants.*.supplier_color_code' => 'required|string',
+            'products.*.variants.*.supplier_color_name' => 'required|string',
+            'products.*.variants.*.color_id' => 'required|exists:colors,id',
+            'products.*.variants.*.size' => 'required|array|min:1',
+            'products.*.variants.*.size.*' => 'required|numeric|min:0',
+
+        ]);
 
         $purchaseOrder->update([
             'order_no' => $request->supplier_order_no,
@@ -243,7 +259,7 @@ class PurchaseOrderController extends Controller
             'delivery_date' => date('Y-m-d', strtotime($request->delivery_date)),
             'supplier_id' => $request->supplier,
         ]);
-    
+
         foreach ($request->products as $productData) {
             $productDetail = PurchaseOrderProduct::updateOrCreate(
                 [
@@ -260,29 +276,33 @@ class PurchaseOrderController extends Controller
                     'short_description' => $productData['short_description'],
                 ]
             );
-    
-            foreach ($productData['variants'] as $variantData) {
-                $purchaseOrderVariant = PurchaseOrderVariant::updateOrCreate(
-                    [
-                        'purchase_product_id' => $productDetail->id,
-                        'color_id' => $variantData['color_id'],
-                    ],
-                    [
-                        'supplier_color_code' => $variantData['supplier_color_code'],
-                        'supplier_color_name' => $variantData['supplier_color_name'],
-                    ]
-                );
-    
-                foreach ($variantData['size'] as $key => $sizes) {
-                    PurchaseOrderVariantSize::updateOrCreate(
+
+            if (isset($productData['variants']) && is_array($productData['variants'])) {
+                foreach ($productData['variants'] as $variantData) {
+                    $purchaseOrderVariant = PurchaseOrderVariant::updateOrCreate(
                         [
-                            'purchase_product_variant_id' => $purchaseOrderVariant->id,
-                            'size_id' => $key,
+                            'purchase_product_id' => $productDetail->id,
+                            'color_id' => $variantData['color_id'],
                         ],
                         [
-                            'quantity' => $sizes,
+                            'supplier_color_code' => $variantData['supplier_color_code'],
+                            'supplier_color_name' => $variantData['supplier_color_name'],
                         ]
                     );
+
+                    if (isset($variantData['size']) && is_array($variantData['size'])) {
+                        foreach ($variantData['size'] as $key => $sizes) {
+                            PurchaseOrderVariantSize::updateOrCreate(
+                                [
+                                    'purchase_product_variant_id' => $purchaseOrderVariant->id,
+                                    'size_id' => $key,
+                                ],
+                                [
+                                    'quantity' => $sizes,
+                                ]
+                            );
+                        }
+                    }
                 }
             }
         }
@@ -295,8 +315,11 @@ class PurchaseOrderController extends Controller
      */
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        //
+        $purchaseOrder->delete();
+
+        return redirect()->route('purchase-orders.index')->with('success', 'Purchase order deleted successfully.');
     }
+
 
     public function getSizeRange(Request $request)
     {

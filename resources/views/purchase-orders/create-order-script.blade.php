@@ -57,7 +57,7 @@
                             ${getErrorMessage(`products.${index}.delivery_date`) ? `<span class="invalid-feedback" style="display: block;">${getErrorMessage(`products.${index}.delivery_date`)}</span>` : ''}
                         </div>
                         <div class="col-sm-6 col-md-2 mb-3">
-                            <x-form-input name="products[${index}][price]" label="Price" placeholder="Enter Price"  required="true" class="${getErrorMessage(`products.${index}.price`) ? 'is-invalid' : ''}" />
+                            <x-form-input type="number" name="products[${index}][price]" label="Price" placeholder="Enter Price"  required="true" class="${getErrorMessage(`products.${index}.price`) ? 'is-invalid' : ''}" />
                             ${getErrorMessage(`products.${index}.price`) ? `<span class="invalid-feedback" style="display: block;">${getErrorMessage(`products.${index}.price`)}</span>` : ''}
                         </div>
                         <div class="col-sm-6 col-md-3 mb-3">

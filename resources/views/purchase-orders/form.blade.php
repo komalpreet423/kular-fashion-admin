@@ -99,7 +99,7 @@
             </div>
 
             <div class="col-sm-6 col-md-2 mb-3">
-                <x-form-input name="products[{{ $index }}][price]" label="Price" placeholder="Enter Price" value="{{ old('products.' . $index . '.price', $product->price) }}" required />
+                <x-form-input  type="number" name="products[{{ $index }}][price]" label="Price" placeholder="Enter Price" value="{{ old('products.' . $index . '.price', $product->price) }}" required />
             </div>
             <div class="col-sm-6 col-md-3 mb-3">
                 <x-form-input name="products[{{ $index }}][short_description]" label="Short Description" placeholder="Enter Short Description" value="{{ old('products.' . $index . '.short_description', $product->short_description) }}" required />
