@@ -75,7 +75,7 @@
             `;
             $('#product-fields-container').append(newField);
 
-            $('select.product-type-dropdown, select.size-scale-dropdown, select.min-size-dropdown, select.max-size-dropdown')
+            $('select.product-type-dropdown,select.size-scale-dropdown, select.min-size-dropdown, select.max-size-dropdown')
             .each(function() {
                 var $this = $(this);
 
@@ -96,7 +96,7 @@
         }
 
         $(function() {
-            $('#supplier, #color, #buy_x_products, [name="products[0][product_type]"], .min-size-dropdown, .max-size-dropdown, [name="products[0][name]')
+            $('#supplier, #brand, #color, #buy_x_products, [name="products[0][product_type]"], .min-size-dropdown, .max-size-dropdown, [name="products[0][name]')
             .each(function() {
                 var $this = $(this);
 
@@ -395,7 +395,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addVariantModalLabel">Add New Variant</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                {{-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> --}}
             </div>
             <div class="modal-body">
                 <input type="hidden" id="selected_product_index">
