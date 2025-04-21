@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
 use App\Models\Color;
@@ -23,7 +24,7 @@ class PurchaseOrderController extends Controller
      */
     public function index()
     {
-        $purchaseOrders = PurchaseOrder::with('supplier', 'purchaseOrderProduct')->get();
+        $purchaseOrders = PurchaseOrder::with('supplier', 'purchaseOrderProduct','brand')->get();
 
         return view('purchase-orders.index', compact('purchaseOrders'));
     }
@@ -37,8 +38,9 @@ class PurchaseOrderController extends Controller
         $colors = Color::where('status', 'Active')->get();
         $sizeScales = SizeScale::select('id', 'name')->where('status', 'Active')->latest()->with('sizes')->get();
         $productTypes = ProductType::where('status', 'Active')->whereNull('deleted_at')->latest()->get();
+        $brands = Brand::all();
 
-        return view('purchase-orders.create', compact('suppliers', 'colors', 'sizeScales', 'productTypes'));
+        return view('purchase-orders.create', compact('suppliers', 'colors', 'sizeScales', 'productTypes','brands'));
     }
 
     /**
@@ -51,6 +53,7 @@ class PurchaseOrderController extends Controller
             'supplier_order_date' => 'required|date',
             'delivery_date' => 'required|date',
             'supplier' => 'required|exists:suppliers,id',
+            'brand_id' => 'required|exists:brands,id',
 
             'products' => 'required|array|min:1',
             'products.*.product_code' => 'required|string|max:255',
@@ -118,6 +121,7 @@ class PurchaseOrderController extends Controller
             'supplier_order_date' => Carbon::createFromFormat('d-m-Y', $request->supplier_order_date),
             'delivery_date' => Carbon::createFromFormat('d-m-Y', $request->delivery_date),
             'supplier_id'   => $request->supplier,
+            'brand_id' => $request->brand_id,
         ]);
 
         if ($purchaseOrder) {
@@ -175,10 +179,11 @@ class PurchaseOrderController extends Controller
         $colors = Color::where('status', 'Active')->get();
         $sizeScales = SizeScale::select('id', 'name')->where('status', 'Active')->latest()->with('sizes')->get();
         $productTypes = ProductType::where('status', 'Active')->whereNull('deleted_at')->latest()->get();
+        $brands = Brand::all();
 
         $sizeScaleIds = $purchaseOrder->purchaseOrderProduct->pluck('size_scale_id')->unique();
         $sizes = Size::where('status', 'Active')->whereIn('size_scale_id', $sizeScaleIds)->orderBy('id', 'asc')->get();
-        return view('purchase-orders.edit', compact('suppliers', 'colors', 'sizeScales', 'productTypes', 'purchaseOrder', 'sizes'));
+        return view('purchase-orders.edit', compact('suppliers', 'colors', 'sizeScales', 'productTypes', 'purchaseOrder', 'sizes','brands'));
     }
 
     /**
@@ -191,6 +196,7 @@ class PurchaseOrderController extends Controller
             'supplier_order_date' => 'required|date',
             'delivery_date' => 'required|date',
             'supplier' => 'required|exists:suppliers,id',
+            'brand_id' => 'required|exists:brands,id',
 
             'products' => 'required|array|min:1',
             'products.*.product_code' => 'required|string|max:255',
@@ -258,6 +264,7 @@ class PurchaseOrderController extends Controller
             'supplier_order_date' => date('Y-m-d', strtotime($request->supplier_order_date)),
             'delivery_date' => date('Y-m-d', strtotime($request->delivery_date)),
             'supplier_id' => $request->supplier,
+            'brand_id' => $request->brand_id,
         ]);
 
         foreach ($request->products as $productData) {

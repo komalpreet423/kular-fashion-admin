@@ -20,6 +20,7 @@
                                 <tr>
                                     <th class="p-1">#</th>
                                     <th class="p-1">Order ID</th>
+                                    <th class="p-1">Brand Name</th>
                                     <th class="p-1">Supplier Name</th>
                                     <th class="p-1">Order Date</th>
                                     <th class="p-1">Delivery Date</th>
@@ -31,6 +32,7 @@
                                 <tr>
                                     <td>{{ $key+1 }}</td>
                                     <td>{{ $purchaseOrder->order_no }}</td>
+                                    <td>{{ $purchaseOrder->brand?->name ?? '-' }}</td>
                                     <td>{{ $purchaseOrder->supplier->supplier_name}}</td>
                                     <td>{{ $purchaseOrder->supplier_order_date }}</td>
                                     <td>{{ $purchaseOrder->delivery_date }}</td>
