@@ -22,6 +22,7 @@ use App\Models\SizeScale;
 use App\Models\StoreInventory;
 use App\Models\Tax;
 use App\Models\Tag;
+use DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -607,7 +608,7 @@ class ProductController extends Controller
                     });
             });
         }
-
+        
         // Sorting logic
         if ($request->has('order')) {
             $columns = [

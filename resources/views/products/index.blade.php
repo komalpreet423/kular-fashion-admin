@@ -181,7 +181,7 @@
                         }
                     }
                 ],
-                order: [[2, 'asc']], // Default sorting on Manufacture Code (3rd column)
+                order: [[3, 'asc']], // Default sorting on Manufacture Code (3rd column)
                 drawCallback: function(settings) {
                     let api = this.api();
                     $('#product-table th, #product-table td').addClass('p-1');
