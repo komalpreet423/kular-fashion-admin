@@ -170,8 +170,8 @@ class InventoryTransferController extends Controller
 
     public function inventoryHistory()
     {
-        $inventoryTransfer = InventoryTransfer::with('sentFrom', 'sentTo', 'sentBy')->get();
-       
+        $inventoryTransfer = InventoryTransfer::with('sentFrom', 'sentTo', 'sentBy')->orderBy('inventory_transfers.created_at', 'desc')->get();
+        
         return view('inventory-transfer.history', ['inventory_transfer' => $inventoryTransfer]);
     }
 

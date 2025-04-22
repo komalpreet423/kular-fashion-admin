@@ -65,7 +65,7 @@
                     targets: 0
                 }],
                 order: [
-                    [0, 'desc']
+                    [5, 'desc']
                 ],
                 drawCallback: function(settings) {
                     $('#datatable th, #datatable td').addClass('p-1');

@@ -262,10 +262,10 @@
                 success : function(resp){
                     if(resp.success){
                         $('#manufacture_err_code').text(resp.message).show();
-                        $('#first-submit').prop('disabled',true);
+                        // $('#first-submit').prop('disabled',true);
                     }else{
                         $('#manufacture_err_code').hide();
-                        $('#first-submit').prop('disabled',false);
+                        // $('#first-submit').prop('disabled',false);
                     }
                 },error : function(err){
                     console.log(err);
