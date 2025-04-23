@@ -610,22 +610,51 @@ class ProductController extends Controller
         }
         
         // Sorting logic
+        $columns = [
+            1 => 'article_code',
+            2 => 'manufacture_code',
+            3 => 'brands.name',
+            4 => 'product_types.name',
+            5 => 'departments.name',
+            6 => 'short_description',
+            7 => 'price',
+        ];
+        
+        // Define the default sorting order
+        $defaultOrder = [
+            'brands.name',
+            'product_types.name',
+            'short_description',
+            'price',
+        ];
+        
+        // Apply sorting based on request
         if ($request->has('order')) {
-            $columns = [
-                1 => 'article_code',
-                2 => 'manufacture_code',
-                3 => 'brands.name',
-                4 => 'product_types.name',
-                5 => 'departments.name',
-                6 => 'short_description',
-                7 => 'price',
-            ];
-    
             $orderColumnIndex = $request->input('order.0.column');
             $orderDirection = $request->input('order.0.dir', 'asc'); // 'asc' or 'desc'
-    
+        
             if (isset($columns[$orderColumnIndex])) {
-                $query->orderBy($columns[$orderColumnIndex], $orderDirection);
+                $primarySortColumn = $columns[$orderColumnIndex];
+        
+                // Apply primary sorting
+                $query->orderBy($primarySortColumn, $orderDirection);
+        
+                // Apply secondary sorting for the remaining columns
+                foreach ($defaultOrder as $column) {
+                    if ($column !== $primarySortColumn) {
+                        $query->orderBy($column, 'asc');
+                    }
+                }
+            } else {
+                // If the specified column index is not in the mapping, apply default sorting
+                foreach ($defaultOrder as $column) {
+                    $query->orderBy($column, 'asc');
+                }
+            }
+        } else {
+            // If no sorting is specified in the request, apply default sorting
+            foreach ($defaultOrder as $column) {
+                $query->orderBy($column, 'asc');
             }
         }
     
