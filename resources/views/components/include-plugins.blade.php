@@ -28,7 +28,13 @@
                     allowInput: true,
                     maxDate: "today"
                 });
-            })
+                flatpickr('.delivery-date-picker', {
+                    dateFormat: "d-m-Y",
+                    allowInput: true,
+                    minDate: "today",
+                    defaultDate: "today"
+                });
+            });
         </script>
     @endpush
 @endif

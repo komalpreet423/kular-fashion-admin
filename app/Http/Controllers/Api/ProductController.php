@@ -7,9 +7,11 @@ use App\Http\Resources\ProductListCollection;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Wishlist;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Auth;
 
 class ProductController extends Controller
 {
@@ -24,7 +26,8 @@ class ProductController extends Controller
                 'quantities',
                 'colors.colorDetail',
                 'sizes.sizeDetail',
-                'webInfo'
+                'webInfo',
+                'wishlist'
             ]);
 
             $query->where(function ($q) {
@@ -297,6 +300,15 @@ class ProductController extends Controller
                 ->where('slug', $slug)->first();
             if (!$product) {
                 return response()->json(['success' => false, 'error' => 'Product not found'], 404);
+            }else{
+                $checkWishlist = Wishlist::where('user_id', Auth::user()->id)->where('product_id', $product->id)->first();
+
+                if(!empty($checkWishlist))
+                {
+                    $product['is_favourite'] = true;
+                }else{                    
+                    $product['is_favourite'] = false;
+                }
             }
 
             $relatedProducts = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')

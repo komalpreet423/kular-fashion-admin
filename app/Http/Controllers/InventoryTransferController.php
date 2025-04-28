@@ -184,9 +184,9 @@ class InventoryTransferController extends Controller
             'sentTo', 
             'sentBy', 
             'inventoryItems',
-            'inventoryItems.product', 
-            'inventoryItems.productColor', 
-            'inventoryItems.productSize', 
+            'inventoryItems.product.productType', 
+            'inventoryItems.productColor.colorDetail', 
+            'inventoryItems.productSize.sizeDetail', 
             'inventoryItems.brand'
         )->findOrFail($id);
         return view('inventory-transfer.show', compact('inventoryTransfer'));

@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Product;
+use App\Models\Wishlist;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ProductListCollection;
 
 class CartController extends Controller
 {
@@ -15,7 +18,7 @@ class CartController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'variant_id' => 'required|exists:product_quantities,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer',
             'user_id' => 'required|exists:users,id',
         ]);
 
@@ -61,7 +64,7 @@ class CartController extends Controller
     public function viewCart(Request $request)
     {
         $cart = Cart::where('user_id', Auth::id())
-            ->with('cartItems.variant', 'cartItems.user')
+            ->with('cartItems.user', 'cartItems.variant.product.webImage', 'cartItems.variant.product.brand', 'cartItems.variant.sizes', 'cartItems.variant.colors')
             ->first();
 
         if (!$cart || $cart->cartItems->isEmpty()) {
@@ -83,4 +86,60 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Cart cleared successfully']);
     }
+
+    public function addToWishlist(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $productExists = Product::where('id', $request->product_id)->first();
+
+        if(!empty($productExists))
+        {
+            $productInWishlist = Wishlist::where('user_id', Auth::user()->id)->where('product_id', $request->product_id)->first();
+
+            if(!empty($productInWishlist))
+            {
+                Wishlist::where('user_id', Auth::user()->id)->where('product_id', $request->product_id)->delete();
+
+                return response()->json(['message' => 'Product removed from wishlist.'], 201);
+            }else{
+                Wishlist::create(
+                    ['user_id' => Auth::user()->id, 'product_id' => $request->product_id]
+                );
+
+                return response()->json(['message' => 'Product added to wishlist.'], 201);
+            }
+        }else{
+            return response()->json(['message' => 'Product not exists'], 422);
+        }
+    }
+
+    public function getWishlistProducts(Request $request)
+    {
+        $wishlist = Wishlist::where('user_id', Auth::id())
+            ->with('product.brand', 'product.webImage')
+            ->get();
+            
+        if ($wishlist->isEmpty()) {
+            return response()->json(['message' => 'Wishlist is empty'], 200);
+        }
+
+        $wishlistProducts = $wishlist->map(function($item) {
+            $product = $item->product;
+            $product->is_favourite = true;
+
+            return $product;
+        });
+
+        $wishlistCollection = new ProductListCollection($wishlistProducts);
+
+        return response()->json(['wishlist' => $wishlistCollection]);
+    }
+
 }

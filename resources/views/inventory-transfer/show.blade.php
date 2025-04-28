@@ -39,11 +39,12 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Article Code</th>
-                                        <th>Manufacture Code</th>
                                         <th>Brand</th>
+                                        <th>Product Type</th>
                                         <th>Color</th>
                                         <th>Size</th>
                                         <th>Short Description</th>
+                                        <th>Manufacture Code</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -52,11 +53,12 @@
                                             <tr>
                                                 <td>{{ ++$key }}</td>
                                                 <td>{{ $item->product->article_code ?? 'N/A' }}</td>
-                                                <td>{{ $item->product->manufacture_code ?? 'N/A' }}</td>
                                                 <td>{{ $item->brand->name ?? 'N/A' }}</td>
-                                                <td>{{ $item->productColor->name ?? 'N/A' }}</td>
-                                                <td>{{ $item->productSize->size ?? 'N/A' }}</td>
+                                                <td>{{ $item->product->productType->name ?? 'N/A' }}</td>
+                                                <td>{{ $item->productColor->colorDetail->name ?? 'N/A' }}</td>
+                                                <td>{{ $item->productSize->sizeDetail->size ?? 'N/A' }}</td>
                                                 <td>{{ $item->product->short_description ?? 'N/A' }}</td>
+                                                <td>{{ $item->product->manufacture_code ?? 'N/A' }}</td>
                                             </tr>
                                         @endfor
                                     @endforeach
