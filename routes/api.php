@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\CollectionController as CollectionApiController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\GiftCardController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,10 +42,17 @@ Route::post('/apply-coupon', [CouponController::class, 'applyCoupon']);
 
 Route::post('/gift-cards/create', [GiftCardController::class, 'createGiftCard']);
 Route::get('/gift-cards', [GiftCardController::class, 'getGiftCards']);
-Route::post('/gift-cards/get', [GiftCardController::class, 'getGiftCard']); 
+Route::post('/gift-cards/get', [GiftCardController::class, 'getGiftCard']);
 Route::post('/gift-cards/redeem', [GiftCardController::class, 'redeemGiftCard']);
 Route::post('/gift-cards/delete', [GiftCardController::class, 'deleteGiftCard']);
 Route::get('/menus', [MenuController::class, 'index']);
+
+
+
+Route::get('/web-configuration', [SettingsController::class, 'webConfiguration']);
+Route::get('/shipping-methods', [SettingsController::class, 'shippingMethods']);
+Route::get('/payment-methods', [SettingsController::class, 'paymentMethods']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/addresses/create', [UserAddressController::class, 'store']);

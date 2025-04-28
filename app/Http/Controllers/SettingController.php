@@ -60,7 +60,7 @@ class SettingController extends Controller
 
     public function generalSettingStore(Request $request)
     {
- 
+
         $datas = $request->all();
         $skippedArray = array_slice($datas, 1, null, true);
 
@@ -101,7 +101,7 @@ class SettingController extends Controller
 
         foreach ($web_settings as $settingKey) {
             $oldImagePath = setting($settingKey);
-           
+
             if ($request->hasFile($settingKey)) {
                 $newImageName = uploadFile($request->file($settingKey), 'uploads/default-images/');
                 $fullOldImagePath = public_path($oldImagePath);
@@ -130,7 +130,7 @@ class SettingController extends Controller
         $rules = [
             $method . '_status' => 'required|boolean'
         ];
-        
+
         if ($method === 'apple_pay') {
             $rules[$method . '_merchant_identifier'] = 'required|string';
             $rules[$method . '_merchant_name'] = 'required|string';
@@ -187,13 +187,13 @@ class SettingController extends Controller
                 if (setting($key) && File::exists(public_path(setting($key)))) {
                     File::delete(public_path(setting($key)));
                 }
-                
+
                 Setting::updateOrCreate(['key' => $key], ['value' => $filePath]);
             } else {
                 if (strpos($key, '_merchant') !== false || strpos($key, '_password') !== false || strpos($key, '_id') !== false || strpos($key, '_key') !== false || strpos($key, '_secret') !== false) {
                     $value = encryptData($value);
                 }
-                
+
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             }
         }
@@ -207,7 +207,7 @@ class SettingController extends Controller
 
     public function shippingMethodUpdate(Request $request, $method){
         $rules = [
-            $method . '_api_endpoint' => 'required|url', 
+            $method . '_api_endpoint' => 'required|url',
             $method . '_status' => 'required|boolean'
         ];
 
@@ -227,10 +227,10 @@ class SettingController extends Controller
             if($key === 'royal_mail_api_key' || $key === 'dpd_api_token'){
                 $value = encryptData($value);
             }
-
+            
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
-        
+
         return redirect()->back()->with('success', 'Shipping method settings updated successfully')->with('method', $method);
     }
 }
