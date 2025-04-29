@@ -105,7 +105,7 @@
             </div>
 
             <div class="col-sm-6 col-md-2">
-                <x-form-input name="products[{{ $index }}][delivery_date]" label="Delivery Date" class="date-picker" placeholder="Enter Delivery Date" value="{{ old('products.' . $index . '.delivery_date', $product->delivery_date) }}" required />
+                <x-form-input name="products[{{ $index }}][delivery_date]" label="Delivery Date" class="delivery-date-picker" placeholder="Enter Delivery Date" value="{{ old('products.' . $index . '.delivery_date', $product->delivery_date) }}" required />
             </div>
 
             <div class="col-sm-6 col-md-2 mb-3">
@@ -241,7 +241,7 @@
                 @enderror
             </div>
             <div class="col-sm-6 col-md-2">
-                <x-form-input name="products[0][delivery_date]" label="Delivery Date" class="date-picker" placeholder="Enter Delivery Date" required />
+                <x-form-input name="products[0][delivery_date]" label="Delivery Date" class="delivery-date-picker" placeholder="Enter Delivery Date" required />
             </div>
             <div class="col-sm-6 col-md-2 mb-3">
                 <x-form-input name="products[0][price]" label="Price" placeholder="Enter Price" required />
