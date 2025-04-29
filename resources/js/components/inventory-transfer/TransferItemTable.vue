@@ -6,10 +6,13 @@
                 <tr>
                     <th class="align-middle p-2">#</th>
                     <th class="align-middle p-2">Article Code</th>
-                    <th class="align-middle p-2">Description</th>
+                    <th class="align-middle p-2">Brand</th>
+                    <th class="align-middle p-2">Product Type</th>
+                    <th class="align-middle p-2">Department</th>
+                    <th class="align-middle p-2">Short Description</th>
                     <th class="align-middle p-2">Color</th>
                     <th class="align-middle p-2">Size</th>
-                    <th class="align-middle p-2">Brand</th>
+                    <th class="align-middle p-2">Manufacture Code</th>
                     <th class="align-middle p-2">Price</th>
                     <th class="align-middle p-2">Action</th>
                 </tr>
@@ -19,10 +22,13 @@
                 <tr v-for="(item, index) in items" :key="item.code" :class="index % 2 === 0 ? 'even' : 'odd'">
                     <td class="p-1">{{ items.length - index }}</td>
                     <td class="p-1">{{ item.code }}</td>
+                    <td class="p-1">{{ item.brand }}</td>
+                    <td class="p-1">{{ item.type }}</td>
+                    <td class="p-1">{{ item.department }}</td>
                     <td class="p-1">{{ item.description }}</td>
                     <td class="p-1">{{ item.color }}</td>
                     <td class="p-1">{{ item.size }}</td>
-                    <td class="p-1">{{ item.brand }}</td>
+                    <td class="p-1">{{ item.manufacture_code }}</td>
                     <td class="p-1">{{ item.price }}</td>
                     <td class="p-1">
                         <button class="btn btn-danger btn-sm  py-0 px-1" @click="deleteItem(index)">
