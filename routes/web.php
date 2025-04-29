@@ -32,6 +32,7 @@ use App\Http\Controllers\CouponDiscountController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PickListController;
+use App\Http\Controllers\WebPagesController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -70,7 +71,9 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'pick-list' => PickListController::class,
         'best-brands-overall' => BestBrandOverallController::class,
         'best-brands-per-product-type' => BestBrandsPerProductTypeController::class,
-        'weekely-turnover' => WeekelyTurnoverController::class
+        'weekely-turnover' => WeekelyTurnoverController::class,
+        'webpages'=>WebPagesController::class,
+
     ]);
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');
@@ -152,3 +155,5 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/best-brands-per-product-type/filter', [BestBrandsPerProductTypeController::class, 'filterData'])->name('best.brands.per.product.type.filter');
     Route::post('/weekely-turnover/filter', [WeekelyTurnoverController::class, 'filterData'])->name('weekely-turnover.filter');
 });
+
+
