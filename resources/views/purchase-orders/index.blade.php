@@ -80,6 +80,24 @@
                 }
             });
         });
+
+        $('#datatable').DataTable({
+                    columnDefs: [{
+                        type: 'string',
+                        targets: 1
+                    }],
+                    order: [
+                        [1, 'asc']
+                    ],
+                    drawCallback: function(settings) {
+                        $('#datatable th, #datatable td').addClass('p-0');
+                    }
+                });
     });
+
+
+
+
+
 </script>
 @endpush

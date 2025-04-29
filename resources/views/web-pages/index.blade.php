@@ -26,9 +26,7 @@
                                             <th>Page Title</th>
 
 
-                                            @canany(['edit collections', 'delete collections'])
                                                 <th>Action</th>
-                                            @endcanany
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -36,24 +34,18 @@
                                             <tr>
                                                 <td>{{ ++$key }}</td>
                                                 <td>{{ ucwords($webPage->page_title) }}</td>
-                                                
-                                                @canany(['edit collections', 'delete collections'])
+
                                                 <td>
-                                                    @can('edit collections')
                                                         <a href="{{ route('webpages.edit', $webPage->id) }}"
                                                            class="btn btn-primary btn-sm edit py-0 px-1">
                                                             <i class="fas fa-pencil-alt"></i>
                                                         </a>
-                                                    @endcan
-                                                    @can('delete collections')
                                                         <button data-source="Web Page"
                                                                 data-endpoint="{{ route('webpages.destroy', $webPage->id) }}"
                                                                 class="delete-btn btn btn-danger btn-sm edit py-0 px-1">
                                                             <i class="fas fa-trash-alt"></i>
                                                         </button>
-                                                    @endcan
                                                 </td>
-                                            @endcanany
                                             </tr>
                                         @endforeach
                                     </tbody>
