@@ -76,11 +76,11 @@
                                         </th>
                                         <th>#</th>
                                         <th>Article Code</th>
-                                        <th>Manufacture Code</th>
                                         <th>Product Type</th>
                                         <th>Brand</th>
                                         <th>Department</th>
                                         <th>Description</th>
+                                        <th>Manufacture Code</th>
                                         <th>Price</th>
                                     </tr>
                                 </thead>
@@ -140,11 +140,11 @@
                         orderable: false
                     },
                     { title: "Article Code", data: 'article_code' },
-                    { title: "Manufacture Code", data: 'manufacture_code' },
                     { title: "Brand", data: 'brand.name' },
                     { title: "Product Type", data: 'product_type.name' },
                     { title: "Department", data: 'department.name' },
                     { title: "Short Description", data: 'short_description' },
+                    { title: "Manufacture Code", data: 'manufacture_code' },
                     { title: "Price", data: 'price' },
                     {
                         title: "Actions",
