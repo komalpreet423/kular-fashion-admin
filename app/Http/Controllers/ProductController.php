@@ -455,7 +455,6 @@ class ProductController extends Controller
         $branches = Branch::with(['inventory' => function ($query) use ($product) {
             $query->where('product_id', $product->id);
         }])->get();
-        
         return view('products.show', compact('product', 'branches'));
     }
 
@@ -1104,7 +1103,7 @@ class ProductController extends Controller
     public function productValidate(Request $request, $barcode)
     {
         $fromStoreId = (int) ($request->from ?? 1);
-        $products = ProductQuantity::with('product', 'product.brand', 'product.department', 'sizes.sizeDetail', 'colors.colorDetail')->get();
+        $products = ProductQuantity::with('product', 'product.brand', 'product.department', 'product.productType', 'sizes.sizeDetail', 'colors.colorDetail')->get();
 
         foreach ($products as $product) {
             if (is_null($product->product)) {
@@ -1138,6 +1137,7 @@ class ProductController extends Controller
                     'product_id' => $product->product->id,
                     'code' => $product->product->article_code,
                     'description' => $product->product->short_description,
+                    'type' => $product->product->productType->name,
                     'product_quantity_id' => $product->id,
                     'color' => $product->colors->colorDetail->name,
                     'color_id' => $product->colors->colorDetail->id,
@@ -1148,6 +1148,8 @@ class ProductController extends Controller
                     'price' => (float) $product->sizes->mrp,
                     'available_quantity' => $availableQuantity,
                     'manufacture_barcode' => $product->manufacture_barcode,
+                    'manufacture_code' => $product->product->manufacture_code,
+                    'department' => $product->product->department->name,
                     'barcode' => $barcode,
                 ];
 

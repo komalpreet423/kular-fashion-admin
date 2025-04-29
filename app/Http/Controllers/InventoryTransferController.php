@@ -189,6 +189,7 @@ class InventoryTransferController extends Controller
             'inventoryItems.productSize.sizeDetail', 
             'inventoryItems.brand'
         )->findOrFail($id);
+        
         return view('inventory-transfer.show', compact('inventoryTransfer'));
     }
 }
