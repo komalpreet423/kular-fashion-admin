@@ -7,6 +7,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use App\Models\ProductType;
+use Auth;
 
 class Product extends Model
 {
@@ -113,5 +114,10 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class, 'product_id');
+    }
+
+    public function wishlist()
+    {
+        return $this->hasOne(Wishlist::class, 'product_id');
     }
 }

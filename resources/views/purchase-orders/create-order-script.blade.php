@@ -53,7 +53,7 @@
                             ${getErrorMessage(`products.${index}.max_size`) ? `<span class="invalid-feedback" style="display: block;">${getErrorMessage(`products.${index}.max_size`)}</span>` : ''}
                         </div>
                         <div class="col-sm-6 col-md-2 mb-3">
-                            <x-form-input name="products[${index}][delivery_date]" label="Delivery Date" class="date-picker  ${getErrorMessage(`products.${index}.delivery_date`) ? 'is-invalid' : ''}" placeholder="Enter Delivery Date"  required="true" />
+                            <x-form-input name="products[${index}][delivery_date]" label="Delivery Date" class="delivery-date-picker  ${getErrorMessage(`products.${index}.delivery_date`) ? 'is-invalid' : ''}" placeholder="Enter Delivery Date"  required="true" />
                             ${getErrorMessage(`products.${index}.delivery_date`) ? `<span class="invalid-feedback" style="display: block;">${getErrorMessage(`products.${index}.delivery_date`)}</span>` : ''}
                         </div>
                         <div class="col-sm-6 col-md-2 mb-3">
@@ -88,10 +88,11 @@
                 }
             });
 
-            flatpickr('.date-picker', {
+            flatpickr('.delivery-date-picker', {
                     dateFormat: "d-m-Y",
                     allowInput: true,
-                    maxDate: "today"
+                    minDate: "today",
+                    defaultDate: "today"
                 });
         }
 

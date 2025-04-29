@@ -84,6 +84,7 @@ class ProductListCollection extends ResourceCollection
                         ]
                     ];
                 }),
+                'is_favourite' => $product->wishlist ? true : false,
             ];
         });
     }

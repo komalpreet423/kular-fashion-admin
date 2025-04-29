@@ -70,3 +70,9 @@ Route::middleware('auth:sanctum')->prefix('cart')->group(function () {
     Route::delete('/remove/{id}', [CartController::class, 'removeItem']);
     Route::delete('/clear', [CartController::class, 'clearCart']);
 });
+
+
+Route::middleware('auth:sanctum')->prefix('wishlist')->group(function () {
+    Route::post('/add', [CartController::class, 'addToWishlist']);
+    Route::get('/show', [CartController::class, 'getWishlistProducts']);
+});

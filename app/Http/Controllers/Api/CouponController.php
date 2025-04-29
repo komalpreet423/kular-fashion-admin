@@ -28,7 +28,7 @@ class CouponController extends Controller
         $coupon = Coupon::where('code', $request->coupon)
                         ->where(function ($query) use ($currentDateTime) {
                             $query->whereNotNull('start_date')
-                                  ->whereDate('start_date', '>=', $currentDateTime);
+                                  ->whereDate('start_date', '<=', $currentDateTime);
                         })
                         ->where(function ($query) use ($currentDateTime) {
                             $query->whereNotNull('expire_date')

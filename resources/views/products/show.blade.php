@@ -208,14 +208,15 @@
                         <table class="table mb-0 table-bordered table-sm">
                             <tbody>
                                 <tr>
+                                    <th scope="row" style="width: 180px;">Size</th>
                                     @foreach ($product->sizes as $size)
                                     <th>{{ $size->sizeDetail->size }}</th>
                                     @endforeach
-                                    <th scope="row">Size</th>
                                 </tr>
 
                                 @foreach ($branches as $branch)
                                 <tr>
+                                    <th class="d-flex align-items-center" style="width: 180px;">{{ $branch->name }}</th>
                                     @foreach ($product->sizes as $size)
                                     <td>
                                         @if ($branch->id === 1)
@@ -225,14 +226,13 @@
                                         @endif
                                     </td>
                                     @endforeach
-                                    <th class="d-flex align-items-center">{{ $branch->name }}</th>
                                 </tr>
                                 @endforeach
                                 <tr>
+                                    <th class="text-success" style="width: 180px;">Goods In</th>
                                     @foreach ($product->sizes as $size)
                                     <td>{{ $size->totalQuantity($color->id) }}</td>
                                     @endforeach
-                                    <th class="text-success">Goods In</th>
                                 </tr>
                             </tbody>
                         </table>
@@ -248,7 +248,7 @@
                         <table class="table mb-0 table-bordered table-sm">
                             <tbody>
                                 <tr>
-                                    <th scope="row">Size</th>
+                                    <th scope="row" style="width: 180px;">Size</th>
                                     @foreach ($product->sizes as $size)
                                     <th>{{ $size->sizeDetail->size }}</th>
                                     @endforeach
@@ -256,7 +256,7 @@
 
                                 @foreach ($product->colors as $color)
                                 <tr>
-                                    <th class="d-flex align-items-center">
+                                    <th class="d-flex align-items-center" style="width: 180px;">
 
                                         <h6 class="m-0">{{ $color->colorDetail->name }} ({{ $color->colorDetail->code }})</h6>
                                         {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}; width: 20px; height: 20px; border-radius: 4px;"> --}}
@@ -290,7 +290,7 @@
                             <table class="table mb-0 table-bordered table-sm">
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Size</th>
+                                        <th scope="row" style="width: 180px;">Size</th>
                                         @foreach ($product->sizes as $size)
                                         <th>{{ $size->sizeDetail->size }}</th>
                                         @endforeach
@@ -298,7 +298,7 @@
 
                                     @foreach ($product->colors as $color)
                                     <tr>
-                                        <th class="d-flex align-items-center">
+                                        <th class="d-flex align-items-center" style="width: 180px;">
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
                                             {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}"> --}}

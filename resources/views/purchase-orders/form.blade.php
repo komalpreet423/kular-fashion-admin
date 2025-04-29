@@ -6,7 +6,7 @@
         <x-form-input name="supplier_order_date" class="date-picker" value="{{ $purchaseOrder->supplier_order_date ?? '' }}" label="Supplier Order Date" placeholder="Supplier Order Date" required="true" />
     </div>
     <div class="col-sm-6 col-md-2 mb-3">
-        <x-form-input name="delivery_date" class="date-picker" label="Delivery Date" placeholder="Delivery Date" value="{{ $purchaseOrder->delivery_date ?? '' }}" required="true" />
+        <x-form-input name="delivery_date" class="delivery-date-picker" label="Delivery Date" placeholder="Delivery Date" value="{{ $purchaseOrder->delivery_date ?? '' }}" required="true" />
     </div>
 
     <div class="col-sm-6 col-md-2 mb-3">
