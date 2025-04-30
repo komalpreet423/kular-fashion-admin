@@ -48,6 +48,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view settings', 'create settings', 'edit settings', 'delete settings',
             'view tax', 'create tax', 'edit tax', 'delete tax',
             'view role', 'create role', 'edit role', 'delete role',
+            'view webpages', 'create webpages', 'edit webpages', 'delete webpages'
         ];
 
         foreach ($permissions as $permission) {
