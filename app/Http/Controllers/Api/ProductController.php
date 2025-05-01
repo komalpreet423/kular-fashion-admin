@@ -298,18 +298,6 @@ class ProductController extends Controller
         try {
             $product = Product::with('brand', 'department', 'quantities', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
                 ->where('slug', $slug)->first();
-            if (!$product) {
-                return response()->json(['success' => false, 'error' => 'Product not found'], 404);
-            }else{
-                $checkWishlist = Wishlist::where('user_id', Auth::user()->id)->where('product_id', $product->id)->first();
-
-                if(!empty($checkWishlist))
-                {
-                    $product['is_favourite'] = true;
-                }else{                    
-                    $product['is_favourite'] = false;
-                }
-            }
 
             $relatedProducts = Product::with('brand', 'department', 'webInfo', 'webImage', 'specifications', 'productType', 'colors.colorDetail', 'sizes.sizeDetail')
                 ->where('product_type_id', $product->product_type_id)

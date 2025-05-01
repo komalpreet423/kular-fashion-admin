@@ -72,7 +72,7 @@ Route::middleware('auth:sanctum')->prefix('cart')->group(function () {
 });
 
 
-Route::middleware('auth:sanctum')->prefix('wishlist')->group(function () {
+Route::prefix('wishlist')->group(function () {
     Route::post('/add', [CartController::class, 'addToWishlist']);
     Route::get('/show', [CartController::class, 'getWishlistProducts']);
 });

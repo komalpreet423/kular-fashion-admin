@@ -38,14 +38,11 @@
                 </div>
                 <div class="col-md-4 value-container free_shipping">
                     <label for="shipping_methods">Shipping Methods<span class="text-danger">*</span></label>
-                    <select name="shipping_methods[]" id="shipping_methods" @class([
-                        'form-control',
-                        'is-invalid' => $errors->has('shipping_methods'),
-                    ]) multiple>
+                    <select name="shipping_methods[]" id="shipping_methods" @class(['form-control','is-invalid' => $errors->has('shipping_methods'),]) multiple>
                         <option value="" disabled>Select Shipping Methods</option>
-                        <option value="royal_mail" @selected(in_array('royal_mail', old('shipping_methods', isset($coupon) && is_string($coupon->shipping_methods) ? json_decode($coupon->shipping_methods, true) : $coupon->shipping_methods ?? [])))>Royal Mail</option>
-                        <option value="dpd" @selected(in_array('dpd', old('shipping_methods', isset($coupon) && is_string($coupon->shipping_methods) ? json_decode($coupon->shipping_methods, true) : $coupon->shipping_methods ?? [])))>DPD</option>
-                        <option value="click_collect" @selected(in_array('click_collect', old('shipping_methods', isset($coupon) && is_string($coupon->shipping_methods) ? json_decode($coupon->shipping_methods, true) : $coupon->shipping_methods ?? [])))>Click & Collect</option>
+                        <option value="royal_mail"@selected(in_array('royal_mail', old('shipping_methods', is_string($coupon->shipping_methods ?? null) ? json_decode($coupon->shipping_methods, true) ?? [] : ($coupon->shipping_methods ?? []))))>Royal Mail</option>
+                        <option value="dpd"@selected(in_array('dpd',old('shipping_methods',isset($coupon) && is_string($coupon->shipping_methods)? (json_decode($coupon->shipping_methods, true) ?? []): ($coupon->shipping_methods ?? []))))>DPD</option>
+                        <option value="click_collect"@selected(in_array('click_collect',old('shipping_methods',isset($coupon) && is_string($coupon->shipping_methods)? (json_decode($coupon->shipping_methods, true) ?? []): ($coupon->shipping_methods ?? []))))>Click & Collect</option>
                     </select>
                     @error('shipping_methods')
                         <span class="invalid-feedback">{{ $message }}</span>

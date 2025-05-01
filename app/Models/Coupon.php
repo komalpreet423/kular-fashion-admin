@@ -9,4 +9,9 @@ class Coupon extends Model
 {
     use SoftDeletes;
     protected $guarded=[];
+
+    public function couponUsagePerCustomer()
+    {
+        return $this->hasMany(CouponUsagePerCustomer::class, 'coupon_id');
+    }
 }
