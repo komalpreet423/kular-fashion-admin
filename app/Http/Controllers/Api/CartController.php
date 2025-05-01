@@ -68,7 +68,7 @@ class CartController extends Controller
             ->first();
 
         if (!$cart || $cart->cartItems->isEmpty()) {
-            return response()->json(['message' => 'Cart is empty'], 404);
+            return response()->json(['message' => 'Cart is empty'], 201);
         }
 
         return response()->json(['cart' => $cart]);
@@ -79,7 +79,7 @@ class CartController extends Controller
         $cart = Cart::where('user_id', $request->user()->id)->first();
 
         if (!$cart) {
-            return response()->json(['message' => 'Cart not found'], 404);
+            return response()->json(['message' => 'Cart not found'], 201);
         }
 
         CartItem::where('cart_id', $cart->id)->delete();
@@ -90,6 +90,7 @@ class CartController extends Controller
     public function addToWishlist(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
             'product_id' => 'required',
         ]);
 
@@ -101,19 +102,53 @@ class CartController extends Controller
 
         if(!empty($productExists))
         {
-            $productInWishlist = Wishlist::where('user_id', Auth::user()->id)->where('product_id', $request->product_id)->first();
+            $productInWishlist = Wishlist::where('user_id', $request->user_id)->where('product_id', $request->product_id)->first();
 
             if(!empty($productInWishlist))
             {
-                Wishlist::where('user_id', Auth::user()->id)->where('product_id', $request->product_id)->delete();
+                Wishlist::where('user_id', $request->user_id)->where('product_id', $request->product_id)->delete();
 
-                return response()->json(['message' => 'Product removed from wishlist.'], 201);
+                $wishlist = Wishlist::where('user_id', $request->user_id)
+                ->with('product.brand', 'product.webImage')
+                ->get();
+
+                if ($wishlist->isEmpty()) {
+                    return response()->json(['message' => 'Product removed from wishlist.'], 200);
+                }
+        
+                $wishlistProducts = $wishlist->map(function($item) {
+                    $product = $item->product;
+                    $product->is_favourite = true;
+        
+                    return $product;
+                });
+        
+                $wishlistCollection = new ProductListCollection($wishlistProducts);
+
+                return response()->json(['message' => 'Product removed from wishlist.', 'wishlist' => $wishlistCollection], 201);
             }else{
                 Wishlist::create(
-                    ['user_id' => Auth::user()->id, 'product_id' => $request->product_id]
+                    ['user_id' => $request->user_id, 'product_id' => $request->product_id]
                 );
 
-                return response()->json(['message' => 'Product added to wishlist.'], 201);
+                $wishlist = Wishlist::where('user_id', $request->user_id)
+                ->with('product.brand', 'product.webImage')
+                ->get();
+
+                if ($wishlist->isEmpty()) {
+                    return response()->json(['message' => 'Product added to wishlist.'], 200);
+                }
+        
+                $wishlistProducts = $wishlist->map(function($item) {
+                    $product = $item->product;
+                    $product->is_favourite = true;
+        
+                    return $product;
+                });
+        
+                $wishlistCollection = new ProductListCollection($wishlistProducts);
+
+                return response()->json(['message' => 'Product added to wishlist.', 'wishlist' => $wishlistCollection], 201);
             }
         }else{
             return response()->json(['message' => 'Product not exists'], 422);
@@ -122,24 +157,31 @@ class CartController extends Controller
 
     public function getWishlistProducts(Request $request)
     {
-        $wishlist = Wishlist::where('user_id', Auth::id())
-            ->with('product.brand', 'product.webImage')
-            ->get();
-            
-        if ($wishlist->isEmpty()) {
-            return response()->json(['message' => 'Wishlist is empty'], 200);
+        $user_id = !empty($request->user_id) ? $request->user_id : null;
+
+        if(!empty($user_id))
+        {
+            $wishlist = Wishlist::where('user_id', $user_id)
+                ->with('product.brand', 'product.webImage')
+                ->get();
+                
+            if ($wishlist->isEmpty()) {
+                return response()->json(['message' => 'Wishlist is empty'], 200);
+            }
+    
+            $wishlistProducts = $wishlist->map(function($item) {
+                $product = $item->product;
+                $product->is_favourite = true;
+    
+                return $product;
+            });
+    
+            $wishlistCollection = new ProductListCollection($wishlistProducts);
+    
+            return response()->json(['wishlist' => $wishlistCollection]);
+        }else{
+            return response()->json(['message' => 'Unable to find user id'], 200);
         }
-
-        $wishlistProducts = $wishlist->map(function($item) {
-            $product = $item->product;
-            $product->is_favourite = true;
-
-            return $product;
-        });
-
-        $wishlistCollection = new ProductListCollection($wishlistProducts);
-
-        return response()->json(['wishlist' => $wishlistCollection]);
     }
 
 }
