@@ -102,7 +102,7 @@ class CouponController extends Controller
             [
                 "code" => $request->code,
                 "type" => $request->type,
-                'value' => $request->status,
+                'value' => $request->value,
                 "shipping_methods" => json_encode($request->shipping_methods),
                 "buy_x_product_ids" => json_encode($request->buy_x_products),
                 "get_y_product_ids" => json_encode($request->buy_y_products),
@@ -217,12 +217,11 @@ class CouponController extends Controller
 
             $imagePath = uploadFile($request->file('image'), 'uploads/coupons/');
         }
-
         $coupon->update(
             [
                 "code" => $request->code,
                 "type" => $request->type,
-                'value' => $request->status,
+                'value' => $request->value,
                 "shipping_methods" => json_encode($request->shipping_methods),
                 "buy_x_product_ids" => json_encode($request->buy_x_products),
                 "get_y_product_ids" => json_encode($request->buy_y_products),
