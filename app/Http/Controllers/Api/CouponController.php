@@ -49,7 +49,7 @@ class CouponController extends Controller
 
             $currentDateTime = Carbon::now();
 
-            $coupon = Coupon::where('code', $request->coupon)
+            $coupon = Coupon::whereRaw('BINARY `code` = ?', [$request->coupon])
                 ->where(function ($query) use ($currentDateTime) {
                     $query->whereNotNull('start_date')
                         ->whereDate('start_date', '<=', $currentDateTime);
@@ -244,7 +244,7 @@ class CouponController extends Controller
 
                 $currentDateTime = Carbon::now();
     
-                $coupon = Coupon::where('code', $request->coupon)
+                $coupon = Coupon::whereRaw('BINARY `code` = ?', [$request->coupon])
                     ->where(function ($query) use ($currentDateTime) {
                         $query->whereNotNull('start_date')
                             ->whereDate('start_date', '<=', $currentDateTime);
