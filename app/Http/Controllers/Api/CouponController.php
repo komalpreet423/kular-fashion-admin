@@ -10,6 +10,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Coupon;
 use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\ProductQuantity;
 use App\Models\CouponUsagePerCustomer;
 use Exception;
 
@@ -18,7 +20,7 @@ class CouponController extends Controller
     public function applyCoupon(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'coupon' => 'required||exists:coupons,code',
+            'coupon' => 'required',
         ]);
     
         if ($validator->fails()) {
@@ -62,15 +64,15 @@ class CouponController extends Controller
             if (!empty($coupon)) {
 
                 if ($coupon->min_spend > $total_of_cart_items) {
-                    return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of more than ' . $total_of_cart_items . ' only!' ], 201);
+                    return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of more than ' . $coupon->min_spend . ' only!' ], 201);
                 }
 
                 if ($coupon->max_spend < $total_of_cart_items) {
-                    return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of less than ' . $total_of_cart_items . ' only!' ], 201);
+                    return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of less than ' . $coupon->max_spend . ' only!' ], 201);
                 }
 
                 if ($coupon->usage_limit_total == 1 && $coupon->usage_total_limit_used >= $coupon->usage_limit_total_value) {
-                    return response()->json(['success' => false,  'message' => 'Coupon is expired' ], 400);
+                    return response()->json(['success' => false,  'message' => 'Coupon is expired' ], 201);
                 }
 
                 if ($coupon->usage_limit_per_customer == 1 && $coupon->usage_limit_per_customer_value > 0) {
@@ -188,22 +190,58 @@ class CouponController extends Controller
                     $final_price = max(0, $discounted_total);
                 }
 
+                Cart::where('id', $cart->id)->update(['coupon_id' => $coupon->id]);
+
                 return response()->json([
                     'success' => true,
-                    'original_total' => $total_of_cart_items,
-                    'eligible_total' => $filtered_total,
-                    'final_price' => round($final_price, 2),
+                    'original_total' => number_format($total_of_cart_items, 2, '.', ''),
+                    'eligible_total' => number_format($filtered_total, 2, '.', ''),
+                    'final_price' => number_format($final_price, 2, '.', ''),
+                    'discount' => number_format($discount, 2, '.', ''),
                     'message' => 'Coupon applied successfully.'
-                ]);
+                ], 200);
             }else{
-                return response()->json(['success' => false,  'message' => 'Coupon is expired' ], 400);
+                return response()->json(['success' => false,  'message' => 'Coupon code does not exists or is expired' ], 201);
             }
         }else{
 
             if(!empty($request->cart))
             {
-                $cart = $request->cart;
-    
+                $cartItems = collect($request->cart['cartItems']);
+                $variant_ids = $cartItems->pluck('variant_id');
+
+                // Fetch variants data with related product and tags
+                $variants_data = ProductQuantity::whereIn('id', $variant_ids)
+                    ->with(['product.tags'])
+                    ->get();
+
+                // Attach quantity to each variant from the original cart items
+                $variants_data->map(function ($variant) use ($cartItems) {
+                    // Find matching cart item by variant_id
+                    $matchingItem = $cartItems->firstWhere('variant_id', $variant->id);
+                    
+                    // Attach quantity if found
+                    $variant->quantity = $matchingItem['quantity'] ?? 1;
+
+                    return $variant;
+                });
+                        
+                $total_of_cart_items = 0;
+
+                if ($variants_data) {
+                    foreach ($variants_data as $item) {
+                        if (
+                            $item &&
+                            $item->product &&
+                            $item->product->price
+                        ) {
+                            $total_of_cart_items += $item->product->price * ($item->quantity ?? 1);
+                        }
+                    }
+                }else{
+                    return response()->json(['success' => false,  'message' => 'Cart Items not found!' ], 201);
+                }
+
                 $currentDateTime = Carbon::now();
     
                 $coupon = Coupon::where('code', $request->coupon)
@@ -221,15 +259,15 @@ class CouponController extends Controller
                 if (!empty($coupon)) {
     
                     if ($coupon->min_spend > $total_of_cart_items) {
-                        return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of more than ' . $total_of_cart_items . ' only!' ], 201);
+                        return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of more than ' . $coupon->min_spend . ' only!' ], 201);
                     }
     
                     if ($coupon->max_spend < $total_of_cart_items) {
-                        return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of less than ' . $total_of_cart_items . ' only!' ], 201);
+                        return response()->json(['success' => false,  'message' => 'Coupon valid on shopping of less than ' . $coupon->max_spend . ' only!' ], 201);
                     }
     
                     if ($coupon->usage_limit_total == 1 && $coupon->usage_total_limit_used >= $coupon->usage_limit_total_value) {
-                        return response()->json(['success' => false,  'message' => 'Coupon is expired' ], 400);
+                        return response()->json(['success' => false,  'message' => 'Coupon is expired' ], 201);
                     }
     
                     if ($coupon->usage_limit_per_customer == 1) {
@@ -243,8 +281,8 @@ class CouponController extends Controller
                     $filtered_total = 0; // sum of items eligible for coupon
                     $eligibleItems = []; // for buy_x logic
     
-                    foreach ($cart->cartItems as $item) {
-                        $variant = $item->variant;
+                    foreach ($variants_data as $item) {
+                        $variant = $item;
                         $product = $variant?->product;
     
                         if (!$variant || !$product || !$product->price) {
@@ -343,13 +381,14 @@ class CouponController extends Controller
     
                     return response()->json([
                         'success' => true,
-                        'original_total' => $total_of_cart_items,
-                        'eligible_total' => $filtered_total,
-                        'final_price' => round($final_price, 2),
+                        'original_total' => number_format($total_of_cart_items, 2, '.', ''),
+                        'eligible_total' => number_format($filtered_total, 2, '.', ''),
+                        'final_price' => number_format($final_price, 2, '.', ''),
+                        'discount' => number_format($discount, 2, '.', ''),
                         'message' => 'Coupon applied successfully.'
-                    ]);
+                    ], 200);
                 }else{
-                    return response()->json(['success' => false,  'message' => 'Coupon is expired' ], 400);
+                    return response()->json(['success' => false,  'message' => 'Coupon not found or expired' ], 201);
                 }
             }else{
                 return response()->json(['success' => false,  'message' => 'Cart not found' ], 201);
