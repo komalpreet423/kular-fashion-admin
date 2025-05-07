@@ -138,14 +138,14 @@ class CouponController extends Controller
 
                 // === Calculate final price based on coupon type ===
                 $final_price = $filtered_total;
-
+                $discounted_total = 0;
                 if ($coupon->type === 'fixed') {
                     // Apply flat discount
                     $final_price = max(0, $filtered_total - $coupon->value);
                 } elseif ($coupon->type === 'percentage') {
                     // Apply percentage discount
-                    $discount = ($coupon->value / 100) * $filtered_total;
-                    $final_price = max(0, $filtered_total - $discount);
+                    $discounted_total = ($coupon->value / 100) * $filtered_total;
+                    $final_price = max(0, $filtered_total - $discounted_total);
                 } elseif ($coupon->type === 'buy_x_get_y') {
                     $buyQty = (int) $coupon->buy_x_quantity;
                     $getQty = (int) $coupon->get_y_quantity;
@@ -169,8 +169,6 @@ class CouponController extends Controller
                     $discountProductIds = json_decode($coupon->buy_x_product_ids, true) ?? [];
                     $discountType = $coupon->buy_x_discount_type; // 'discount' or 'percentage'
                     $discountValue = $coupon->buy_x_discount;
-
-                    $discounted_total = 0;
 
                     foreach ($eligibleItems as $item) {
                         $isDiscounted = in_array($item['product_id'], $discountProductIds);
@@ -196,8 +194,8 @@ class CouponController extends Controller
                     'success' => true,
                     'original_total' => number_format($total_of_cart_items, 2, '.', ''),
                     'eligible_total' => number_format($filtered_total, 2, '.', ''),
-                    'final_price' => number_format($final_price, 2, '.', ''),
-                    'discount' => number_format($discount, 2, '.', ''),
+                    'final_price' => number_format(($total_of_cart_items - $discounted_total), 2, '.', ''),
+                    'discount' => number_format($discounted_total, 2, '.', ''),
                     'message' => 'Coupon applied successfully.'
                 ], 200);
             }else{
@@ -324,7 +322,7 @@ class CouponController extends Controller
                             'quantity' => $quantity,
                         ];
                     }
-    
+                    $discounted_total = 0;
                     // === Calculate final price based on coupon type ===
                     $final_price = $filtered_total;
     
@@ -333,8 +331,8 @@ class CouponController extends Controller
                         $final_price = max(0, $filtered_total - $coupon->value);
                     } elseif ($coupon->type === 'percentage') {
                         // Apply percentage discount
-                        $discount = ($coupon->value / 100) * $filtered_total;
-                        $final_price = max(0, $filtered_total - $discount);
+                        $discounted_total = ($coupon->value / 100) * $filtered_total;
+                        $final_price = max(0, $filtered_total - $discounted_total);
                     } elseif ($coupon->type === 'buy_x_get_y') {
                         $buyQty = (int) $coupon->buy_x_quantity;
                         $getQty = (int) $coupon->get_y_quantity;
@@ -359,8 +357,6 @@ class CouponController extends Controller
                         $discountType = $coupon->buy_x_discount_type; // 'discount' or 'percentage'
                         $discountValue = $coupon->buy_x_discount;
     
-                        $discounted_total = 0;
-    
                         foreach ($eligibleItems as $item) {
                             $isDiscounted = in_array($item['product_id'], $discountProductIds);
                             $line_total = $item['price'] * $item['quantity'];
@@ -383,8 +379,8 @@ class CouponController extends Controller
                         'success' => true,
                         'original_total' => number_format($total_of_cart_items, 2, '.', ''),
                         'eligible_total' => number_format($filtered_total, 2, '.', ''),
-                        'final_price' => number_format($final_price, 2, '.', ''),
-                        'discount' => number_format($discount, 2, '.', ''),
+                        'final_price' => number_format(($total_of_cart_items - $discounted_total), 2, '.', ''),
+                        'discount' => number_format($discounted_total, 2, '.', ''),
                         'message' => 'Coupon applied successfully.'
                     ], 200);
                 }else{

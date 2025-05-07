@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\CollectionController as CollectionApiController;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\UserAddressController;
 use App\Http\Controllers\GiftCardController;
+use App\Http\Controllers\Api\CustomerAddressesController;
+use App\Http\Controllers\Api\OrdersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -68,3 +70,13 @@ Route::prefix('wishlist')->group(function () {
     Route::post('/add', [CartController::class, 'addToWishlist']);
     Route::get('/show', [CartController::class, 'getWishlistProducts']);
 });
+
+Route::middleware('auth:sanctum')->prefix('customer-addresses')->group(function () {
+    Route::get('/', [CustomerAddressesController::class, 'customer_addresses']);
+    Route::post('/add', [CustomerAddressesController::class, 'add_address']);
+    Route::delete('/delete/{id}', [CustomerAddressesController::class, 'delete_address']);
+    Route::put('/update/{id}', [CustomerAddressesController::class, 'updateAddress']);
+});
+
+
+Route::post('/place-order', [OrdersController::class, 'placeOrder']);
