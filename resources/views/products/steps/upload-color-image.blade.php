@@ -53,7 +53,7 @@
             let defaultImage = '{{ asset("assets/images/default.webp") }}';
 
             function fetchBinaryImage(imageUrl, selectedColorId) {
-                fetch(imageUrl, { mode: 'no-cors' })
+                fetch(imageUrl)
                     .then(response => {
                         if (!response.ok) {
                             $(`#preview-color-image-${selectedColorId}`).addClass('border border-danger border-3');
@@ -63,10 +63,10 @@
                     })
                     .then(blob => {
                         const mimeType = blob.type;
-                        const fileExtension = mimeType.split('/')[1]; 
+                        const fileExtension = mimeType.split('/')[1];
                         const fileName = `image.${fileExtension}`;
                         const file = new File([blob], fileName, {
-                            type: fileExtension
+                            type: mimeType
                         });
 
                         const dataTransfer = new DataTransfer();
