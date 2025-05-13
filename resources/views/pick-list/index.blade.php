@@ -33,7 +33,7 @@
                                 <div class="col-md-4">
                                     <label for="date">Select Date</label>
                                     @php
-                                    $defaultDate = request('date') ?? now()->subDay()->format('Y-m-d');
+                                    $defaultDate = request('date') ?? now()->subDay()->format('d-m-y');
                                     @endphp
                                     <input type="text" id="date" name="date" class="form-control" autocomplete="off" value="{{ $defaultDate }}">
                                 </div>
@@ -79,7 +79,7 @@
                                         <td>{{ $item->description ?? 'N/A' }}</td>
                                         <td>{{ $item->color_name ?? 'N/A' }}</td>
                                         <td>{{ $item->size ?? 'N/A' }}</td>
-                                        <td>{{ $item->created_at->format('Y-m-d') }}</td>
+                                        <td>{{ $item->created_at->format('d-m-y') }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -117,7 +117,7 @@
         var selectedDate = "{{ $defaultDate }}";
         flatpickr("#date", {
             enableTime: false
-            , dateFormat: "Y-m-d"
+            , dateFormat: "d-m-y"
             , defaultDate: selectedDate
             , allowInput: true
         });
