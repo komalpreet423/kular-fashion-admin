@@ -56,4 +56,9 @@ class User extends Authenticatable
     public function branch(){
         return $this->hasOne(Branch::class,'id','branch_id');
     }
+
+    public function customer_addresses()
+    {
+        return $this->hasMany(CustomerAddresses::class);
+    }
 }
