@@ -301,8 +301,7 @@
                                         <th class="d-flex align-items-center" style="width: 180px;">
                                             <h6 class="m-0">{{ $color->colorDetail->name }}
                                                 ({{ $color->colorDetail->code }})</h6>
-                                            {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}"> --}}
-                                            </div>
+                                            {{-- <div class="me-1 d-color-code" style="background: {{ $color->colorDetail->ui_color_code }}"> </div> --}}
                                             @if ($color->image_path)
                                             <img src="{{ asset($color->image_path) }}" alt="Color Image" class="me-2 img-thumbnail zoomable-image" style="width: 30px; height: 24px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showFullScreenImage('{{ asset($color->image_path) }}')">
                                             @endif
@@ -367,28 +366,35 @@
     function showFullScreenImage(imageUrl) {
         let fullScreenDiv = $(`
             <div class="fullscreen-overlay">
+                <span class="fullscreen-close">&times;</span>
                 <img src="${imageUrl}" class="fullscreen-image" />
             </div>
         `);
 
         $('body').append(fullScreenDiv);
 
-        $('.fullscreen-image').on('click', function() {
+        $('.fullscreen-image').on('click', function () {
             if ($(this).css('transform') === 'matrix(1, 0, 0, 1, 0, 0)') {
                 $(this).css({
-                    'transform': 'scale(1.5)'
-                    , 'cursor': 'zoom-out'
+                    'transform': 'scale(1.5)',
+                    'cursor': 'zoom-out'
                 });
             } else {
                 $(this).css({
-                    'transform': 'scale(1)'
-                    , 'cursor': 'zoom-in'
+                    'transform': 'scale(1)',
+                    'cursor': 'zoom-in'
                 });
             }
         });
 
-        $('.fullscreen-overlay').on('click', function(e) {
-            if (!$(e.target).hasClass('fullscreen-image')) {
+        // Close button click
+        $('.fullscreen-close').on('click', function () {
+            $('.fullscreen-overlay').remove();
+        });
+
+        // Click outside image
+        $('.fullscreen-overlay').on('click', function (e) {
+            if (!$(e.target).hasClass('fullscreen-image') && !$(e.target).hasClass('fullscreen-close')) {
                 $(this).remove();
             }
         });

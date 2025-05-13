@@ -268,7 +268,7 @@
                     </div>
                 `;
                 $('#googleImagesModal .modal-body').html(searchImageContent);
-
+                console.log(article);
                 // Set default search query
                 const searchQuery =
                     `${article.brand?.name || ''} ${article.manufacture_code} ${article.short_description} ${article.product_type?.name || ''}`;
