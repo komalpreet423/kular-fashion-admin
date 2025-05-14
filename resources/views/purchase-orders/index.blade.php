@@ -34,8 +34,8 @@
                                     <td>{{ $purchaseOrder->order_no }}</td>
                                     <td>{{ $purchaseOrder->brand?->name ?? '-' }}</td>
                                     <td>{{ $purchaseOrder->supplier->supplier_name}}</td>
-                                    <td>{{ $purchaseOrder->supplier_order_date }}</td>
-                                    <td>{{ $purchaseOrder->delivery_date }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($purchaseOrder->supplier_order_date)->format('d-m-y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($purchaseOrder->delivery_date)->format('d-m-y') }}</td>
                                     <td class="d-flex"><a href="{{ route('purchase-orders.edit', $purchaseOrder->id) }}" class="btn btn-primary btn-sm edit mx-1"><i class="fas fa-pencil-alt"></i></a>
                                         <form action="{{ route('purchase-orders.destroy', $purchaseOrder->id) }}" method="POST" class="d-inline delete-form">
                                             @csrf

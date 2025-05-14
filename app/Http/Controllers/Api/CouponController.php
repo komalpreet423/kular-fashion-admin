@@ -193,7 +193,7 @@ class CouponController extends Controller
                     'success' => true,
                     'original_total' => number_format($total_of_cart_items, 2, '.', ''),
                     'eligible_total' => number_format($filtered_total, 2, '.', ''),
-                    'final_price' => number_format($final_price, 2, '.', ''),
+                    'final_price' => number_format(($total_of_cart_items - $discounted_total), 2, '.', ''),
                     'discount' => number_format($discounted_total, 2, '.', ''),
                     'message' => 'Coupon applied successfully.'
                 ], 200);
@@ -354,7 +354,7 @@ class CouponController extends Controller
                         $discountProductIds = json_decode($coupon->buy_x_product_ids, true) ?? [];
                         $discountType = $coupon->buy_x_discount_type; // 'discount' or 'percentage'
                         $discountValue = $coupon->buy_x_discount;
-
+    
                         foreach ($eligibleItems as $item) {
                             $isDiscounted = in_array($item['product_id'], $discountProductIds);
                             $line_total = $item['price'] * $item['quantity'];
@@ -377,7 +377,7 @@ class CouponController extends Controller
                         'success' => true,
                         'original_total' => number_format($total_of_cart_items, 2, '.', ''),
                         'eligible_total' => number_format($filtered_total, 2, '.', ''),
-                        'final_price' => number_format($final_price, 2, '.', ''),
+                        'final_price' => number_format(($total_of_cart_items - $discounted_total), 2, '.', ''),
                         'discount' => number_format($discounted_total, 2, '.', ''),
                         'message' => 'Coupon applied successfully.'
                     ], 200);

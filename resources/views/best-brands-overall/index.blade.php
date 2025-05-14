@@ -246,7 +246,7 @@
         $('.form-select').select2();
 
         flatpickr('.best-brand-date-picker', {
-            dateFormat: "Y-m-d"
+            dateFormat: "d-m-y"
             , allowInput: true
             , maxDate: new Date()
         });
