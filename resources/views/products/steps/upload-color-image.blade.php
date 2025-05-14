@@ -268,7 +268,7 @@
                     </div>
                 `;
                 $('#googleImagesModal .modal-body').html(searchImageContent);
-
+                console.log(article);
                 // Set default search query
 
                 const searchQuery =
