@@ -38,7 +38,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="form-group col-3 mb-2">
-                                    <label for="brandFilter" class="mb-0">Brand Name:</label>
+                                    <!--label for="brandFilter" class="mb-0">Brand Name:</label-->
                                     <select id="brandFilter" class="form-control select2">
                                         <option value="">All Brands</option>
                                         @foreach ($brands as $brand)
@@ -48,7 +48,7 @@
                                 </div>
 
                                 <div class="form-group col-3 mb-2">
-                                    <label for="typeFilter" class="mb-0">Product Type:</label>
+                                    <!--label for="typeFilter" class="mb-0">Product Type:</label-->
                                     <select id="typeFilter" class="form-control select2">
                                         <option value="">All Products Types</option>
                                         @foreach ($productTypes as $productType)
@@ -58,13 +58,17 @@
                                 </div>
 
                                 <div class="form-group col-3 mb-2">
-                                    <label for="departmentFilter" class="mb-0">Department:</label>
+                                    <!--label for="departmentFilter" class="mb-0">Department:</label-->
                                     <select id="departmentFilter" class="form-control select2">
                                         <option value="">All Department</option>
                                         @foreach ($departments as $department)
                                             <option value="{{ $department->id }}">{{ $department->name }}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="form-group col-3 mb-2">
+                                    <!--label for="departmentFilter" class="mb-0">Department:</label-->
+                                    <input type="text" id="custom-search-input" class="form-control w-100" placeholder="Search Products">
                                 </div>
                             </div>
                             <table id="product-table" data-selected-products="" data-unselected-products=""
@@ -99,12 +103,13 @@
             $('#brandFilter, #typeFilter, #departmentFilter').select2({
                 width: '100%',
             });
-
+            
             var selectedProducts = [];
             var unselectedProducts = [];
 
             var table = $('#product-table').DataTable({
                 processing: true,
+                
                 serverSide: true,
                 ajax: {
                     url: "{{ route('get.products') }}",
@@ -153,19 +158,19 @@
                             var actions = '<div class="action-buttons">';
                             @can('view products')
                                 actions += `<a href="{{ route('products.show', ':id') }}" class="btn btn-secondary btn-sm py-0 px-1">`
-                                    .replace(/:id/g, row.id);
+                                    .replace(/:id/, row.id);
                                 actions += `<i class="fas fa-eye"></i>`;
                                 actions += `</a>`;
                             @endcan
 
                             @can('edit products')
                                 actions += `<a href="{{ route('products.edit.web-configuration', ':id') }}" class="btn btn-success btn-sm edit py-0 px-1">`
-                                    .replace(/:id/g, row.id);
+                                    .replace(/:id/, row.id);
                                 actions += `<i class="fas fa-image"></i>`;
                                 actions += `</a>`;
 
                                 actions += `<a href="{{ route('products.edit', ':id') }}" class="btn btn-primary btn-sm edit py-0 px-1">`
-                                    .replace(/:id/g, row.id);
+                                    .replace(/:id/, row.id);
                                 actions += `<i class="fas fa-pencil-alt"></i>`;
                                 actions += `</a>`;
                             @endcan
@@ -174,9 +179,9 @@
                                 actions += `<button data-source="product" data-endpoint="{{ route('products.destroy', ':id') }}" class="delete-btn btn btn-danger btn-sm py-0 px-1">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>`
-                                    .replace(/:id/g, row.id);
+                                    .replace(/:id/, row.id);
                             @endcan
-
+ 
                             return actions;
                         }
                     }
@@ -194,8 +199,35 @@
                     } else {
                         $('#add-product-link').attr('href', `{{ route('products.create') }}`)
                     }
+                    updateSelectedCount();
                 }
             });
+
+            function updateSelectedCount() {
+                let selectedCount = $('.product-checkbox:checked').length;
+
+                // Remove existing count display
+                $('#selected-count-display').remove();
+
+                // Show only if at least one checkbox is selected
+                if (selectedCount > 0) {
+                    let paginateContainer = $('.dataTables_paginate');
+                    if (paginateContainer.length) {
+                        $('#product-table_previous').before('<li style="display:flex; align-items:center;"><span id="selected-count-display" class="me-3 text-primary fw-bold">Selected: ' + selectedCount + '</span></li>');
+                    }
+                }
+            }
+
+            $(document).on('change', '.product-checkbox', function() {
+                updateSelectedCount();
+            });
+
+
+            $(document).on('change', '#select-all-checkbox', function() {
+                $('.product-checkbox').prop('checked', this.checked).trigger('change');
+            });
+
+
 
             $('#brandFilter, #typeFilter, #departmentFilter').on('change', function() {
                 table.ajax.reload();
@@ -304,6 +336,9 @@
     @push('styles')
         <style>
             #product-table_filter label {
+                display: none;
+            }
+            #product-table_wrapper #custom-search-input {
                 display: none;
             }
         </style>
