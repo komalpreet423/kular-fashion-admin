@@ -66,7 +66,7 @@
                             <table class="table mb-0 table-bordered table-sm">
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Size</th>
+                                        <th scope="row" style="width: 220px;">Size</th>
                                         @foreach ($product->sizes as $size)
                                         <th>{{ $size->sizeDetail->size }}</th>
                                         @endforeach
@@ -103,7 +103,7 @@
                             <table class="table mb-0 table-bordered table-sm">
                                 <tbody>
                                     <tr>
-                                        <th scope="row">Size</th>
+                                        <th scope="row" style="width: 220px;">Size</th>
                                         @foreach ($product->sizes as $size)
                                         <th>{{ $size->sizeDetail->size }}</th>
                                         @endforeach
