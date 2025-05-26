@@ -144,6 +144,8 @@
         <div class="mb-3">
             <x-form-input name="last_date" class="date-picker" :disabled="isset($isEditing) ? $isEditing : false"
                 value="{{ now()->format('d-m-Y') }}" label="Last In Date" placeholder="Enter Last In Date" />
+            <input name="last_date" type="hidden"
+                value="{{ now()->format('d-m-Y') }}" label="Last In Date" placeholder="Enter Last In Date" />
         </div>
     </div>
     <div class="col-sm-6 col-md-2">
