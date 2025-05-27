@@ -15,7 +15,7 @@ class BrandController extends Controller
 {
     public function brands(Request $request){
 
-        $brands = Brand::where('status','Active')->paginate($request->input('length', 10));
+        $brands = Brand::where('status','Active')->paginate($request->input('length', 42));
         
         if($brands)
         {
