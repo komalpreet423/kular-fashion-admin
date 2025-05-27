@@ -21,33 +21,42 @@
                         <div class="col-md-12">
                             <div class="mt-4 mt-xl-3">
                                 <div class="row">
-                                    <div class="col-sm-4">
-                                        <h6 class="mt-1 mb-2">Article Code:
+                                    <div class="col-sm-3">
+                                        <h6 class="mt-1 mb-2">Article Code :
                                             <strong>{{ $product->article_code }}</strong>
                                         </h6>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <div>
-                                            <a href="javascript: void(0);" class="text-primary">{{ $product->brand->name }}</a>
-                                            > {{ $product->productType->name }}
-                                        </div>
+                                    <div class="col-sm-3">
+                                        <h6 class="mt-1 mb-2">Brand :
+                                            <strong>{{ $product->brand->name }}</strong>
+                                        </h6>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <p class="text-muted mb-2">{{ $product->short_description }}</p>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <h6 class="mb-2">Manufacture Code: {{ $product->manufacture_code }}</h6>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <h6>Price: <b>£{{ $product->mrp }}</b></h6>
+                                    <div class="col-sm-3">
+                                        <h6 class="mt-1 mb-2">Product Type :
+                                            <strong>{{ $product->productType->name }}</strong>
+                                        </h6>
                                     </div>
                                     @if ($product->in_date)
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h6>In Date: <b>{{ $product->in_date->format('d-m-Y') }}</b></h6>
                                     </div>
                                     @endif
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <h6 class="mt-1 mb-2">Short Description :
+                                            {{ $product->short_description }}
+                                        </h6>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-2">Manufacture Code: {{ $product->manufacture_code }}</h6>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <h6>Price: <b>£{{ $product->mrp }}</b></h6>
+                                    </div>
+
                                     @if ($product->last_date && $product->in_date != $product->last_date)
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <h6>Last In Date: <b>{{ $product->last_date->format('d-m-Y') }}</b>
                                         </h6>
                                     </div>
