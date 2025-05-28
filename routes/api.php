@@ -26,7 +26,7 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
-Route::get('/products', [BrandController::class, 'getProductByBrandId']);
+Route::get('/brands/products', [BrandController::class, 'getProductByBrandId']);
 
 Route::post('products/add-manufacture-barcode', [ProductBarcodeController::class, 'addManufactureBarcode']);
 Route::post('/collections/check-name', [CollectionController::class, 'checkCollectionName']);
