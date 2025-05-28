@@ -16,6 +16,7 @@ use App\Http\Controllers\GiftCardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Api\CustomerAddressesController;
 use App\Http\Controllers\Api\OrdersController;
+use App\Http\Controllers\Api\WebPagesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +56,8 @@ Route::get('/menus', [MenuController::class, 'index']);
 Route::get('/web-configuration', [SettingsController::class, 'webConfiguration']);
 Route::get('/shipping-methods', [SettingsController::class, 'shippingMethods']);
 Route::get('/payment-methods', [SettingsController::class, 'paymentMethods']);
+Route::get('/webpages', [WebPagesController::class, 'index']);
+Route::get('/webpages/{slug}', [WebPagesController::class, 'getwebpagebyslug']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
