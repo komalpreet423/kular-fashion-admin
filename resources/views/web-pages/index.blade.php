@@ -31,7 +31,7 @@
                                         @foreach ($webPages as $key => $webPage)
                                             <tr>
                                                 <td>{{ ++$key }}</td>
-                                                <td>{{ ucwords($webPage->page_title) }}</td>
+                                                <td>{{ ucwords($webPage->title) }}</td>
 
                                                 <td>
                                                     @can('edit webpages')
