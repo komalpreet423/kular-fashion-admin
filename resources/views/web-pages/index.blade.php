@@ -5,7 +5,7 @@
     @section('header-button')
     @can('create webpages')
         <a href="{{ route('webpages.create') }}" class="btn btn-primary">Add New Web Page</a>
-        @endcan
+    @endcan
 
     @endsection
 

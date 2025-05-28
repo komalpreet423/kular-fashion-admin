@@ -37,7 +37,8 @@ class ModuleSeeder extends Seeder
             ['name' => 'Price Reasons', 'slug' => 'price reasons'],
             ['name' => 'Settings', 'slug' => 'settings'],
             ['name' => 'Tax', 'slug' => 'tax'],
-            ['name' => 'Role', 'slug' => 'role']
+            ['name' => 'Role', 'slug' => 'role'],
+            ['name' => 'Webpages', 'slug' => 'webpages']
         ];
 
         foreach ($modules as $module) {
