@@ -18,7 +18,7 @@ class CustomerAddressesController extends Controller
             $address->is_default = (bool) $address->is_default;
             return $address;
         });
-    
+
         if ($formattedAddresses->isNotEmpty()) {
             return response()->json([
                 'message' => 'Customer Addresses list fetched',
@@ -86,17 +86,15 @@ class CustomerAddressesController extends Controller
     {
         $address = CustomerAddresses::find($id);
 
-        if($address->is_default == 1)
-        {
-            $firstAddress = CustomerAddresses::where('user_id', Auth::id())->where('id', '!=', $address->id)->first();
-            $firstAddress->update(['is_default' => true]);
-        }
-
         if (!$address) {
             return response()->json(['message' => 'Address not found'], 404);
         }
 
         $address->delete();
+
+        $firstAddress = CustomerAddresses::where('user_id', Auth::id())->first();
+        $firstAddress->update(['is_default' => true]);
+
         return response()->json(['message' => 'Address removed successfully']);
     }
 
@@ -113,12 +111,18 @@ class CustomerAddressesController extends Controller
             'state' => 'required|string|max:255',
             'zip_code' => 'required|string|max:10',
             'country' => 'required|string|max:255',
-            'is_default' => 'boolean',
+            'is_default' => 'nullable|boolean',
             'type' => 'required|string|max:20'
         ]);
 
+        $request->merge([
+            'is_default' => $request->has('is_default') ? true : false
+        ]);
+
         $userId = Auth::id();
-        $address = CustomerAddresses::where('id', $id)->where('user_id', $userId)->first();
+        $address = CustomerAddresses::where('id', $id)
+            ->where('user_id', $userId)
+            ->first();
 
         if (!$address) {
             return response()->json([
@@ -126,10 +130,14 @@ class CustomerAddressesController extends Controller
             ], 404);
         }
 
-        if($address->is_default == 1 && $address->is_default !== $request->is_default)
-        {
-            $firstAddress = CustomerAddresses::where('user_id', Auth::id())->where('id', '!=', $address->id)->first();
-            $firstAddress->update(['is_default' => true]);
+        if ($address->is_default == 1 && !$request->is_default) {
+            $firstAddress = CustomerAddresses::where('user_id', $userId)
+                ->where('id', '!=', $address->id)
+                ->first();
+
+            if ($firstAddress) {
+                $firstAddress->update(['is_default' => true]);
+            }
         }
 
         if ($request->is_default) {
@@ -147,11 +155,10 @@ class CustomerAddressesController extends Controller
             'state' => $request->state,
             'zip_code' => $request->zip_code,
             'country' => $request->country,
-            'is_default' => $request->is_default ? true : false,
+            'is_default' => $request->is_default,
             'type' => $request->type,
         ]);
 
-        // Convert is_default to boolean before returning
         $address->is_default = (bool) $address->is_default;
 
         return response()->json([
