@@ -31,7 +31,7 @@ class WebPagesController extends Controller
             abort(403);
         }
         $validated = $request->validate([
-            'page_title' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'page_content' => 'required|string',
             'heading' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:255',
@@ -60,7 +60,8 @@ class WebPagesController extends Controller
             abort(403);
         }
         $validated = $request->validate([
-            'page_title' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:web_pages,slug,' . $id,
             'page_content' => 'required|string',
             'heading' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:255',
