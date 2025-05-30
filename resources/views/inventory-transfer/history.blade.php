@@ -33,7 +33,7 @@
                                             <td>{{ $transfer->sentTo->name }}</td>
                                             <td>{{ $transfer->sentBy->name }}</td>
                                             <td>{{ count($transfer->inventoryItems) }}</td>
-                                            <td>{{ date('m-d-Y h:i', strtotime($transfer->created_at)) }}</td>
+                                            <td>{{ date('d-m-Y h:i', strtotime($transfer->created_at)) }}</td>
                                             <td>
                                                 <a href="{{ route('inventory-transfer-view', ['id' => $transfer->id]) }}"
                                                     class="btn btn-secondary btn-sm  py-0 px-1">
