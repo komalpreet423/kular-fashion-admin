@@ -627,4 +627,21 @@ class OrdersController extends Controller
             }
         }
     }
+
+    public function orderGet($id = null)
+    {
+        $query = CustomerOrders::with(['orderItems','orderItems.product','orderItems.user']);
+
+        if (!is_null($id)) {
+            $query->where('id', $id);
+        }
+
+        $orders = $query->where('user_id', Auth::id())->get();
+
+        if($query->count() <= 0){
+            return response()->json(['success' => false, 'message' => 'Order Id Not Found'], 200);
+        }
+
+        return response()->json(['success' => true,'data' => $orders], 200);
+    }
 }

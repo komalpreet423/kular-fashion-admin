@@ -77,7 +77,9 @@ Route::middleware('auth:sanctum')->prefix('cart')->group(function () {
     Route::delete('/clear', [CartController::class, 'clearCart']);
 });
 
-
+Route::middleware('auth:sanctum')->prefix('order')->group(function () {
+    Route::get('show/{id?}', [OrdersController::class, 'orderGet']);
+});
 Route::prefix('wishlist')->group(function () {
     Route::post('/add', [CartController::class, 'addToWishlist']);
     Route::get('/show', [CartController::class, 'getWishlistProducts']);

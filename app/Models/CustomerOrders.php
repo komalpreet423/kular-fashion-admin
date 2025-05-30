@@ -55,7 +55,7 @@ class CustomerOrders extends Model
 
     public function orderItems()
     {
-        return $this->hasMany(CustomerOrderItems::class);
+        return $this->hasMany(CustomerOrderItems::class,'customer_order_id');
     }
 
     public function customerAddress()
