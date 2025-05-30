@@ -121,13 +121,9 @@
                 @endcanany
 
                 @canany(['view departments', 'view product types', 'view brands', 'view colors', 'view size scales',
-                    'view tags'])
+                    'view tags','view webpages'])
 
-                    <li>
-                        {{-- @can('view categories') --}}
                     <li><a href="{{ route('webpages.index') }}"><i class="fa-solid fa-list fs-5"></i>Web Pages</a></li>
-                    {{-- @endcan --}}
-                    </li>
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">
                             <i class="bx bxs-package"></i>
