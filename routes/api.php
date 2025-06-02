@@ -16,6 +16,7 @@ use App\Http\Controllers\GiftCardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Api\CustomerAddressesController;
 use App\Http\Controllers\Api\OrdersController;
+use App\Http\Controllers\Api\GetCountriesAndStatesController;
 use App\Http\Controllers\Api\WebPagesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -51,7 +52,8 @@ Route::post('/gift-cards/redeem', [GiftCardController::class, 'redeemGiftCard'])
 Route::post('/gift-cards/delete', [GiftCardController::class, 'deleteGiftCard']);
 Route::get('/menus', [MenuController::class, 'index']);
 
-
+Route::get('/countries', [GetCountriesAndStatesController::class, 'getCountries']);
+Route::get('/states/{countryId}', [GetCountriesAndStatesController::class, 'getStates']);
 
 Route::get('/web-configuration', [SettingsController::class, 'webConfiguration']);
 Route::get('/shipping-methods', [SettingsController::class, 'shippingMethods']);
