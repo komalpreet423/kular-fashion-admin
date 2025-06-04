@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\ProductImportExportController;
 use App\Http\Controllers\CouponDiscountController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PickListController;
 use App\Http\Controllers\WebPagesController;
@@ -73,6 +74,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'best-brands-per-product-type' => BestBrandsPerProductTypeController::class,
         'weekely-turnover' => WeekelyTurnoverController::class,
         'webpages'=>WebPagesController::class,
+       'contact-us' => ContactUsController::class,
+       
 
     ]);
 

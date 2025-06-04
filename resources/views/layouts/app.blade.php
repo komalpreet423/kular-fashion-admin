@@ -122,7 +122,7 @@
                     }
                 });
             })
-        })
+        });
 
         $(document).ready(function() {
             // Restrict 'e', 'E', '+', and '-' for all input fields of type number
