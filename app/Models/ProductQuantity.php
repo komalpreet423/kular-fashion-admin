@@ -52,4 +52,12 @@ class ProductQuantity extends Model
         $checkDigit = (10 - ($sum % 10)) % 10;
         return $barcode . $checkDigit;
     }
+    public function getNameAttribute()
+    {
+        $productName = $this->product->name ?? '';
+        $size = $this->sizes->sizeDetail->size ?? '';
+        $color = $this->colors->colorDetail->name ?? '';
+
+        return trim("{$productName} - {$size} - {$color}");
+    }
 }
