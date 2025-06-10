@@ -34,6 +34,7 @@ use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PickListController;
 use App\Http\Controllers\WebPagesController;
+use App\Http\Controllers\WebsiteOrdersController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -75,6 +76,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'weekely-turnover' => WeekelyTurnoverController::class,
         'webpages'=>WebPagesController::class,
        'contact-us' => ContactUsController::class,
+       'orders' => WebsiteOrdersController::class,
        
 
     ]);

@@ -163,6 +163,7 @@ class OrdersController extends Controller
                         $getQty = (int) $coupon->get_y_quantity;
 
                         // Flatten all eligible items into single list with quantity
+
                         $allItems = [];
                         foreach ($eligibleItems as $item) {
                             for ($i = 0; $i < $item['quantity']; $i++) {
@@ -203,7 +204,7 @@ class OrdersController extends Controller
                     $latestOrder = CustomerOrders::latest('id')->first();
 
                     $nextId = $latestOrder ? $latestOrder->id + 1 : 1;
-                    $formattedOrderId = 'KF' . str_pad($nextId, 10, '0', STR_PAD_LEFT);
+                   $formattedOrderId = 'KF' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
 
                     $orderData = [];
 
@@ -287,7 +288,7 @@ class OrdersController extends Controller
                     $latestOrder = CustomerOrders::latest('id')->first();
 
                     $nextId = $latestOrder ? $latestOrder->id + 1 : 1;
-                    $formattedOrderId = 'KF' . str_pad($nextId, 10, '0', STR_PAD_LEFT);
+                  $formattedOrderId = 'KF' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
 
                     $orderData = [];
 
@@ -498,7 +499,7 @@ class OrdersController extends Controller
                     $latestOrder = CustomerOrders::latest('id')->first();
 
                     $nextId = $latestOrder ? $latestOrder->id + 1 : 1;
-                    $formattedOrderId = 'KF' . str_pad($nextId, 10, '0', STR_PAD_LEFT);
+                  $formattedOrderId = 'KF' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
 
                     $orderData = [];
 
@@ -581,7 +582,7 @@ class OrdersController extends Controller
                     $latestOrder = CustomerOrders::latest('id')->first();
 
                     $nextId = $latestOrder ? $latestOrder->id + 1 : 1;
-                    $formattedOrderId = 'KF' . str_pad($nextId, 10, '0', STR_PAD_LEFT);
+                   $formattedOrderId = 'KF' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
 
                     $orderData = [];
 
