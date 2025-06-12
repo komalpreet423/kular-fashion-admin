@@ -35,6 +35,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PickListController;
 use App\Http\Controllers\WebPagesController;
 use App\Http\Controllers\WebsiteOrdersController;
+use App\Http\Controllers\WebsiteGiftVoucherController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -77,9 +78,9 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'webpages'=>WebPagesController::class,
        'contact-us' => ContactUsController::class,
        'orders' => WebsiteOrdersController::class,
-       
-
+       'gift-voucher'=>WebsiteGiftVoucherController::class,
     ]);
+    
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');
 

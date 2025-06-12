@@ -28,7 +28,7 @@ class GiftCardController extends Controller
         $cardNumber = strtoupper(Str::random(12));
 
         $giftCard = GiftCard::create([
-            'user_id' => $request->user_id ?? Auth::id(),
+            'user_id' => $request->user_id,
             'recipient_email' => $request->recipient_email,
             'sender_name' => $request->sender_name,
             'message' => $request->message,

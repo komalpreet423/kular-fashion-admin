@@ -106,6 +106,9 @@
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('orders.index') }}">Orders</a></li>
                     </ul>
+                     <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="{{ route('gift-voucher.index') }}">Gift Voucher</a></li>
+                    </ul>
                 </li>
 
                 @canany([
