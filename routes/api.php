@@ -95,5 +95,6 @@ Route::middleware('auth:sanctum')->prefix('customer-addresses')->group(function 
     Route::put('/update/{id}', [CustomerAddressesController::class, 'updateAddress']);
 });
 
+Route::put('/cart/update', [CartController::class, 'updateQuantity']);
 
 Route::post('/place-order', [OrdersController::class, 'placeOrder']);

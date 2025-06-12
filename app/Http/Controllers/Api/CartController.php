@@ -183,5 +183,57 @@ class CartController extends Controller
             return response()->json(['message' => 'Unable to find user id'], 200);
         }
     }
+    public function updateQuantity(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'cart_item_id' => 'required|exists:cart_items,id',
+            'variant_id' => 'required|exists:product_quantities,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            // Find the cart item
+            $cartItem = CartItem::where('id', $request->cart_item_id)
+                ->where('variant_id', $request->variant_id)
+                ->first();
+
+            if (!$cartItem) {
+                return response()->json(['message' => 'Cart item not found'], 404);
+            }
+
+            // Verify product stock if needed
+            $variant = $cartItem->variant;
+            if ($variant && $request->quantity > $variant->quantity) {
+                return response()->json([
+                    'message' => 'Requested quantity exceeds available stock',
+                    'max_quantity' => $variant->quantity
+                ], 422);
+            }
+
+            // Update quantity
+            $cartItem->update(['quantity' => $request->quantity]);
+
+            // Return updated cart
+            $cart = Cart::where('id', $cartItem->cart_id)
+                ->with('cartItems.user', 'cartItems.variant.product.webImage', 'cartItems.variant.product.brand', 'cartItems.variant.sizes', 'cartItems.variant.colors')
+                ->first();
+
+            return response()->json([
+                'message' => 'Quantity updated successfully',
+                'cart_item' => $cartItem,
+                'cart' => $cart
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update quantity',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 }
