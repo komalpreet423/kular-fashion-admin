@@ -30,7 +30,7 @@ class CustomerOrderItems extends Model
 
     public function order()
     {
-        return $this->belongsTo(CustomerOrder::class, 'customer_order_id', 'id');
+        return $this->belongsTo(CustomerOrders::class, 'customer_order_id', 'id');
     }
 
     public function variant()

@@ -95,6 +95,7 @@
                                         <th>Total</th>
                                         <th>Status</th>
                                         <th>Placed At</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -109,6 +110,10 @@
                                             <td>{{ ucfirst($order->status) }}
                                             </td>
                                             <td>{{ $order->placed_at ? \Carbon\Carbon::parse($order->placed_at)->format('d-m-Y') : 'N/A' }}
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('orders.show', $order->id) }}"
+                                                    class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach
