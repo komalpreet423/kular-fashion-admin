@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'phone_number',
         'profile_image',
+        'status',
         'date_of_birth',
         'password',
         'branch_id',

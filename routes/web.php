@@ -36,6 +36,7 @@ use App\Http\Controllers\PickListController;
 use App\Http\Controllers\WebPagesController;
 use App\Http\Controllers\WebsiteOrdersController;
 use App\Http\Controllers\WebsiteGiftVoucherController;
+use App\Http\Controllers\CustomerController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -79,6 +80,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
        'contact-us' => ContactUsController::class,
        'orders' => WebsiteOrdersController::class,
        'gift-voucher'=>WebsiteGiftVoucherController::class,
+       'customers' => CustomerController::class,
     ]);
     
 

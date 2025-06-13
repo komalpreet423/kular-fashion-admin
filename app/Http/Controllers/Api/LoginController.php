@@ -50,7 +50,7 @@ class LoginController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users,email',
             'name' => 'required',
-            //'phone_number' => 'required|digits:10|unique:users,phone_number',
+            'phone_number' => 'required|digits:10|unique:users,phone_number',
             'password' => 'required|min:6',
         ]);
     
@@ -65,7 +65,7 @@ class LoginController extends Controller
         $user = User::create([
             "name" => $request->name,
             "email" => $request->email,
-            //"phone_number" => $request->phone_number,
+            "phone_number" => $request->phone_number,
             "password" => Hash::make($request->password),
         ]);
     

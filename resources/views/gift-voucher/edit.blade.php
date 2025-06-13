@@ -56,9 +56,9 @@
                                         <select name="payment_method" id="payment_method" class="form-select">
                                             <option value="">Select Payment Method</option>
                                             
-                                            <option value="credit_debit_card"
-                                                {{ $voucher->payment_method === 'credit_debit_card' ? 'selected' : '' }}>
-                                                Credit/Debit Card</option>
+                                            <option value="credit_card"
+                                                {{ $voucher->payment_method === 'credit_card' ? 'selected' : '' }}>
+                                                Credit Card</option>
                                             <option value="upi"
                                                 {{ $voucher->payment_method === 'upi' ? 'selected' : '' }}>UPI</option>
                                             <option value="net_banking"
