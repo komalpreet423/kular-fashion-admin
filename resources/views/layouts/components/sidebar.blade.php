@@ -98,17 +98,17 @@
                         <li><a href="{{ route('weekely-turnover.index') }}">Weekely Turnover</a></li>
                     </ul>
                 </li>
-                 <li>
+                <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
-                       <i class="fas fa-globe"></i>
+                        <i class="fas fa-globe"></i>
                         <span>WebSite</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('orders.index') }}">Orders</a></li>
-                    </ul>
-                     <ul class="sub-menu" aria-expanded="false">
                         <li><a href="{{ route('gift-voucher.index') }}">Gift Voucher</a></li>
+                         <li><a href="{{ route('customers.index') }}">Customers</a></li>
                     </ul>
+
                 </li>
 
                 @canany([
@@ -133,10 +133,11 @@
                 @endcanany
 
                 @canany(['view departments', 'view product types', 'view brands', 'view colors', 'view size scales',
-                    'view tags','view webpages'])
+                    'view tags', 'view webpages'])
 
                     <li><a href="{{ route('webpages.index') }}"><i class="fa-solid fa-list fs-5"></i>Web Pages</a></li>
-                    <li><a href="{{ route('contact-us.index') }}"><i class="fa-solid fa-envelope fs-5"></i> Contact Us</a></li>
+                    <li><a href="{{ route('contact-us.index') }}"><i class="fa-solid fa-envelope fs-5"></i> Contact Us</a>
+                    </li>
 
                     <li>
                         <a href="javascript: void(0);" class="has-arrow waves-effect">

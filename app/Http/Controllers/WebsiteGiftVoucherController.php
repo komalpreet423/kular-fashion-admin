@@ -11,22 +11,29 @@ class WebsiteGiftVoucherController extends Controller
 {
     public function index(Request $request)
     {
-
         $query = GiftCard::with('user')->latest();
+
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
+
         if ($request->filled('payment_method')) {
             $query->where('payment_method', $request->payment_method);
         }
+
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
         $giftVouchers = $query->get();
-        $users = User::all();
+        $users = User::whereHas('roles', function ($query) {
+            $query->where('name', 'customer');
+        })->get();
+
         $statusOptions = ['active', 'redeemed', 'expired'];
+
         return view('gift-voucher.index', compact('giftVouchers', 'users', 'statusOptions'));
     }
+
     public function create()
     {
         return view('gift-voucher.create');

@@ -25,66 +25,66 @@
                                     <div class="col-md-3">
                                         <select name="payment_type" id="PaymentTypeFilter" class="form-select">
                                             <option value="">All Payment Types</option>
-                                            <option value="cod"
-                                                {{ request('payment_type') === 'cod' ? 'selected' : '' }}>Cash on Delivery
-                                            </option>
+                                            <option value="cod" {{ request('payment_type') == 'cod' ? 'selected' : '' }}>
+                                                Cash on Delivery</option>
                                             <option value="credit_debit_card"
-                                                {{ request('payment_type') === 'credit_debit_card' ? 'selected' : '' }}>
+                                                {{ request('payment_type') == 'credit_debit_card' ? 'selected' : '' }}>
                                                 Credit/Debit Card</option>
-                                            <option value="upi"
-                                                {{ request('payment_type') === 'upi' ? 'selected' : '' }}>UPI</option>
+                                            <option value="upi" {{ request('payment_type') == 'upi' ? 'selected' : '' }}>
+                                                UPI</option>
                                             <option value="net_banking"
-                                                {{ request('payment_type') === 'net_banking' ? 'selected' : '' }}>Net
-                                                Banking</option>
+                                                {{ request('payment_type') == 'net_banking' ? 'selected' : '' }}>
+                                                Net Banking</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
                                         <select name="status" id="StatusFilter" class="form-select">
                                             <option value="">All Status</option>
-                                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>
+                                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
                                                 Pending</option>
                                             <option value="processing"
-                                                {{ request('status') === 'processing' ? 'selected' : '' }}>Processing
-                                            </option>
-                                            <option value="shipped"
-                                                {{ request('status') === 'shipped' ? 'selected' : '' }}>Shipped</option>
+                                                {{ request('status') == 'processing' ? 'selected' : '' }}>
+                                                Processing</option>
+                                            <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>
+                                                Shipped</option>
                                             <option value="delivered"
-                                                {{ request('status') === 'delivered' ? 'selected' : '' }}>Delivered
-                                            </option>
+                                                {{ request('status') == 'delivered' ? 'selected' : '' }}>
+                                                Delivered</option>
                                             <option value="cancelled"
-                                                {{ request('status') === 'cancelled' ? 'selected' : '' }}>Cancelled
-                                            </option>
+                                                {{ request('status') == 'cancelled' ? 'selected' : '' }}>
+                                                Cancelled</option>
                                             <option value="returned"
-                                                {{ request('status') === 'returned' ? 'selected' : '' }}>Returned</option>
+                                                {{ request('status') == 'returned' ? 'selected' : '' }}>
+                                                Returned</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
                                         <select name="payment_status" id="PaymentStatusFilter" class="form-select">
                                             <option value="">All Payment Status</option>
                                             <option value="pending"
-                                                {{ request('payment_status') === 'pending' ? 'selected' : '' }}>Pending
+                                                {{ request('payment_status') == 'pending' ? 'selected' : '' }}>Pending
                                             </option>
                                             <option value="initiated"
-                                                {{ request('payment_status') === 'initiated' ? 'selected' : '' }}>Initiated
+                                                {{ request('payment_status') == 'initiated' ? 'selected' : '' }}>Initiated
                                             </option>
                                             <option value="authorized"
-                                                {{ request('payment_status') === 'authorized' ? 'selected' : '' }}>
+                                                {{ request('payment_status') == 'authorized' ? 'selected' : '' }}>
                                                 Authorized</option>
                                             <option value="paid"
-                                                {{ request('payment_status') === 'paid' ? 'selected' : '' }}>Paid</option>
+                                                {{ request('payment_status') == 'paid' ? 'selected' : '' }}>Paid</option>
                                             <option value="failed"
-                                                {{ request('payment_status') === 'failed' ? 'selected' : '' }}>Failed
+                                                {{ request('payment_status') == 'failed' ? 'selected' : '' }}>Failed
                                             </option>
                                             <option value="refunded"
-                                                {{ request('payment_status') === 'refunded' ? 'selected' : '' }}>Refunded
+                                                {{ request('payment_status') == 'refunded' ? 'selected' : '' }}>Refunded
                                             </option>
                                         </select>
                                     </div>
                                 </div>
                             </form>
 
-                            <table id="orders-datatable"
-                                class="table table-bordered table-striped dt-responsive nowrap w-100">
+                            <table id="datatable"
+                                class="table table-sm table-bordered table-striped dt-responsive nowrap w-100">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -107,13 +107,13 @@
                                             <td>{{ ucfirst($order->payment_type) }}</td>
                                             <td>{{ ucfirst($order->payment_status) }}</td>
                                             <td>{{ number_format($order->total, 2) }}</td>
-                                            <td>{{ ucfirst($order->status) }}
-                                            </td>
+                                            <td>{{ ucfirst($order->status) }}</td>
                                             <td>{{ $order->placed_at ? \Carbon\Carbon::parse($order->placed_at)->format('d-m-Y') : 'N/A' }}
                                             </td>
                                             <td>
                                                 <a href="{{ route('orders.show', $order->id) }}"
-                                                    class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></a>
+                                                    class="btn btn-sm btn-secondary  py-0 px-1 "><i
+                                                        class="fas fa-eye"></i></a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -126,20 +126,25 @@
             </div>
         </div>
     </div>
-    <x-include-plugins :plugins="['dataTable', 'select2']" />
+    <x-include-plugins :plugins="['dataTable', 'update-status', 'select2']"></x-include-plugins>
     <script>
         $(document).ready(function() {
-            $('#StatusFilter,#UserFilter,#PaymentStatusFilter,#PaymentTypeFilter').select2();
+            $('#UserFilter, #StatusFilter, #PaymentStatusFilter, #PaymentTypeFilter').select2();
 
-            $('#StatusFilter,#UserFilter,#PaymentStatusFilter,#PaymentTypeFilter').on('change', function() {
+            $('#UserFilter, #StatusFilter, #PaymentStatusFilter, #PaymentTypeFilter').on('change', function() {
                 $('#filterForm').submit();
             });
-            $('#orders-datatable').DataTable({
+
+            $('#datatable').DataTable({
+                columnDefs: [{
+                    type: 'string',
+                    targets: 1
+                }],
                 order: [
-                    [1, 'desc']
+                    [1, 'asc']
                 ],
                 drawCallback: function() {
-                    $('#orders-datatable th, #orders-datatable td').addClass('p-1');
+                    $('#datatable th, #datatable td').addClass('p-0');
                 }
             });
         });
