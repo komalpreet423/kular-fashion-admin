@@ -9,5 +9,5 @@ class HomeImage extends Model
     use HasFactory;
 
     protected $table = 'home_images'; 
-    protected $fillable = ['image_path'];
+  protected $fillable = ['image_path', 'type'];
 }

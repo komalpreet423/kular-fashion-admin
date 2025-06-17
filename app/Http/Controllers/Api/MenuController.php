@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\HomeImage;
+
+
 
 class MenuController extends Controller
 {
@@ -38,4 +41,29 @@ class MenuController extends Controller
             'departments' => $departments
         ]);
     }
+
+    public function getImages()
+{
+    $sliderImages = HomeImage::where('type', 'slider')->latest()->get()->map(function ($img) {
+        return [
+            'id' => $img->id,
+            'image_url' => asset($img->image_path),
+            'created_at' => $img->created_at->toDateTimeString(),
+        ];
+    });
+
+    $newsletterImages = HomeImage::where('type', 'newsletter')->latest()->get()->map(function ($img) {
+        return [
+            'id' => $img->id,
+            'image_url' => asset($img->image_path),
+            'created_at' => $img->created_at->toDateTimeString(),
+        ];
+    });
+
+    return response()->json([
+        'success' => true,
+        'slider_images' => $sliderImages,
+        'newsletter_images' => $newsletterImages,
+    ]);
+}
 }
