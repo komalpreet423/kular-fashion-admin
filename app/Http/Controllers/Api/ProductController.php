@@ -48,11 +48,24 @@ class ProductController extends Controller
                 $q->orWhereDoesntHave('webInfo');
             });
 
+            if ($request->has('department_slug')) {
+                $slug = $request->input('department_slug');
+                $query->whereHas('department', function ($q) use ($slug) {
+                    $q->where('slug', $slug);
+                });
+            }
+
+            if ($request->has('product_type_slug')) {
+                $slug = $request->input('product_type_slug');
+                $query->whereHas('productType', function ($q) use ($slug) {
+                    $q->where('slug', $slug);
+                });
+            }
             if ($request->has('brands')) {
                 $brands = explode(',', $request->input('brands'));
                 $query->whereIn('brand_id', $brands);
             }
-            
+
             if ($request->has('product_ids')) {
                 $product_ids = explode(',', $request->input('product_ids'));
                 $query->whereIn('id', $product_ids);
@@ -122,65 +135,65 @@ class ProductController extends Controller
                     ];
                 });
 
-                $productTypes = Product::whereIn('id', $products->pluck('id'))
-                    ->with('productType')
-                    ->get()
-                    ->take(9) 
-                    ->pluck('productType')
-                    ->unique('id')
-                    ->flatten()
-                    ->map(function ($brand) {
-                        return [
-                            'id' => $brand->id,
-                            'name' => $brand->name,
-                        ];
-                    });
+            $productTypes = Product::whereIn('id', $products->pluck('id'))
+                ->with('productType')
+                ->get()
+                ->take(9)
+                ->pluck('productType')
+                ->unique('id')
+                ->flatten()
+                ->map(function ($brand) {
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                    ];
+                });
 
 
-                $colorsQuery = Product::query();
+            $colorsQuery = Product::query();
 
-                if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
-                    $colorsQuery = Product::whereIn('id', $products->pluck('id'));
-                }
-                
-                $colors = $colorsQuery->with('colors.colorDetail')->get()
-                    ->pluck('colors')->flatten()
-                    ->unique(function ($color) {
-                        return $color->colorDetail ? $color->colorDetail->id : null;
-                    })->values()
-                    ->map(function ($color) {
-                        return [
-                            'id' => $color->color_id,
-                            'name' => $color->colorDetail ? $color->colorDetail->name : null,
-                            'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
-                        ];
-                    });
+            if ($request->has('sizes') && !empty($request->input('sizes')) && !is_null($request->input('sizes'))) {
+                $colorsQuery = Product::whereIn('id', $products->pluck('id'));
+            }
 
-                $sizes = Product::whereIn('id', $products->pluck('id'))
-                    ->with('sizes.sizeDetail')
-                    ->get()
-                    ->pluck('sizes')
-                    ->flatten()
-                    ->unique(fn($size) => $size->sizeDetail->size)
-                    ->map(function ($size) {
-                        return [
-                            'id' => $size->size_id,
-                            'name' => $size->sizeDetail->size, 
-                        ];
-                    });
-                
-                $perPage = 9;
-                $page = request()->get('page', 1); 
-                $offset = ($page - 1) * $perPage;
-                $paginatedSizes = $sizes->slice($offset, $perPage)->values();
-                $paginatedProductTypes = $productTypes->slice($offset, $perPage)->values();
+            $colors = $colorsQuery->with('colors.colorDetail')->get()
+                ->pluck('colors')->flatten()
+                ->unique(function ($color) {
+                    return $color->colorDetail ? $color->colorDetail->id : null;
+                })->values()
+                ->map(function ($color) {
+                    return [
+                        'id' => $color->color_id,
+                        'name' => $color->colorDetail ? $color->colorDetail->name : null,
+                        'color_code' => $color->colorDetail ? $color->colorDetail->ui_color_code : null,
+                    ];
+                });
 
-                $pagination = [
-                    'total' => $sizes->count(),
-                    'per_page' => $perPage,
-                    'current_page' => $page,
-                    'last_page' => ceil($sizes->count() / $perPage),
-                ];
+            $sizes = Product::whereIn('id', $products->pluck('id'))
+                ->with('sizes.sizeDetail')
+                ->get()
+                ->pluck('sizes')
+                ->flatten()
+                ->unique(fn($size) => $size->sizeDetail->size)
+                ->map(function ($size) {
+                    return [
+                        'id' => $size->size_id,
+                        'name' => $size->sizeDetail->size,
+                    ];
+                });
+
+            $perPage = 9;
+            $page = request()->get('page', 1);
+            $offset = ($page - 1) * $perPage;
+            $paginatedSizes = $sizes->slice($offset, $perPage)->values();
+            $paginatedProductTypes = $productTypes->slice($offset, $perPage)->values();
+
+            $pagination = [
+                'total' => $sizes->count(),
+                'per_page' => $perPage,
+                'current_page' => $page,
+                'last_page' => ceil($sizes->count() / $perPage),
+            ];
 
             $minPrice = $products->min(function ($product) {
                 return $product->sizes->min('web_sale_price');
@@ -203,7 +216,7 @@ class ProductController extends Controller
                     'last_page' => $paginatedProducts->lastPage(),
                 ],
             ];
-            
+
             if ($request->filters == true) {
                 $response['filters'] = [
                     'brands' => $brands,
@@ -219,13 +232,13 @@ class ProductController extends Controller
                     ],
                     'colors' => $colors,
                     'sizes' => [
-                        'data' => $paginatedSizes, 
+                        'data' => $paginatedSizes,
                         'pagination' => [
                             'total' => $sizes->count(),
                             'per_page' => $perPage,
                             'current_page' => $page,
                             'last_page' => ceil($sizes->count() / $perPage),
-                        ], 
+                        ],
                     ],
                     'price' => [
                         'min' => (float)$minPrice,
@@ -233,9 +246,8 @@ class ProductController extends Controller
                     ]
                 ];
             }
-            
-            return response()->json($response);
 
+            return response()->json($response);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
