@@ -37,6 +37,8 @@ use App\Http\Controllers\WebPagesController;
 use App\Http\Controllers\WebsiteOrdersController;
 use App\Http\Controllers\WebsiteGiftVoucherController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\HomeController;
+
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -81,8 +83,12 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
        'orders' => WebsiteOrdersController::class,
        'gift-voucher'=>WebsiteGiftVoucherController::class,
        'customers' => CustomerController::class,
+         'home' => HomeController::class,
     ]);
     
+
+
+    Route::post('/home/upload-images', [HomeController::class, 'uploadImages'])->name('images.upload');
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');
 
