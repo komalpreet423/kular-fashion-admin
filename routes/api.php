@@ -81,9 +81,11 @@ Route::middleware('auth:sanctum')->prefix('cart')->group(function () {
     Route::delete('/clear', [CartController::class, 'clearCart']);
 });
 
-Route::middleware('auth:sanctum')->prefix('order')->group(function () {
+/*Route::middleware('auth:sanctum')->prefix('order')->group(function () {
     Route::get('show/{id?}', [OrdersController::class, 'orderGet']);
-});
+});*/
+Route::get('/order/show/{id?}', [OrdersController::class, 'orderGet']);
+
 Route::prefix('wishlist')->group(function () {
     Route::post('/add', [CartController::class, 'addToWishlist']);
     Route::get('/show', [CartController::class, 'getWishlistProducts']);
@@ -95,6 +97,8 @@ Route::middleware('auth:sanctum')->prefix('customer-addresses')->group(function 
     Route::delete('/delete/{id}', [CustomerAddressesController::class, 'delete_address']);
     Route::put('/update/{id}', [CustomerAddressesController::class, 'updateAddress']);
 });
+Route::get('/customer-addresses', [CustomerAddressesController::class, 'customer_addresses']);
+Route::post('/customer-addresses/add', [CustomerAddressesController::class, 'add_address']);
 
 Route::put('/cart/update', [CartController::class, 'updateQuantity']);
 
