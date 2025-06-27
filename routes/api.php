@@ -81,10 +81,10 @@ Route::middleware('auth:sanctum')->prefix('cart')->group(function () {
     Route::delete('/clear', [CartController::class, 'clearCart']);
 });
 
-/*Route::middleware('auth:sanctum')->prefix('order')->group(function () {
+Route::middleware('auth:sanctum')->prefix('order')->group(function () {
     Route::get('show/{id?}', [OrdersController::class, 'orderGet']);
-});*/
-Route::get('/order/show/{id?}', [OrdersController::class, 'orderGet']);
+});
+
 
 Route::prefix('wishlist')->group(function () {
     Route::post('/add', [CartController::class, 'addToWishlist']);
@@ -103,3 +103,4 @@ Route::post('/customer-addresses/add', [CustomerAddressesController::class, 'add
 Route::put('/cart/update', [CartController::class, 'updateQuantity']);
 
 Route::post('/place-order', [OrdersController::class, 'placeOrder']);
+Route::post('/send-order-email', [OrdersController::class, 'sendOrderEmail']);
