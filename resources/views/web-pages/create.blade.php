@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Create a new Web Page')
+@section('title', 'Create Web Page')
 
 @section('header-button')
     <a href="{{ route('webpages.index') }}" class="btn btn-primary"><i class="bx bx-arrow-back"></i> Go Back</a>
