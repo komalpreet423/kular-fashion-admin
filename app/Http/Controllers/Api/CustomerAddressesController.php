@@ -43,6 +43,7 @@ class CustomerAddressesController extends Controller
             'name' => 'required|string|max:255',
             'country_code' => 'required|string|max:255',
             'phone_no' => 'required|string|max:255',
+             'email' => 'nullable|email|max:255',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'required|string|max:255',
             'landmark' => 'required|string|max:255',
@@ -65,7 +66,8 @@ class CustomerAddressesController extends Controller
         $check_if_default_address_exists = CustomerAddresses::where('user_id', $request->user_id)->where('is_default', true)->first();
 
         $address = CustomerAddresses::create([
-            'user_id' => $request->user_id,
+            'user_id' => $request->user_id ?: null,
+             'email' => $request->email,
             'name' => $request->name,
             'country_code' => $request->country_code,
             'phone_no' => $request->phone_no,

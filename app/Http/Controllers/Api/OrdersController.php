@@ -452,39 +452,60 @@ class OrdersController extends Controller
         return response()->json(['success' => true, 'data' => $orders], 200);
     }
 
-  public function sendOrderEmail(Request $request)
+public function sendOrderEmail(Request $request)
 {
     $request->validate([
         'order_id' => 'required|integer',
     ]);
 
-    $order = CustomerOrders::with(['orderItems.product','orderItems.variant.sizes.sizeDetail', 'user'])->find($request->order_id);
+    $order = CustomerOrders::with([
+        'orderItems.product',
+        'orderItems.variant.sizes.sizeDetail',
+        'user',
+    ])->find($request->order_id);
 
-    if (!$order || !$order->user || !$order->user->email) {
-        \Log::error('Order or user email not found', ['order_id' => $request->order_id]);
+    if (!$order) {
+        \Log::error('Order not found', ['order_id' => $request->order_id]);
         return response()->json([
             'success' => false,
-            'message' => 'Order or user email not found.'
+            'message' => 'Order not found.'
         ], 404);
     }
 
+    // Get email: from user if logged in, else from address
+    $email = optional($order->user)->email;
+
+    if (!$email && $order->customer_address_id) {
+        $address = \App\Models\CustomerAddresses::find($order->customer_address_id);
+        $email = $address?->email;
+    }
+
+    if (!$email) {
+        \Log::error('Email not found for order', ['order_id' => $order->id]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Email not found for this order.'
+        ], 400);
+    }
+
     try {
-        Mail::to($order->user->email)->send(new OrderPlacedMail($order));
+        Mail::to($email)->send(new \App\Mail\OrderPlacedMail($order));
         return response()->json([
             'success' => true,
-            'message' => 'Email sent to ' . $order->user->email
+            'message' => 'Email sent to ' . $email
         ]);
     } catch (\Throwable $e) {
         \Log::error('Email sending failed', [
             'order_id' => $order->id,
-            'user_email' => $order->user->email,
+            'email' => $email,
             'error' => $e->getMessage()
         ]);
         return response()->json([
             'success' => false,
-            'message' => 'Email failed: ' . $e->getMessage()
+            'message' => 'Email sending failed: ' . $e->getMessage()
         ], 500);
     }
 }
+
 
 }
