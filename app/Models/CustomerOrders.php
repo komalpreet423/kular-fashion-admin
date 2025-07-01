@@ -60,6 +60,7 @@ class CustomerOrders extends Model
 
     public function customerAddress()
     {
-        return $this->belongsTo(CustomerAddresses::class);
+        return $this->belongsTo(CustomerAddresses::class,'customer_address_id');
     }
+
 }

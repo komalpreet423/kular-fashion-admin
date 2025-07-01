@@ -12,7 +12,12 @@ class CustomerAddressesController extends Controller
 {
     public function customer_addresses(Request $request)
     {
-        $customerAddresses = CustomerAddresses::where('user_id', Auth::id())->get();
+        if ($request->has('phone_no')) {
+            $customerAddresses = CustomerAddresses::where('phone_no', $request->phone_no)->get();
+        }else{
+            $customerAddresses = CustomerAddresses::where('user_id', $request->user_id)->get();
+        }
+        
 
         $formattedAddresses = $customerAddresses->map(function ($address) {
             $address->is_default = (bool) $address->is_default;
@@ -38,6 +43,7 @@ class CustomerAddressesController extends Controller
             'name' => 'required|string|max:255',
             'country_code' => 'required|string|max:255',
             'phone_no' => 'required|string|max:255',
+             'email' => 'nullable|email|max:255',
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'required|string|max:255',
             'landmark' => 'required|string|max:255',
@@ -54,13 +60,14 @@ class CustomerAddressesController extends Controller
         }
 
         if ($request->is_default) {
-            CustomerAddresses::where('user_id', Auth::id())->update(['is_default' => false]);
+            CustomerAddresses::where('user_id', $request->user_id)->update(['is_default' => false]);
         }
 
-        $check_if_default_address_exists = CustomerAddresses::where('user_id', Auth::id())->where('is_default', true)->first();
+        $check_if_default_address_exists = CustomerAddresses::where('user_id', $request->user_id)->where('is_default', true)->first();
 
         $address = CustomerAddresses::create([
-            'user_id' => Auth::id(),
+            'user_id' => $request->user_id ?: null,
+             'email' => $request->email,
             'name' => $request->name,
             'country_code' => $request->country_code,
             'phone_no' => $request->phone_no,
