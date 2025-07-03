@@ -2,18 +2,18 @@
 
 @section('title', 'Products')
 @section('header-button')
-{{-- <form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="d-inline">
+
+<form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data" id="importForm" class="d-inline">
 @csrf
-<input type="file" name="file" id="fileInput" accept=".csv" required style="display: none;" onchange="document.getElementById('importForm').submit();">
+<input type="file" name="file" id="fileInput"  accept=".csv, .xls, .xlsx" required style="display: none;" onchange="document.getElementById('importForm').submit();">
 <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click();">
     <i class="fas fa-file-import"></i> Import Products
 </button>
 </form>
 
-<a href="{{ route('products.export') }}" class="btn btn-primary">
+{{-- <a href="{{ route('products.export') }}" class="btn btn-primary">
     <i class="bx bx-download"></i> Download Product Configuration File
 </a> --}}
-
 
 <button id="bulk-edit-button" class="btn btn-warning d-none" data-bs-toggle="modal" data-bs-target="#bulkEditModal">
     <i class="fas fa-edit"></i> Bulk Edit
