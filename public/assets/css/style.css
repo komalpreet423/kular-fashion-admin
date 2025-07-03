@@ -280,3 +280,7 @@ table tbody tr.even {
 div#product-table_length {
     margin-top: 12px;
 }
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: unset !important;
+}
