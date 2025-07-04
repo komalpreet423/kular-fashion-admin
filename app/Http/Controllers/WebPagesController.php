@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WebPages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Tag;
 
 class WebPagesController extends Controller
 {
@@ -23,8 +24,8 @@ class WebPagesController extends Controller
         if (!Gate::allows('create webpages')) {
             abort(403);
         }
-
-        return view('web-pages.create', ['webPage' => null]);
+        $tags = Tag::where('status', 'Active')->pluck('name')->toArray();
+        return view('web-pages.create', ['webPage' => null, 'tags' => $tags]);
     }
 
     public function store(Request $request)
@@ -75,9 +76,9 @@ class WebPagesController extends Controller
         if (!Gate::allows('edit webpages')) {
             abort(403);
         }
-
         $webPage = WebPages::findOrFail($id);
-        return view('web-pages.edit', compact('webPage'));
+        $tags = Tag::where('status', 'Active')->pluck('name')->toArray(); 
+        return view('web-pages.edit', compact('webPage', 'tags')); 
     }
 
     public function update(Request $request, string $id)
@@ -87,6 +88,7 @@ class WebPagesController extends Controller
         }
 
         $validated = $request->validate([
+            
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:web_pages,slug,' . $id,
             'page_content' => 'nullable|string',
@@ -121,7 +123,7 @@ class WebPagesController extends Controller
         $validated['rules'] = $request->input('rules', []);
         $validated['filter_mode'] = $request->input('filter_mode') === 'show_some' ? 'show_some' : null;
 
-        
+
 
         $webPage->update($validated);
 

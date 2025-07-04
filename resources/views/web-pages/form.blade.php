@@ -23,37 +23,48 @@
             @endif
         </div>
 
-        <h4 class="card-title mt-2">Page Content</h4>
-        <textarea name="page_content" class="form-control editor" rows="5" placeholder="Enter Page Content">{{ old('page_content', $webPage->page_content ?? '') }}</textarea>
+       <h4 class="card-title mt-2">Page Content</h4>
+<textarea name="page_content" class="form-control editor" rows="5" placeholder="Enter Page Content">{!! old('page_content', $webPage->page_content ?? '') !!}</textarea>
     </div>
 </div>
 
 <!-- Listing Page Rules -->
 <div class="card">
-    <div class="card-body p-4">
+    <div class="card-body p-3">
         <h4 class="card-title">Listing Page Rules</h4>
-        @php
-            $rulesInput = old('rules', $webPage->rules ?? []);
-            $rules = is_array($rulesInput)
-                ? $rulesInput
-                : (is_string($rulesInput)
-                    ? json_decode($rulesInput, true) ?? []
-                    : []);
-        @endphp
-        <div class="rule-group mb-2">
-            @foreach ([
-        'rule' => 'Rule',
-        'must' => 'Must',
-        'have_tags' => 'Have one of these tags',
-        'collections' => 'Collections transitional wear',
-    ] as $key => $label)
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" name="rules[]" id="{{ $key }}"
-                        value="{{ $key }}" {{ in_array($key, $rules) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="{{ $key }}">{{ $label }}</label>
+
+        <div id="rules-container">
+            <div class="rule-group border p-3 mb-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Rule</label>
+                        <select name="rules[0][type]" class="form-select">
+                            <option value="must">Must</option>
+                            <option value="must_not">Must Not</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Condition</label>
+                        <select name="rules[0][condition]" class="form-select condition-select">
+                            <option value="">Select Condition</option>
+                            <option value="has_tags">Have one of these tags</option>
+                            <option value="has_all_tags">Have all of these tags</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 tag-group" style="display: none;">
+                        <label class="form-label">Tags</label>
+                        <select name="rules[0][tags][]" class="form-select tags-select" multiple>
+                            @foreach ($tags as $tag)
+                                <option value="{{ $tag }}">{{ $tag }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-            @endforeach
+            </div>
         </div>
+
+        <button type="button" class="btn btn-outline-primary mt-2" onclick="addRuleGroup()">+ Add New Rule
+            Group</button>
     </div>
 </div>
 
@@ -183,7 +194,10 @@
     </div>
 </div>
 <button type="submit" class="btn btn-primary w-md">Submit</button>
-<x-include-plugins :plugins="['chosen', 'datePicker', 'contentEditor']" />
+
+<!-- Include necessary plugins -->
+<x-include-plugins :plugins="['chosen', 'datePicker', 'contentEditor', 'select2']" />
+
 <style>
     .upload-area {
         text-align: center;
@@ -202,6 +216,13 @@
         justify-content: center;
         flex-direction: column;
     }
+    .dropzone-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
     .dropzone:hover {
         border-color: #999;
@@ -228,22 +249,59 @@
     .form-check {
         padding-left: 1.5em;
     }
+
+    /* Select2 styles */
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #ced4da;
+        min-height: 38px;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        color: #495057;
+        padding: 0 5px;
+        margin-top: 4px;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #6c757d;
+        margin-right: 5px;
+    }
+
+    .select2-container .select2-search--inline .select2-search__field {
+        margin-top: 5px;
+    }
 </style>
+
 <script>
     $(document).ready(function() {
+
+        $('.tags-select').select2({
+            tags: true,
+            tokenSeparators: [','],
+            width: '100%',
+            placeholder: 'Select or type tags',
+            allowClear: true
+        });
+
+
         $('.dropzone').each(function() {
             const dropzone = $(this);
             const fileInput = dropzone.find('.file-input');
             const previewBox = dropzone.find('.dropzone-content');
 
-            // Click opens file picker
             dropzone.on('click', function(e) {
                 if (!$(e.target).is('input[type="file"]')) {
                     fileInput.trigger('click');
                 }
             });
 
-            // File input change shows preview
             fileInput.on('change', function() {
                 if (this.files.length > 0) {
                     showPreview(this.files[0], previewBox);
@@ -261,7 +319,7 @@
             }
         });
 
-        // Filter toggle logic
+
         function toggleFilterList() {
             if ($('#filter_mode_show_some').is(':checked')) {
                 $('#filter-list').show();
@@ -270,12 +328,176 @@
             }
         }
 
-        // Ensure state is applied on page load
-        $(document).ready(function() {
-            toggleFilterList();
+        toggleFilterList();
+        $('#filter_mode_show_some').on('change', toggleFilterList);
 
-            // Attach change event
-            $('#filter_mode_show_some').on('change', toggleFilterList);
+
+        $('#description').on('input', function() {
+            const text = $(this).val();
+            $('#wordCount').text(text.trim() ? text.trim().split(/\s+/).length : 0);
+            $('#charCount').text(text.length);
+        }).trigger('input');
+    });
+
+
+    function addRuleGroup() {
+        var index = $('.rule-group').length;
+
+        var $ruleGroup = $('<div>', {
+            class: 'rule-group border p-3 mb-3 position-relative'
         });
+
+
+        var $deleteBtn = $('<button>', {
+            type: 'button',
+            class: 'btn btn-sm btn-outline-danger delete-rule-group',
+            html: '<i class="fas fa-times"></i>',
+            click: function() {
+                deleteRuleGroup(this);
+            }
+        }).css({
+            'position': 'absolute',
+            'right': '10px',
+            'top': '10px',
+            'width': '24px',
+            'height': '24px',
+            'padding': '0',
+            'display': 'flex',
+            'align-items': 'center',
+            'justify-content': 'center',
+            'border-radius': '50%'
+        });
+
+        $ruleGroup.append($deleteBtn);
+
+        var $row = $('<div>', {
+            class: 'row'
+        });
+
+        var $ruleCol = $('<div>', {
+            class: 'col-md-3'
+        }).append(
+            $('<label>', {
+                class: 'form-label',
+                text: 'Rule'
+            }),
+            $('<select>', {
+                name: `rules[${index}][type]`,
+                class: 'form-select'
+            }).append(
+                $('<option>', {
+                    value: 'must',
+                    text: 'Must'
+                }),
+                $('<option>', {
+                    value: 'must_not',
+                    text: 'Must Not'
+                })
+            )
+        );
+
+        var $conditionCol = $('<div>', {
+            class: 'col-md-3'
+        }).append(
+            $('<label>', {
+                class: 'form-label',
+                text: 'Condition'
+            }),
+            $('<select>', {
+                name: `rules[${index}][condition]`,
+                class: 'form-select condition-select'
+            }).append(
+                $('<option>', {
+                    value: '',
+                    text: 'Select Condition'
+                }),
+                $('<option>', {
+                    value: 'has_tags',
+                    text: 'Have one of these tags'
+                }),
+                $('<option>', {
+                    value: 'has_all_tags',
+                    text: 'Have all of these tags'
+                })
+            )
+        );
+
+        var $tagCol = $('<div>', {
+            class: 'col-md-6 tag-group',
+            style: 'display: none;'
+        }).append(
+            $('<label>', {
+                class: 'form-label',
+                text: 'Tags'
+            }),
+            $('<select>', {
+                name: `rules[${index}][tags][]`,
+                class: 'form-select tags-select',
+                multiple: 'multiple'
+            })
+        );
+
+
+        @foreach ($tags as $tag)
+            $tagCol.find('select').append(
+                $('<option>', {
+                    value: '{{ $tag }}',
+                    text: '{{ $tag }}'
+                })
+            );
+        @endforeach
+
+        $row.append($ruleCol, $conditionCol, $tagCol);
+        $ruleGroup.append($row);
+        $('#rules-container').append($ruleGroup);
+
+        $ruleGroup.find('.tags-select').select2({
+            tags: true,
+            tokenSeparators: [','],
+            width: '100%',
+            placeholder: 'Select or type tags',
+            allowClear: true
+        });
+    }
+
+    function deleteRuleGroup(button) {
+
+        if ($('.rule-group').length > 1) {
+            $(button).closest('.rule-group').fadeOut(200, function() {
+                $(this).remove();
+
+                $('.rule-group').each(function(index) {
+                    $(this).find('select, input').each(function() {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            name = name.replace(/rules\[\d+\]/, `rules[${index}]`);
+                            $(this).attr('name', name);
+                        }
+                    });
+                });
+            });
+        } else {
+            alert('You must have at least one rule group.');
+        }
+    }
+
+    $(document).on('change', '.condition-select', function() {
+        var selectedValue = $(this).val();
+        var $row = $(this).closest('.row');
+        var $tagGroup = $row.find('.tag-group');
+        var $tagSelect = $row.find('.tags-select');
+
+        if (selectedValue === 'has_tags' || selectedValue === 'has_all_tags') {
+            $tagGroup.show();
+            if (selectedValue === 'has_all_tags') {
+                $tagSelect.find('option').prop('selected', true);
+                $tagSelect.trigger('change');
+            }
+        } else {
+            $tagGroup.hide();
+        }
+    });
+    $(document).on('select2:open', () => {
+        document.querySelector('.select2-container--open .select2-search__field').focus();
     });
 </script>

@@ -60,8 +60,8 @@ Route::get('/states/{countryId}', [GetCountriesAndStatesController::class, 'getS
 Route::get('/web-configuration', [SettingsController::class, 'webConfiguration']);
 Route::get('/shipping-methods', [SettingsController::class, 'shippingMethods']);
 Route::get('/payment-methods', [SettingsController::class, 'paymentMethods']);
-Route::get('/webpages', [WebPagesController::class, 'index']);
-Route::get('/webpages/{slug}', [WebPagesController::class, 'getwebpagebyslug']);
+Route::get('/web-pages', [WebPagesController::class, 'index']);
+Route::get('/web-pages/{slug}', [WebPagesController::class, 'show']);
 Route::post('/contact-us', [ContactUsController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
