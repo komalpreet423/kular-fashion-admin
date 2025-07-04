@@ -733,33 +733,33 @@ class ProductController extends Controller
     }
 
     public function productStep3(Request $request)
-{
-    $savingProduct = (object) Session::get('savingProduct');
+    {
+        $savingProduct = (object) Session::get('savingProduct');
 
-    if (!$savingProduct || empty($savingProduct->size_scale_id)) {
-        return redirect()->route('products.create.step-1');
+        if (!$savingProduct || empty($savingProduct->size_scale_id)) {
+            return redirect()->route('products.create.step-1');
+        }
+
+    
+        $brand = \App\Models\Brand::find($savingProduct->brand_id);
+        $productType = \App\Models\ProductType::find($savingProduct->product_type_id);
+
+        $savingProduct->brand = (object) ['name' => $brand?->name ?? ''];
+        $savingProduct->product_type = (object) ['name' => $productType?->name ?? ''];
+
+    
+        $sizes =Size::whereBetween('id', [$savingProduct->size_range_min, $savingProduct->size_range_max])->get();
+
+        $reversedColors = array_reverse($savingProduct->colors ?? []);
+        $savedColors = Color::whereIn('id', $reversedColors)->get();
+        $savedColorsMapped = $savedColors->keyBy('id')->toArray();
+
+        $savedColors = array_map(fn($id) => $savedColorsMapped[$id] ?? null, $reversedColors);
+        $excludedSavedColors = array_keys($savedColorsMapped);
+        $colors =Color::where('status', 'Active')->whereNotIn('id', $excludedSavedColors)->get();
+
+        return view('products.steps.step-3', compact('savingProduct', 'sizes', 'savedColors', 'colors'));
     }
-
- 
-    $brand = \App\Models\Brand::find($savingProduct->brand_id);
-    $productType = \App\Models\ProductType::find($savingProduct->product_type_id);
-
-    $savingProduct->brand = (object) ['name' => $brand?->name ?? ''];
-    $savingProduct->product_type = (object) ['name' => $productType?->name ?? ''];
-
- 
-    $sizes =Size::whereBetween('id', [$savingProduct->size_range_min, $savingProduct->size_range_max])->get();
-
-    $reversedColors = array_reverse($savingProduct->colors ?? []);
-    $savedColors = Color::whereIn('id', $reversedColors)->get();
-    $savedColorsMapped = $savedColors->keyBy('id')->toArray();
-
-    $savedColors = array_map(fn($id) => $savedColorsMapped[$id] ?? null, $reversedColors);
-    $excludedSavedColors = array_keys($savedColorsMapped);
-    $colors =Color::where('status', 'Active')->whereNotIn('id', $excludedSavedColors)->get();
-
-    return view('products.steps.step-3', compact('savingProduct', 'sizes', 'savedColors', 'colors'));
-}
     /**
      * Generate a consistent two-digit code for the product ID.
      *
