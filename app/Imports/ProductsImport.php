@@ -169,7 +169,7 @@ class ProductsImport implements
                     'product_size_id' => $productSize->id,
                 ],
                 [
-                    'quantity' => 0,
+                    'quantity' => $quantity,
                     'total_quantity' => $quantity
                 ]
             );
@@ -184,7 +184,7 @@ class ProductsImport implements
                     'product_color_id' => $productColor->id,
                     'product_size_id' => $productSize->id,
                     'brand_id' => $brand_id,
-                    'quantity' => 0,
+                    'quantity' => $quantity,
                     'total_quantity' => $quantity
                 ]
             );
