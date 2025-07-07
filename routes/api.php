@@ -40,6 +40,7 @@ Route::post('/verify-otp', [LoginController::class, 'verify_otp']);
 Route::post('/reset-password', [LoginController::class, 'reset_password']);
 
 Route::get('/brands', [BrandController::class, 'brands'])->name('brand.index');
+Route::get('brand-products', [BrandController::class, 'getBrandProducts']);
 Route::get('/departments', [DepartmentController::class, 'departments'])->name('department.index');
 Route::get('/product-types', [ProductTypeController::class, 'producTypes'])->name('productType.index');
 Route::get('/collections', [CollectionApiController::class, 'collections']);
