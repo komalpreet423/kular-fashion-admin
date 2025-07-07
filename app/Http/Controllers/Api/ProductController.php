@@ -117,7 +117,7 @@ class ProductController extends Controller
             $transformedProducts = $this->transformProducts($products);
 
             // Paginate the transformed products manually
-            $perPage = $request->input('per_page', 10); // Default to 10 items per page
+            $perPage = $request->input('per_page', 20); // Default to 20 items per page
             $currentPage = $request->input('page', 1); // Default to page 1
             $paginatedProducts = $this->paginateCollection($transformedProducts, $perPage, $currentPage);
 
@@ -138,14 +138,14 @@ class ProductController extends Controller
             $productTypes = Product::whereIn('id', $products->pluck('id'))
                 ->with('productType')
                 ->get()
-                ->take(9)
                 ->pluck('productType')
+                ->filter()
                 ->unique('id')
-                ->flatten()
-                ->map(function ($brand) {
+                ->values() 
+                ->map(function ($type) {
                     return [
-                        'id' => $brand->id,
-                        'name' => $brand->name,
+                        'id' => $type->id,
+                        'name' => $type->name,
                     ];
                 });
 
@@ -182,7 +182,7 @@ class ProductController extends Controller
                     ];
                 });
 
-            $perPage = 9;
+            $perPage = 20;
             $page = request()->get('page', 1);
             $offset = ($page - 1) * $perPage;
             $paginatedSizes = $sizes->slice($offset, $perPage)->values();
@@ -221,8 +221,8 @@ class ProductController extends Controller
                 $response['filters'] = [
                     'brands' => $brands,
                     'product_types' => [
-                        //'data' => $productTypes,
-                        'data' => [],
+                        'data' => $paginatedProductTypes,
+                        // 'data' => [],
                         'pagination' => [
                             'total' => $productTypes->count(),
                             'per_page' => $perPage,
