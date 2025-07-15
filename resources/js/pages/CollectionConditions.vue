@@ -23,11 +23,11 @@
 
                 <div class="col-sm-6 col-md-3">
                     <label for="status">Image</label>
-                    <input type="file" name="image" class="form-control" accept="image/*">
+                    <input type="file" name="image" class="form-control" accept="image/*" @change="previewImage">
 
-                    <div class="row d-block">
+                    <div class="row d-block" v-if="imagePreviewUrl">
                         <div class="col-md-8 mt-2">
-                            <img src="" id="preview-collection" class="img-fluid w-50" name="collection_image" hidden>
+                            <img :src="imagePreviewUrl" id="preview-collection" class="img-fluid w-50" alt="Preview">
                         </div>
                     </div>
                 </div>
@@ -76,7 +76,8 @@
             </div>
             <div class="mt-3">
                 <h4 class="card-title">Description</h4>
-                <textarea name="description" id="description" class="editor" rows="2">{{ savedCollection.description }}</textarea>
+                <textarea name="description" id="description" class="editor"
+                    rows="2">{{ savedCollection.description }}</textarea>
             </div>
         </div>
     </div>
@@ -89,20 +90,21 @@
                     <div class="row">
                         <div class="col-sm-10">
                             <label for="heading">Heading</label>
-                            <input name="heading" id="heading" class="form-control" :value="savedCollection.heading" placeholder="Meta title" />
+                            <input name="heading" id="heading" class="form-control" :value="savedCollection.heading"
+                                placeholder="Meta title" />
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-4">
                     <div class="mb-3">
                         <label for="meta_title">Meta title</label>
-                        <input name="meta_title" id="meta_title" class="form-control" :value="savedCollection.meta_title"
-                            placeholder="Meta title" />
+                        <input name="meta_title" id="meta_title" class="form-control"
+                            :value="savedCollection.meta_title" placeholder="Meta title" />
                     </div>
                     <div class="mb-3">
                         <label for="meta_keywords">Meta Keywords</label>
-                        <input name="meta_keywords" id="meta_keywords" class="form-control" :value="savedCollection.meta_keywords"
-                            placeholder="Meta Keywords" />
+                        <input name="meta_keywords" id="meta_keywords" class="form-control"
+                            :value="savedCollection.meta_keywords" placeholder="Meta Keywords" />
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -161,6 +163,10 @@ export default {
             errors: {
                 name: ''
             },
+            imagePreviewUrl: this.savedCollection.image
+                ? `${window.location.origin}/${this.savedCollection.image}`
+                : '',
+
             conditionMap: {
                 tags: "Have one of these tags",
                 product_types: "Any of these product types",
@@ -169,7 +175,7 @@ export default {
                 price_status: "Have the price status",
                 published_within: "Have been published within"
             }
-        }
+        };
     },
     mounted() {
         if (this.savedCollection) {
@@ -253,6 +259,12 @@ export default {
         addNewCondition(conditionType) {
             this.conditionType = conditionType;
             $('#addConditionModal').modal('show');
+        },
+        previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.imagePreviewUrl = URL.createObjectURL(file);
+            }
         },
         removeCondition(payload) {
             let selectedCondition = this.conditions[payload.conditionType][payload.conditionIndex];
