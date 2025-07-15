@@ -23,11 +23,11 @@
 
                 <div class="col-sm-6 col-md-3">
                     <label for="status">Image</label>
-                    <input type="file" name="collection_image" class="form-control" accept="image/*">
+                    <input type="file" name="image" class="form-control" accept="image/*">
 
                     <div class="row d-block">
                         <div class="col-md-8 mt-2">
-                            <img src="" id="preview-collection" class="img-fluid w-50" name="image" hidden>
+                            <img src="" id="preview-collection" class="img-fluid w-50" name="collection_image" hidden>
                         </div>
                     </div>
                 </div>
@@ -209,7 +209,7 @@ export default {
             }
         }
 
-        $('[name="collection_image"]').change(function (event) {
+        $('[name="image"]').change(function (event) {
             var reader = new FileReader();
             reader.onload = function (e) {
                 $('#preview-collection').attr('src', e.target.result).removeAttr('hidden');
