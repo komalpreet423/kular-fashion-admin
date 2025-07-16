@@ -103,7 +103,7 @@ class Product extends Model
 
     public function webImage()
     {
-        return $this->hasMany(ProductWebImage::class);
+        return $this->hasMany(ProductWebImage::class,'product_id');
     }
 
     public function webInfo()

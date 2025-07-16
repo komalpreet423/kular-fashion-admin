@@ -437,7 +437,7 @@ class OrdersController extends Controller
 
     public function orderGet($id = null)
     {
-        $query = CustomerOrders::with(['orderItems', 'orderItems.product', 'orderItems.user']);
+        $query = CustomerOrders::with(['orderItems', 'orderItems.product','orderItems.variant','orderItems.product.webImage', 'orderItems.user']);
 
         if (!is_null($id)) {
             $query->where('id', $id);
