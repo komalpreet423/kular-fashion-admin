@@ -10,21 +10,20 @@
                 <x-form-input name="slug" label="Slug" value="{{ old('slug', $webPage->slug ?? '') }}"
                     placeholder="Enter Slug" />
             </div>
-            @if (isset($webPage) && $webPage->exists)
-                <div class="col-md-4">
-                    <x-form-input type="datetime-local" class="date-picker-publish" name="published_at"
-                        label="Published Timestamp" :value="old(
-                            'published_at',
-                            $webPage->published_at
-                                ? \Carbon\Carbon::parse($webPage->published_at)->format('Y-m-d\TH:i')
-                                : '',
-                        )" disabled="true" />
-                </div>
-            @endif
+
+            <div class="col-md-4">
+                <x-form-input type="datetime-local" class="date-picker-publish" name="published_at"
+                    label="Published Timestamp" :value="old(
+                        'published_at',
+                        isset($webPage->published_at)
+                            ? \Carbon\Carbon::parse($webPage->published_at)->format('Y-m-d\TH:i')
+                            : \Carbon\Carbon::now()->format('Y-m-d\TH:i'),
+                    )" />
+            </div>
         </div>
 
-       <h4 class="card-title mt-2">Page Content</h4>
-<textarea name="page_content" class="form-control editor" rows="5" placeholder="Enter Page Content">{!! old('page_content', $webPage->page_content ?? '') !!}</textarea>
+        <h4 class="card-title mt-2">Page Content</h4>
+        <textarea name="page_content" class="form-control editor" rows="5" placeholder="Enter Page Content">{!! old('page_content', $webPage->page_content ?? '') !!}</textarea>
     </div>
 </div>
 
@@ -216,13 +215,14 @@
         justify-content: center;
         flex-direction: column;
     }
+
     .dropzone-content {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
     .dropzone:hover {
         border-color: #999;

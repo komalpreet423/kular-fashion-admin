@@ -37,6 +37,7 @@ class WebPagesController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:web_pages,slug',
+            'published_at' => 'nullable',
             'page_content' => 'nullable|string',
             'description' => 'nullable|string',
             'summary' => 'nullable|string',
@@ -77,8 +78,8 @@ class WebPagesController extends Controller
             abort(403);
         }
         $webPage = WebPages::findOrFail($id);
-        $tags = Tag::where('status', 'Active')->pluck('name')->toArray(); 
-        return view('web-pages.edit', compact('webPage', 'tags')); 
+        $tags = Tag::where('status', 'Active')->pluck('name')->toArray();
+        return view('web-pages.edit', compact('webPage', 'tags'));
     }
 
     public function update(Request $request, string $id)
@@ -88,10 +89,11 @@ class WebPagesController extends Controller
         }
 
         $validated = $request->validate([
-            
+
             'title' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:web_pages,slug,' . $id,
             'page_content' => 'nullable|string',
+            'published_at' => 'nullable',
             'description' => 'nullable|string',
             'summary' => 'nullable|string',
             'heading' => 'nullable|string|max:255',
