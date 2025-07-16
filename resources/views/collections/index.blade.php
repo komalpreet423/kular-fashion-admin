@@ -33,7 +33,14 @@
                                         <tr>
                                             <td>{{ ++$key }}</td>
                                             <td>{{ ucwords($collection->name) }}</td>
-                                            <td>{{ $collection->image }}</td>
+                                            <td>
+                                                @if ($collection->image && file_exists(public_path($collection->image)))
+                                                    <img src="{{ asset($collection->image) }}" alt="Collection Image"
+                                                        width="40" height="40" class="rounded">
+                                                @else
+                                                    <span class="text-muted">No Image</span>
+                                                @endif
+                                            </td>
                                             @canany(['edit collections', 'delete collections'])
                                                 <td>
                                                     @if (Auth::user()->can('edit collections'))

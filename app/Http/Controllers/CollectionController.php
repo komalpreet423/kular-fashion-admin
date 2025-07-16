@@ -51,6 +51,20 @@ class CollectionController extends Controller
             abort(403);
         }
 
+        $request->validate([
+            'collection_name' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $imagePath = null;
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/collections'), $imageName);
+            $imagePath = 'uploads/collections/' . $imageName;
+        }
+
         Collection::create([
             'name' => $request->collection_name,
             'include_conditions' => json_encode($request->include),
@@ -62,10 +76,12 @@ class CollectionController extends Controller
             'meta_keywords' => $request->meta_keywords,
             'meta_description' => $request->meta_description,
             'status' => $request->status,
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('collections.index')->with('success', 'Collection Added successfully.');
     }
+
 
     /**
      * Display the specified resource.
@@ -98,6 +114,24 @@ class CollectionController extends Controller
      */
     public function update(Request $request, Collection $collection)
     {
+        $request->validate([
+            'collection_name' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $imagePath = $collection->image;
+
+        if ($request->hasFile('image')) {
+            if ($collection->image && file_exists(public_path($collection->image))) {
+                unlink(public_path($collection->image));
+            }
+
+            $image = $request->file('image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/collections'), $imageName);
+            $imagePath = 'uploads/collections/' . $imageName;
+        }
+
         $collection->update([
             'name' => $request->collection_name,
             'include_conditions' => json_encode($request->include),
@@ -109,9 +143,10 @@ class CollectionController extends Controller
             'meta_keywords' => $request->meta_keywords,
             'meta_description' => $request->meta_description,
             'status' => $request->status,
+            'image' => $imagePath,
         ]);
 
-        return redirect()->back()->with("success","Collection Updated successfully");
+        return redirect()->back()->with("success", "Collection Updated successfully");
     }
 
     /**
@@ -119,7 +154,7 @@ class CollectionController extends Controller
      */
     public function destroy(Collection $collection)
     {
-        if(!Gate::allows('delete collections')) {
+        if (!Gate::allows('delete collections')) {
             abort(403);
         }
         $collection->delete();
