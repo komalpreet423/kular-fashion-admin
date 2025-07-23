@@ -52,9 +52,9 @@
                     </div>
                     <div class="col-md-6 tag-group" style="display: none;">
                         <label class="form-label">Tags</label>
-                        <select name="rules[0][tags][]" class="form-select tags-select" multiple>
+                        <select name="rules[0][tag_ids][]" class="form-select tags-select" multiple>
                             @foreach ($tags as $tag)
-                                <option value="{{ $tag }}">{{ $tag }}</option>
+                                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -462,18 +462,17 @@
                 text: 'Tags'
             }),
             $('<select>', {
-                name: `rules[${index}][tags][]`,
+                name: `rules[${index}][tag_ids][]`,
                 class: 'form-select tags-select',
                 multiple: 'multiple'
             })
         );
 
-
         @foreach ($tags as $tag)
             $tagCol.find('select').append(
                 $('<option>', {
-                    value: '{{ $tag }}',
-                    text: '{{ $tag }}'
+                    value: '{{ $tag->id }}',
+                    text: '{{ $tag->name }}'
                 })
             );
         @endforeach
@@ -523,9 +522,12 @@
             if (selectedValue === 'has_all_tags') {
                 $tagSelect.find('option').prop('selected', true);
                 $tagSelect.trigger('change');
+            } else {
+                $tagSelect.val(null).trigger('change');
             }
         } else {
             $tagGroup.hide();
+            $tagSelect.val(null).trigger('change');
         }
     });
     $(document).on('select2:open', () => {
