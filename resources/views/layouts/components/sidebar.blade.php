@@ -113,6 +113,7 @@
                             <ul class="sub-menu" aria-expanded="false">
                               <li><a href="{{ route('home.index') }}">Home</a></li>
                               <li><a href="{{ route('submenu-options.index') }}">Submenu Options</a></li>
+                              <li><a href="{{ route('footer-links.index') }}">blocks</a></li>
                             </ul>
                         </li>
                     </ul>
