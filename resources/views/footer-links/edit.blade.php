@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Footer Link')
+@section('title', 'Edit Block')
 
 @section('header-button')
     <a href="{{ route('footer-links.index') }}" class="btn btn-primary">
