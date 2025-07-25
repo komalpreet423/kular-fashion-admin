@@ -22,7 +22,7 @@
                             <th>Name</th>
                             <th>Key</th>
                             <th>Description</th>
-                            <th>Attributes</th>
+                            {{-- <th>Attributes</th> --}}
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -33,7 +33,7 @@
                                 <td>{{ $block->name }}</td>
                                 <td>{{ $block->key }}</td>
                                 <td>{{ $block->description }}</td>
-                                <td>
+                                {{-- <td>
                                     @foreach($block->attributes as $attr)
                                         <div>
                                             <strong>{{ $attr->name }}</strong>
@@ -46,7 +46,7 @@
                                             @endif
                                         </div>
                                     @endforeach
-                                </td>
+                                </td> --}}
                                 <td>
                                     <a href="{{ route('footer-links.edit', $block) }}" class="btn btn-sm btn-primary py-0 px-1"><i class="fas fa-edit"></i></a>
                                     <button data-endpoint="{{ route('footer-links.destroy', $block) }}"
