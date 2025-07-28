@@ -294,7 +294,6 @@
                     $content.text(item.title);
                 }
 
-                // Add delete button
                 const $deleteBtn = $('<button>')
                     .addClass('btn btn-sm btn-outline-danger')
                     .html('<i class="fas fa-trash"></i>')
@@ -332,7 +331,7 @@
                 $panel.html('');
                 const $clone = $template.clone().removeClass('d-none').attr('id', '');
 
-                // Clear any previous file inputs
+               
                 $clone.find('input[type="file"]').val('');
 
                 if (item) {
@@ -340,7 +339,7 @@
                         const value = item.data[key];
                         if (value !== null && value !== undefined) {
                             if (key === 'image_url' && item.type === 'image') {
-                                // For image items, show the preview
+                               
                                 $clone.find('#liveImagePreview').attr('src', value).show();
                                 $clone.find('#selectedFileName').text(value.split('/').pop());
                             } else {
@@ -356,7 +355,7 @@
                     saveItem(templateId, item ? item.id : null);
                 });
 
-                // Handle file input changes only for image form
+                
                 if (templateId === 'imageForm') {
                     $clone.find('input[type="file"]').on('change', function(event) {
                         const file = event.target.files[0];
@@ -378,7 +377,7 @@
             const $form = $('#rightPanel form');
             let isValid = true;
 
-            // Clear previous errors
+        
             $form.find('.is-invalid').removeClass('is-invalid');
             $form.find('.invalid-feedback').hide();
 
@@ -396,7 +395,7 @@
             let title = '';
             const typePrefix = type.replace('Form', '').toLowerCase();
 
-            // Validate based on type
+        
             switch (typePrefix) {
                 case 'menu':
                     if (!formData['menu_name']?.trim()) {
@@ -462,7 +461,6 @@
                 return false;
             }
 
-            // Process image if needed
             if (typePrefix === 'image') {
                 const fileInput = $form.find('input[type="file"]')[0];
                 const files = fileInput?.files;
@@ -475,7 +473,7 @@
                         finalizeSave();
                     };
                     reader.readAsDataURL(files[0]);
-                    return; // Wait for reader to complete
+                    return; 
                 } else if (itemId) {
                     const existingItem = items.find(item => item.id === itemId);
                     if (existingItem && existingItem.data.image_url) {
