@@ -27,43 +27,66 @@
     </div>
 </div>
 
+
 <!-- Listing Page Rules -->
 <div class="card">
     <div class="card-body p-3">
         <h4 class="card-title">Listing Page Rules</h4>
 
         <div id="rules-container">
-            <div class="rule-group border p-3 mb-3">
+            @php
+               
+                $rules = [];
+                if (isset($webPage->rules)) {
+                    if (is_string($webPage->rules)) {
+                        $rules = json_decode($webPage->rules, true) ?? [['type' => 'must', 'condition' => '', 'tag_ids' => []]];
+                    } elseif (is_array($webPage->rules)) {
+                        $rules = $webPage->rules;
+                    }
+                }
+                $rules = old('rules', $rules ?: [['type' => 'must', 'condition' => '', 'tag_ids' => []]]);
+                
+            
+                if (empty($rules)) {
+                    $rules = [['type' => 'must', 'condition' => '', 'tag_ids' => []]];
+                }
+            @endphp
+
+            @foreach($rules as $index => $rule)
+            <div class="rule-group border p-3 mb-3 position-relative">
+                <button type="button" class="btn btn-sm btn-outline-danger delete-rule-group" onclick="deleteRuleGroup(this)" style="position: absolute; right: 10px; top: 10px; width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                    <i class="fas fa-times"></i>
+                </button>
                 <div class="row">
                     <div class="col-md-3">
                         <label class="form-label">Rule</label>
-                        <select name="rules[0][type]" class="form-select">
-                            <option value="must">Must</option>
-                            <option value="must_not">Must Not</option>
+                        <select name="rules[{{ $index }}][type]" class="form-select">
+                            <option value="must" {{ ($rule['type'] ?? 'must') == 'must' ? 'selected' : '' }}>Must</option>
+                            <option value="must_not" {{ ($rule['type'] ?? 'must') == 'must_not' ? 'selected' : '' }}>Must Not</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Condition</label>
-                        <select name="rules[0][condition]" class="form-select condition-select">
+                        <select name="rules[{{ $index }}][condition]" class="form-select condition-select">
                             <option value="">Select Condition</option>
-                            <option value="has_tags">Have one of these tags</option>
-                            <option value="has_all_tags">Have all of these tags</option>
+                            <option value="has_tags" {{ ($rule['condition'] ?? '') == 'has_tags' ? 'selected' : '' }}>Have one of these tags</option>
+                            <option value="has_all_tags" {{ ($rule['condition'] ?? '') == 'has_all_tags' ? 'selected' : '' }}>Have all of these tags</option>
                         </select>
                     </div>
-                    <div class="col-md-6 tag-group" style="display: none;">
+                    <div class="col-md-6 tag-group" style="{{ in_array($rule['condition'] ?? '', ['has_tags', 'has_all_tags']) ? '' : 'display: none;' }}">
                         <label class="form-label">Tags</label>
-                        <select name="rules[0][tag_ids][]" class="form-select tags-select" multiple>
+                        <select name="rules[{{ $index }}][tag_ids][]" class="form-select tags-select" multiple data-selected="{{ isset($rule['tag_ids']) ? json_encode($rule['tag_ids']) : '[]' }}">
                             @foreach ($tags as $tag)
-                                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                <option value="{{ $tag->id }}" {{ isset($rule['tag_ids']) && in_array($tag->id, $rule['tag_ids']) ? 'selected' : '' }}>{{ $tag->name }}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
             </div>
+            @endforeach
         </div>
 
-        <button type="button" class="btn btn-outline-primary mt-2" onclick="addRuleGroup()">+ Add New Rule
-            Group</button>
+        <button type="button" class="btn btn-outline-primary mt-2" onclick="addRuleGroup()">+ Add New Rule Group</button>
     </div>
 </div>
 
@@ -299,15 +322,17 @@
 
 <script>
     $(document).ready(function() {
-
-        $('.tags-select').select2({
-            tags: true,
-            tokenSeparators: [','],
-            width: '100%',
-            placeholder: 'Select or type tags',
-            allowClear: true
+        // Initialize select2 for tags with any pre-selected values
+        $('.tags-select').each(function() {
+            var selectedValues = $(this).data('selected') || [];
+            $(this).select2({
+                tags: true,
+                tokenSeparators: [','],
+                width: '100%',
+                placeholder: 'Select or type tags',
+                allowClear: true
+            }).val(selectedValues).trigger('change');
         });
-
 
         $('.dropzone').each(function() {
             const dropzone = $(this);
@@ -337,20 +362,6 @@
             }
         });
 
-        function previewImage(event) {
-            const file = event.target.files[0];
-            const previewBox = document.getElementById('preview_large');
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewBox.innerHTML =
-                        `<img src="${e.target.result}" class="img-thumbnail uploaded-image" width="150">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
         function toggleFilterList() {
             if ($('#filter_mode_show_some').is(':checked')) {
                 $('#filter-list').show();
@@ -362,7 +373,6 @@
         toggleFilterList();
         $('#filter_mode_show_some').on('change', toggleFilterList);
 
-
         $('#description').on('input', function() {
             const text = $(this).val();
             $('#wordCount').text(text.trim() ? text.trim().split(/\s+/).length : 0);
@@ -370,14 +380,15 @@
         }).trigger('input');
     });
 
-
     function addRuleGroup() {
         var index = $('.rule-group').length;
+        var $firstGroup = $('.rule-group').first();
+        var selectedCondition = $firstGroup.find('.condition-select').val();
+        var selectedTags = $firstGroup.find('.tags-select').val();
 
         var $ruleGroup = $('<div>', {
             class: 'rule-group border p-3 mb-3 position-relative'
         });
-
 
         var $deleteBtn = $('<button>', {
             type: 'button',
@@ -418,7 +429,8 @@
             }).append(
                 $('<option>', {
                     value: 'must',
-                    text: 'Must'
+                    text: 'Must',
+                    selected: true
                 }),
                 $('<option>', {
                     value: 'must_not',
@@ -444,18 +456,20 @@
                 }),
                 $('<option>', {
                     value: 'has_tags',
-                    text: 'Have one of these tags'
+                    text: 'Have one of these tags',
+                    selected: selectedCondition === 'has_tags'
                 }),
                 $('<option>', {
                     value: 'has_all_tags',
-                    text: 'Have all of these tags'
+                    text: 'Have all of these tags',
+                    selected: selectedCondition === 'has_all_tags'
                 })
             )
         );
 
         var $tagCol = $('<div>', {
             class: 'col-md-6 tag-group',
-            style: 'display: none;'
+            style: selectedCondition ? '' : 'display: none;'
         }).append(
             $('<label>', {
                 class: 'form-label',
@@ -464,7 +478,8 @@
             $('<select>', {
                 name: `rules[${index}][tag_ids][]`,
                 class: 'form-select tags-select',
-                multiple: 'multiple'
+                multiple: 'multiple',
+                'data-selected': JSON.stringify(selectedTags || [])
             })
         );
 
@@ -472,7 +487,8 @@
             $tagCol.find('select').append(
                 $('<option>', {
                     value: '{{ $tag->id }}',
-                    text: '{{ $tag->name }}'
+                    text: '{{ $tag->name }}',
+                    selected: selectedTags && selectedTags.includes('{{ $tag->id }}')
                 })
             );
         @endforeach
@@ -488,14 +504,16 @@
             placeholder: 'Select or type tags',
             allowClear: true
         });
+
+        if (selectedCondition) {
+            $ruleGroup.find('.condition-select').trigger('change');
+        }
     }
 
     function deleteRuleGroup(button) {
-
         if ($('.rule-group').length > 1) {
             $(button).closest('.rule-group').fadeOut(200, function() {
                 $(this).remove();
-
                 $('.rule-group').each(function(index) {
                     $(this).find('select, input').each(function() {
                         var name = $(this).attr('name');
@@ -522,14 +540,13 @@
             if (selectedValue === 'has_all_tags') {
                 $tagSelect.find('option').prop('selected', true);
                 $tagSelect.trigger('change');
-            } else {
-                $tagSelect.val(null).trigger('change');
             }
         } else {
             $tagGroup.hide();
             $tagSelect.val(null).trigger('change');
         }
     });
+
     $(document).on('select2:open', () => {
         document.querySelector('.select2-container--open .select2-search__field').focus();
     });
