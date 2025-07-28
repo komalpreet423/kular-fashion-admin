@@ -37,7 +37,6 @@ use App\Http\Controllers\WebPagesController;
 use App\Http\Controllers\WebsiteOrdersController;
 use App\Http\Controllers\WebsiteGiftVoucherController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SubmenuOptionController;
 use App\Http\Controllers\FooterLinkController;
 
@@ -85,7 +84,6 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'orders' => WebsiteOrdersController::class,
         'gift-voucher' => WebsiteGiftVoucherController::class,
         'customers' => CustomerController::class,
-        'home' => HomeController::class,
         'submenu-options' => SubmenuOptionController::class,
 
     ]);
@@ -94,7 +92,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         'footer-links' => 'block'
     ]);
 
-    Route::post('/home/upload-images', [HomeController::class, 'uploadImages'])->name('images.upload');
+    
 
     Route::get('inventory-history', [InventoryTransferController::class, 'inventoryHistory'])->name('inventory-history');
 

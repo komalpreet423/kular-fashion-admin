@@ -98,14 +98,14 @@ class WebPagesController extends Controller
             $query->whereHas('webInfo', function ($q) {
                 $q->where('status', 1);
             })
-            ->orWhereHas('webInfo', function ($q) {
-                $q->where('status', 2);
-            })->whereHas('quantities', function ($q) {
-                $q->select('product_id')
-                  ->groupBy('product_id')
-                  ->havingRaw('SUM(quantity) > 0');
-            })
-            ->orWhereDoesntHave('webInfo');
+                ->orWhereHas('webInfo', function ($q) {
+                    $q->where('status', 2);
+                })->whereHas('quantities', function ($q) {
+                    $q->select('product_id')
+                        ->groupBy('product_id')
+                        ->havingRaw('SUM(quantity) > 0');
+                })
+                ->orWhereDoesntHave('webInfo');
         });
     }
 
@@ -114,43 +114,34 @@ class WebPagesController extends Controller
         foreach ($rules as $rule) {
             if (!is_array($rule)) continue;
 
-            switch ($rule['type'] ?? null) {
-                case 'department':
-                    if (isset($rule['value'])) {
-                        $query->whereHas('department', function ($q) use ($rule) {
-                            $q->where('slug', $rule['value']);
-                        });
-                    }
+            $type = $rule['type'] ?? null;
+            $condition = $rule['condition'] ?? null;
+            $tagIds = $rule['tag_ids'] ?? [];
+
+            // Skip if no valid condition or no tag IDs
+            if (empty($condition) || empty($tagIds)) continue;
+
+            switch ($condition) {
+                case 'has_tags':
+                    // Products must have at least one of these tags
+                    $query->whereHas('tags', function ($q) use ($tagIds, $type) {
+                        $q->whereIn('id', $tagIds);
+                        if ($type === 'must_not') {
+                            $q->whereNotIn('id', $tagIds);
+                        }
+                    });
                     break;
 
-                case 'product_type':
-                    if (isset($rule['value'])) {
-                        $query->whereHas('productType', function ($q) use ($rule) {
-                            $q->where('slug', $rule['value']);
-                        });
-                    }
-                    break;
-
-                case 'brand':
-                    if (isset($rule['value'])) {
-                        $query->whereHas('brand', function ($q) use ($rule) {
-                            $q->where('slug', $rule['value']);
-                        });
-                    }
-                    break;
-
-                case 'tag':
-                    if (isset($rule['value'])) {
-                        $query->whereHas('tags', function ($q) use ($rule) {
-                            $q->where('slug', $rule['value']);
-                        });
-                    }
-                    break;
-
-                case 'product_ids':
-                    if (isset($rule['values']) && is_array($rule['values'])) {
-                        $query->whereIn('id', $rule['values']);
-                    }
+                case 'has_all_tags':
+                    // Products must have all of these tags
+                    $query->whereHas('tags', function ($q) use ($tagIds, $type) {
+                        foreach ($tagIds as $tagId) {
+                            $q->where('id', $tagId);
+                        }
+                        if ($type === 'must_not') {
+                            $q->whereNotIn('id', $tagIds);
+                        }
+                    }, '=', count($tagIds));
                     break;
             }
         }

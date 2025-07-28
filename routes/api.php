@@ -55,7 +55,6 @@ Route::post('/gift-cards/get', [GiftCardController::class, 'getGiftCard']);
 Route::post('/gift-cards/redeem', [GiftCardController::class, 'redeemGiftCard']);
 Route::post('/gift-cards/delete', [GiftCardController::class, 'deleteGiftCard']);
 Route::get('/menus', [MenuController::class, 'index']);
-Route::get('/home-images', [MenuController::class, 'getImages']);
 Route::get('/submenu-options', [SubmenuOptionController::class, 'index']); 
 Route::get('/blocks', [BlockController::class, 'index']);
 Route::get('/blocks/{id}', [BlockController::class, 'show']);
