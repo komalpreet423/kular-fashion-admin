@@ -43,6 +43,10 @@
                                             </td>
                                             @canany(['edit collections', 'delete collections'])
                                                 <td>
+                                                    <a target="_blank" rel="noopener noreferrer" href="{{ config('app.web_collection').$collection->slug }}"
+                                                        class="btn btn-primary btn-sm edit py-0 px-1">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                     @if (Auth::user()->can('edit collections'))
                                                         <a href="{{ route('collections.edit', $collection->id) }}"
                                                             class="btn btn-primary btn-sm edit py-0 px-1"><i

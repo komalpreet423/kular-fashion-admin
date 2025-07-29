@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Imports\SizeCodeImport;
 use App\Imports\ProductsImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -204,5 +204,20 @@ class ProductImportExportController extends Controller
                 'A' . ($key + 2)
             );
         }
+    }
+
+    public function importSizeCodes(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        Excel::import(new SizeCodeImport, $request->file('file'));
+
+       // return back()->with('success', 'Size codes updated successfully.');
+    }
+    public function showSizeCodeImportForm()
+    {
+        return view('size-import');
     }
 }

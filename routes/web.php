@@ -171,3 +171,6 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
 });
 
 
+Route::get('/update-data',[ProductController::class,'updateData']);
+Route::get('/import-size', [ProductImportExportController::class, 'showSizeCodeImportForm'])->name('import.size.codes.form');
+Route::post('/import-size-codes', [ProductImportExportController::class, 'importSizeCodes'])->name('import.size.codes');

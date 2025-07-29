@@ -120,23 +120,23 @@
                     <option value="tag">Tag</option>
                 </select>
 
-<div id="filter-container" class="mt-1">
-    <ul class="list-reset flex flex-col leading-normal mt-2" style="list-style: none;">
-        <li v-for="(isCollapsed, filterKey) in collapsedFilters" :key="filterKey" class="collaps-list mt-2">
-            <div class="flex flex-row items-center justify-between">
-                {{ formatFilterName(filterKey) }}
-            </div>
-            <div class="checkbox d-flex" style="gap: 5px;">
-                <input 
-                    type="checkbox" 
-                    :name="'collaps[' + filterKey + ']'"
-                    v-model="collapsedFilters[filterKey]"
-                >
-                Collapse
-            </div>
-        </li>
-    </ul>
-</div>
+                <div id="filter-container" class="mt-1">
+                    <ul class="list-reset flex flex-col leading-normal mt-2" style="list-style: none;">
+                        <li v-for="(isCollapsed, filterKey) in collapsedFilters" :key="filterKey" class="collaps-list mt-2">
+                            <div class="flex flex-row items-center justify-between">
+                                {{ formatFilterName(filterKey) }}
+                            </div>
+                            <div class="checkbox d-flex" style="gap: 5px;">
+                                <input 
+                                    type="checkbox" 
+                                    :name="'collaps[' + filterKey + ']'"
+                                    v-model="collapsedFilters[filterKey]"
+                                >
+                                Collapse
+                            </div>
+                        </li>
+                    </ul>
+                </div>
 
             </div>
 
