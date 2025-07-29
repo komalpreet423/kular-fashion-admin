@@ -19,6 +19,8 @@ use App\Http\Controllers\Api\OrdersController;
 use App\Http\Controllers\Api\GetCountriesAndStatesController;
 use App\Http\Controllers\Api\ContactUsController;
 use App\Http\Controllers\Api\WebPagesController;
+use App\Http\Controllers\Api\SubmenuOptionController;
+use App\Http\Controllers\Api\BlockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +56,10 @@ Route::post('/gift-cards/redeem', [GiftCardController::class, 'redeemGiftCard'])
 Route::post('/gift-cards/delete', [GiftCardController::class, 'deleteGiftCard']);
 Route::get('/menus', [MenuController::class, 'index']);
 Route::get('/home-images', [MenuController::class, 'getImages']);
+Route::get('/submenu-options', [SubmenuOptionController::class, 'index']); 
+Route::get('/blocks', [BlockController::class, 'index']);
+Route::get('/blocks/{id}', [BlockController::class, 'show']);
+Route::get('/blocks/section/{key}', [BlockController::class, 'getSectionBlocks']);
 
 Route::get('/countries', [GetCountriesAndStatesController::class, 'getCountries']);
 Route::get('/states/{countryId}', [GetCountriesAndStatesController::class, 'getStates']);
