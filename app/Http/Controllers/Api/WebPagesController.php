@@ -116,32 +116,64 @@ class WebPagesController extends Controller
 
             $type = $rule['type'] ?? null;
             $condition = $rule['condition'] ?? null;
-            $tagIds = $rule['tag_ids'] ?? [];
 
-            // Skip if no valid condition or no tag IDs
-            if (empty($condition) || empty($tagIds)) continue;
+            if ($type === 'must' && $condition === 'has_tags' && !empty($rule['tag_ids'])) {
+                $query->whereHas('tags', function ($q) use ($rule) {
+                    $q->whereIn('tag_id', $rule['tag_ids']);
+                });
+            }
 
-            switch ($condition) {
-                case 'has_tags':
-                    // Products must have at least one of these tags
-                    $query->whereHas('tags', function ($q) use ($tagIds, $type) {
-                        $q->whereIn('id', $tagIds);
-                        if ($type === 'must_not') {
-                            $q->whereNotIn('id', $tagIds);
-                        }
+            if ($type === 'must_not' && $condition === 'has_tags' && !empty($rule['tag_ids'])) {
+                $query->whereDoesntHave('tags', function ($q) use ($rule) {
+                    $q->whereIn('tag_id', $rule['tag_ids']);
+                });
+            }
+
+            if ($type === 'must' && $condition === 'has_all_tags' && !empty($rule['tag_ids'])) {
+                foreach ($rule['tag_ids'] as $tagId) {
+                    $query->whereHas('tags', function ($q) use ($tagId) {
+                        $q->where('tag_id', $tagId);
                     });
+                }
+            }
+
+            switch ($type) {
+                case 'department':
+                    if (isset($rule['value'])) {
+                        $query->whereHas('department', function ($q) use ($rule) {
+                            $q->where('slug', $rule['value']);
+                        });
+                    }
                     break;
 
-                case 'has_all_tags':
-                    // Products must have all of these tags
-                    $query->whereHas('tags', function ($q) use ($tagIds, $type) {
-                        foreach ($tagIds as $tagId) {
-                            $q->where('id', $tagId);
-                        }
-                        if ($type === 'must_not') {
-                            $q->whereNotIn('id', $tagIds);
-                        }
-                    }, '=', count($tagIds));
+                case 'product_type':
+                    if (isset($rule['value'])) {
+                        $query->whereHas('productType', function ($q) use ($rule) {
+                            $q->where('slug', $rule['value']);
+                        });
+                    }
+                    break;
+
+                case 'brand':
+                    if (isset($rule['value'])) {
+                        $query->whereHas('brand', function ($q) use ($rule) {
+                            $q->where('slug', $rule['value']);
+                        });
+                    }
+                    break;
+
+                case 'tag':
+                    if (isset($rule['value'])) {
+                        $query->whereHas('tags', function ($q) use ($rule) {
+                            $q->where('slug', $rule['value']);
+                        });
+                    }
+                    break;
+
+                case 'product_ids':
+                    if (isset($rule['values']) && is_array($rule['values'])) {
+                        $query->whereIn('id', $rule['values']);
+                    }
                     break;
             }
         }
@@ -257,7 +289,8 @@ class WebPagesController extends Controller
             'published_at' => $webPage->published_at,
             'hide_categories' => $webPage->hide_categories,
             'hide_all_filters' => $webPage->hide_all_filters,
-            'show_all_filters' => $webPage->show_all_filters
+            'show_all_filters' => $webPage->show_all_filters,
+            'rules' => is_array($webPage->rules) ? $webPage->rules : json_decode($webPage->rules, true)
         ];
     }
 }
