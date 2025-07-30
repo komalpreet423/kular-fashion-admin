@@ -1179,7 +1179,8 @@ class ProductController extends Controller
     public function editWebConfigration(Product $product)
     {
         $tags = Tag::where('status', 'Active')->orderBy('name', 'ASC')->get();
-        return view('products.web-configuration.edit', compact('product', 'tags'));
+        $quantity = ProductQuantity::where('product_id', $product->id)->sum('quantity');
+        return view('products.web-configuration.edit', compact('product', 'tags','quantity'));
     }
 
     protected function syncSpecifications($productId, $specifications)
