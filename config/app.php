@@ -53,6 +53,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'web_collection' => env('WEB_COLLECTION', 'http://localhost:3000/collection/'),
 
     /*
     |--------------------------------------------------------------------------

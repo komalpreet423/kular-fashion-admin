@@ -565,11 +565,9 @@ class ProductController extends Controller
 
     public function getProducts(Request $request)
     {
-        $query = Product::with(['brand', 'department', 'quantities', 'productType', 'colors.colorDetail', 'sizes.sizeDetail']);
+        $query = Product::with(['brand', 'department', 'quantities', 'productType', 'colors.colorDetail', 'sizes.sizeDetail','webInfo']);
 
-        if ($request->new_products_only) {
-            $query->where('are_barcodes_printed', 0)->orWhere('barcodes_printed_for_all', 0);
-        }
+
 
         if ($request->has('brand_id') && $request->brand_id) {
             $query->whereHas('brand', function ($q) use ($request) {
@@ -606,6 +604,9 @@ class ProductController extends Controller
                         $q->where('name', 'like', "%{$search}%");
                     });
             });
+        }
+        if ($request->new_products_only) {
+            $query->where('are_barcodes_printed', 0)->orWhere('barcodes_printed_for_all', 0);
         }
         
         // Sorting logic
@@ -663,7 +664,7 @@ class ProductController extends Controller
             ->join('departments', 'products.department_id', '=', 'departments.id')
             ->select('products.*')
             ->paginate($request->input('length', 10));
-    
+
         return response()->json([
             'draw' => $request->input('draw'),
             'recordsTotal' => $products->total(),
@@ -1485,6 +1486,59 @@ class ProductController extends Controller
             return response()->json(["success" => true, "message" => "This code already existing"]);
         }else{
             return response()->json(["success" => false, "message" => "true"]);
+        }
+    }
+    public function updateData()
+    {
+        DB::beginTransaction();
+
+        try {
+            // Step 1: Update new_code based on id
+            $sizes = Size::all();
+            foreach ($sizes as $size) {
+                $size->new_code = str_pad($size->id, 3, '0', STR_PAD_LEFT);
+                $size->save();
+            }
+
+            // Step 2: Normalize size names to uppercase if not duplicated
+            $sizes = Size::all();
+            $normalizedNames = [];
+
+            foreach ($sizes as $size) {
+                $upperName = strtoupper($size->size);
+
+                // If another entry already has this uppercased name, delete this one
+                if (in_array($upperName, $normalizedNames)) {
+                    if (strtolower($size->size) === $size->size) {
+                        // It's a lowercase duplicate, delete it
+                        $size->delete();
+                    }
+                    continue;
+                }
+
+                // If the name is not already in uppercase, and no duplicate exists, update it
+                if ($size->size !== $upperName) {
+                    $existing = Size::where('size', $upperName)->first();
+                    if ($existing) {
+                        // Already exists, delete current lowercase
+                        $size->delete();
+                    } else {
+                        // Doesn't exist — safe to update
+                        $size->size = $upperName;
+                        $size->save();
+                        $normalizedNames[] = $upperName;
+                    }
+                } else {
+                    $normalizedNames[] = $upperName;
+                }
+            }
+
+            DB::commit();
+            return 'Update completed successfully.';
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return 'Error occurred: ' . $e->getMessage();
         }
     }
 }

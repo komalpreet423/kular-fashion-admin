@@ -86,6 +86,7 @@
                                     <th>Description</th>
                                     <th>Manufacture Code</th>
                                     <th>Price</th>
+                                    <th>Visible</th>
                                 </tr>
                             </thead>
 
@@ -109,7 +110,10 @@
 
         var table = $('#product-table').DataTable({
             processing: true,
-
+            lengthMenu: [ 
+                [10, 25, 50, 100, 250, 350, 500, -1], 
+                [10, 25, 50, 100, 250, 350, 500] 
+            ],
             serverSide: true,
             dom: 'rt<"d-flex justify-content-between align-items-center "<"dt-info-left"i><"d-flex align-items-center gap-2"l p>><"clear">',
             
@@ -172,6 +176,20 @@
                 {
                     title: "Price",
                     data: 'price'
+                },
+                {
+                    title: "Visible",
+                    data: 'visible',
+                    render: function (data, type, row) {
+                        if (type === 'display') {
+                            if (row.web_info && row.web_info.status == 1) {
+                                return '<i class="fa fa-circle" aria-hidden="true" style="color:green;"></i>';
+                            } else {
+                                return '<i class="fa fa-circle" aria-hidden="true" style="color:red;"></i>';
+                            }
+                        }
+                        return data;
+                    }
                 },
                 {
                     title: "Actions",

@@ -173,3 +173,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/best-brands-per-product-type/filter', [BestBrandsPerProductTypeController::class, 'filterData'])->name('best.brands.per.product.type.filter');
     Route::post('/weekely-turnover/filter', [WeekelyTurnoverController::class, 'filterData'])->name('weekely-turnover.filter');
 });
+
+
+Route::get('/update-data',[ProductController::class,'updateData']);
+Route::get('/import-size', [ProductImportExportController::class, 'showSizeCodeImportForm'])->name('import.size.codes.form');
+Route::post('/import-size-codes', [ProductImportExportController::class, 'importSizeCodes'])->name('import.size.codes');
