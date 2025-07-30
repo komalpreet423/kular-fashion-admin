@@ -35,58 +35,73 @@
 
         <div id="rules-container">
             @php
-               
+
                 $rules = [];
                 if (isset($webPage->rules)) {
                     if (is_string($webPage->rules)) {
-                        $rules = json_decode($webPage->rules, true) ?? [['type' => 'must', 'condition' => '', 'tag_ids' => []]];
+                        $rules = json_decode($webPage->rules, true) ?? [
+                            ['type' => 'must', 'condition' => '', 'tag_ids' => []],
+                        ];
                     } elseif (is_array($webPage->rules)) {
                         $rules = $webPage->rules;
                     }
                 }
                 $rules = old('rules', $rules ?: [['type' => 'must', 'condition' => '', 'tag_ids' => []]]);
-                
-            
+
                 if (empty($rules)) {
                     $rules = [['type' => 'must', 'condition' => '', 'tag_ids' => []]];
                 }
             @endphp
 
-            @foreach($rules as $index => $rule)
-            <div class="rule-group border p-3 mb-3 position-relative">
-                <button type="button" class="btn btn-sm btn-outline-danger delete-rule-group" onclick="deleteRuleGroup(this)" style="position: absolute; right: 10px; top: 10px; width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="row">
-                    <div class="col-md-3">
-                        <label class="form-label">Rule</label>
-                        <select name="rules[{{ $index }}][type]" class="form-select">
-                            <option value="must" {{ ($rule['type'] ?? 'must') == 'must' ? 'selected' : '' }}>Must</option>
-                            <option value="must_not" {{ ($rule['type'] ?? 'must') == 'must_not' ? 'selected' : '' }}>Must Not</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Condition</label>
-                        <select name="rules[{{ $index }}][condition]" class="form-select condition-select">
-                            <option value="">Select Condition</option>
-                            <option value="has_tags" {{ ($rule['condition'] ?? '') == 'has_tags' ? 'selected' : '' }}>Have one of these tags</option>
-                            <option value="has_all_tags" {{ ($rule['condition'] ?? '') == 'has_all_tags' ? 'selected' : '' }}>Have all of these tags</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 tag-group" style="{{ in_array($rule['condition'] ?? '', ['has_tags', 'has_all_tags']) ? '' : 'display: none;' }}">
-                        <label class="form-label">Tags</label>
-                        <select name="rules[{{ $index }}][tag_ids][]" class="form-select tags-select" multiple data-selected="{{ isset($rule['tag_ids']) ? json_encode($rule['tag_ids']) : '[]' }}">
-                            @foreach ($tags as $tag)
-                                <option value="{{ $tag->id }}" {{ isset($rule['tag_ids']) && in_array($tag->id, $rule['tag_ids']) ? 'selected' : '' }}>{{ $tag->name }}</option>
-                            @endforeach
-                        </select>
+            @foreach ($rules as $index => $rule)
+                <div class="rule-group border p-3 mb-3 position-relative">
+                    <button type="button" class="btn btn-sm btn-outline-danger delete-rule-group"
+                        onclick="deleteRuleGroup(this)"
+                        style="position: absolute; right: 10px; top: 10px; width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="form-label">Rule</label>
+                            <select name="rules[{{ $index }}][type]" class="form-select">
+                                <option value="must" {{ ($rule['type'] ?? 'must') == 'must' ? 'selected' : '' }}>Must
+                                </option>
+                                <option value="must_not"
+                                    {{ ($rule['type'] ?? 'must') == 'must_not' ? 'selected' : '' }}>Must Not</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Condition</label>
+                            <select name="rules[{{ $index }}][condition]" class="form-select condition-select">
+                                <option value="">Select Condition</option>
+                                <option value="has_tags"
+                                    {{ ($rule['condition'] ?? '') == 'has_tags' ? 'selected' : '' }}>Have one of these
+                                    tags</option>
+                                <option value="has_all_tags"
+                                    {{ ($rule['condition'] ?? '') == 'has_all_tags' ? 'selected' : '' }}>Have all of
+                                    these tags</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 tag-group"
+                            style="{{ in_array($rule['condition'] ?? '', ['has_tags', 'has_all_tags']) ? '' : 'display: none;' }}">
+                            <label class="form-label">Tags</label>
+                            <select name="rules[{{ $index }}][tag_ids][]" class="form-select tags-select"
+                                multiple
+                                data-selected="{{ isset($rule['tag_ids']) ? json_encode($rule['tag_ids']) : '[]' }}">
+                                @foreach ($tags as $tag)
+                                    <option value="{{ $tag->id }}"
+                                        {{ isset($rule['tag_ids']) && in_array($tag->id, $rule['tag_ids']) ? 'selected' : '' }}>
+                                        {{ $tag->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endforeach
         </div>
 
-        <button type="button" class="btn btn-outline-primary mt-2" onclick="addRuleGroup()">+ Add New Rule Group</button>
+        <button type="button" class="btn btn-outline-primary mt-2" onclick="addRuleGroup()">+ Add New Rule
+            Group</button>
     </div>
 </div>
 
@@ -128,7 +143,7 @@
 </div>
 
 <!-- Listing Page Options -->
-<div class="card">
+{{-- <div class="card">
     <div class="card-body p-4">
         <h4 class="card-title">Listing Page Options</h4>
         @foreach ([
@@ -177,7 +192,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 <!-- SEO Section -->
 <div class="card">
