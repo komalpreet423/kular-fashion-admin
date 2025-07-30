@@ -46,28 +46,5 @@ class MenuController extends Controller
 
 
 
-    public function getImages()
-{
-    $sliderImages = HomeImage::where('type', 'slider')->latest()->get()->map(function ($img) {
-        return [
-            'id' => $img->id,
-            'image_url' => asset($img->image_path),
-            'created_at' => $img->created_at->toDateTimeString(),
-        ];
-    });
 
-    $newsletterImages = HomeImage::where('type', 'newsletter')->latest()->get()->map(function ($img) {
-        return [
-            'id' => $img->id,
-            'image_url' => asset($img->image_path),
-            'created_at' => $img->created_at->toDateTimeString(),
-        ];
-    });
-
-    return response()->json([
-        'success' => true,
-        'slider_images' => $sliderImages,
-        'newsletter_images' => $newsletterImages,
-    ]);
-}
 }

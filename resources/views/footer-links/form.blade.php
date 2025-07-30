@@ -172,6 +172,25 @@
         font-size: 0.875em;
         color: #dc3545;
     }
+
+    .content-item .btn {
+        padding: 0.15rem 0.3rem;
+        font-size: 0.7rem;
+        margin-left: 0.5rem;
+    }
+
+    .content-item {
+        transition: all 0.2s;
+    }
+
+    .content-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .content-item.active {
+        background-color: #e9ecef;
+        border-color: #dee2e6 !important;
+    }
 </style>
 
 <script>
@@ -253,25 +272,37 @@
             $list.html('');
             items.forEach(item => {
                 const $div = $('<div>')
-                    .addClass('content-item border p-2 mb-2 cursor-pointer')
+                    .addClass(
+                        'content-item border p-2 mb-2 cursor-pointer d-flex justify-content-between align-items-center'
+                        )
                     .attr('data-id', item.id);
+
+                const $content = $('<div>').addClass('d-flex align-items-center');
 
                 if (item.type === 'image') {
                     const imgSrc = item.data.image_url || 'https://via.placeholder.com/50';
-                    $div.append(
-                        $('<div>').addClass('d-flex align-items-center').append(
-                            $('<img>').attr('src', imgSrc).css({
-                                'width': '30px',
-                                'height': '30px',
-                                'object-fit': 'cover',
-                                'margin-right': '10px'
-                            }),
-                            $('<span>').text(item.title)
-                        )
+                    $content.append(
+                        $('<img>').attr('src', imgSrc).css({
+                            'width': '30px',
+                            'height': '30px',
+                            'object-fit': 'cover',
+                            'margin-right': '10px'
+                        }),
+                        $('<span>').text(item.title)
                     );
                 } else {
-                    $div.text(item.title);
+                    $content.text(item.title);
                 }
+
+                const $deleteBtn = $('<button>')
+                    .addClass('btn btn-sm btn-outline-danger')
+                    .html('<i class="fas fa-trash"></i>')
+                    .on('click', function(e) {
+                        e.stopPropagation();
+                        deleteItem(item.id);
+                    });
+
+                $div.append($content, $deleteBtn);
 
                 $div.on('click', function() {
                     $('.content-item').removeClass('active');
@@ -283,6 +314,14 @@
             });
         }
 
+        function deleteItem(itemId) {
+            items = items.filter(item => item.id !== itemId);
+            renderItems();
+            $('#rightPanel').html(
+                '<p class="text-muted text-center mt-5" id="placeholderText">Select an item or create a new one.</p>'
+            );
+        }
+
         function loadForm(templateId, item = null) {
             const $panel = $('#rightPanel');
             $('#placeholderText').remove();
@@ -292,7 +331,7 @@
                 $panel.html('');
                 const $clone = $template.clone().removeClass('d-none').attr('id', '');
 
-                // Clear any previous file inputs
+               
                 $clone.find('input[type="file"]').val('');
 
                 if (item) {
@@ -300,7 +339,7 @@
                         const value = item.data[key];
                         if (value !== null && value !== undefined) {
                             if (key === 'image_url' && item.type === 'image') {
-                                // For image items, show the preview
+                               
                                 $clone.find('#liveImagePreview').attr('src', value).show();
                                 $clone.find('#selectedFileName').text(value.split('/').pop());
                             } else {
@@ -316,7 +355,7 @@
                     saveItem(templateId, item ? item.id : null);
                 });
 
-                // Handle file input changes only for image form
+                
                 if (templateId === 'imageForm') {
                     $clone.find('input[type="file"]').on('change', function(event) {
                         const file = event.target.files[0];
@@ -338,7 +377,7 @@
             const $form = $('#rightPanel form');
             let isValid = true;
 
-            // Clear previous errors
+        
             $form.find('.is-invalid').removeClass('is-invalid');
             $form.find('.invalid-feedback').hide();
 
@@ -356,7 +395,7 @@
             let title = '';
             const typePrefix = type.replace('Form', '').toLowerCase();
 
-            // Validate based on type
+        
             switch (typePrefix) {
                 case 'menu':
                     if (!formData['menu_name']?.trim()) {
@@ -422,7 +461,6 @@
                 return false;
             }
 
-            // Process image if needed
             if (typePrefix === 'image') {
                 const fileInput = $form.find('input[type="file"]')[0];
                 const files = fileInput?.files;
@@ -435,7 +473,7 @@
                         finalizeSave();
                     };
                     reader.readAsDataURL(files[0]);
-                    return; // Wait for reader to complete
+                    return; 
                 } else if (itemId) {
                     const existingItem = items.find(item => item.id === itemId);
                     if (existingItem && existingItem.data.image_url) {
@@ -470,7 +508,6 @@
             finalizeSave();
         }
 
-
         $('form').on('submit', function(e) {
             let isValid = true;
 
@@ -498,14 +535,12 @@
                     );
             }
 
-
             const $descriptionInput = $('textarea[name="description"]');
             if (!$descriptionInput.val().trim()) {
                 isValid = false;
                 $descriptionInput.addClass('is-invalid')
                     .after('<div class="invalid-feedback">Description is required</div>');
             }
-
 
             if (items.length === 0) {
                 isValid = false;
