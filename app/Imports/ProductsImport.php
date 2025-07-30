@@ -107,12 +107,20 @@ class ProductsImport implements
 
             // Size
             $sizeKey = $row['size'] . '-' . $sizeScale_id;
+
             if (!isset($this->sizeCache[$sizeKey])) {
-                $this->sizeCache[$sizeKey] = Size::firstOrCreate(
+                $size = Size::firstOrCreate(
                     ['size' => $row['size'], 'size_scale_id' => $sizeScale_id],
-                    ['new_code' => $colorCode, 'status' => 'Active']
-                )->id;
+                    ['status' => 'Active']
+                );
+
+                // Generate new_code as 3-digit padded id
+                $size->new_code = str_pad($size->id, 3, '0', STR_PAD_LEFT);
+                $size->save();
+
+                $this->sizeCache[$sizeKey] = $size->id;
             }
+
             $size_id = $this->sizeCache[$sizeKey];
 
             // ProductType

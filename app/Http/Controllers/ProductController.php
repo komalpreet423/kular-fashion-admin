@@ -565,7 +565,7 @@ class ProductController extends Controller
 
     public function getProducts(Request $request)
     {
-        $query = Product::with(['brand', 'department', 'quantities', 'productType', 'colors.colorDetail', 'sizes.sizeDetail']);
+        $query = Product::with(['brand', 'department', 'quantities', 'productType', 'colors.colorDetail', 'sizes.sizeDetail','webInfo']);
 
 
 
