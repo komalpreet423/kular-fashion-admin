@@ -4,9 +4,10 @@
         <h4 class="card-title">Basic Information</h4>
 
         <div class="row">
-            <div class="col-md-4 mb-2">
-                <x-form-input name="name" value='{{ $product->name ?? "" }}' label="Product Name"
-                    placeholder="Enter Product Name" required="true" />
+           <div class="col-md-4 mb-2">
+                <label for="name">Product Name</label>
+                <input type="text" name="name" id="name" class="form-control" value="{{ $product->name ?? '' }}"
+                    placeholder="Enter Product Name" required>
             </div>
             <div class="col-md-2 mb-2">
                 <x-form-input name="price" type="number" step="0.01" value="{{ $product->price ?? '' }}" label="Price"
@@ -110,10 +111,20 @@
                     <tbody>
                         <tr>
                             <th>Price</th>
-                            @foreach ($product->sizes as $index => $size)
-                            <th><input type="text" name="sizes[{{ $size->id }}][web_price]" class="form-control"
-                                value="{{ $size->web_price }}"></th>
+                            @foreach ($product->sizes as $size)
+                                @php
+                                    $quantity =
+                                        $product->quantities->where('product_size_id', $size->id)->first() ??
+                                        $product->quantities->where('size_id', $size->sizeDetail->id)->first();
+                                @endphp
+                                <td>
+                                    <input type="text" name="sizes[{{ $size->id }}][web_price]"
+                                        class="form-control" value="{{ $size->web_price }}">
+                                    <small class="d-block text-start mt-1 "> <strong>Quantity:
+                                         {{ $quantity->quantity ?? 0 }}  </strong></small>
+                                </td>
                             @endforeach
+                         
                         </tr>
                         <tr>
                             <th>Sale Price</th>
