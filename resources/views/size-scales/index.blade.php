@@ -23,6 +23,7 @@
                                         <th>#</th>
                                         <th>Size Scale</th>
                                         <th>Total Sizes</th>
+                                        <th>Products</th>
                                         <th>Status</th>
                                         @canany(['view size', 'edit size scales', 'delete size scales'])
                                             <th>Action</th>
@@ -44,6 +45,7 @@
                                                 @endif
                                             </td>
                                             <td>{{ $sizeScale->sizes_count }}</td>
+                                            <td><a href="{{ route('index.products',['sizeScale',$sizeScale->id]) }}">{{ $sizeScale->products_count }}</a></td>
                                             <td>
                                                 <input type="checkbox" id="{{ $sizeScale->id }}" class="update-status"
                                                     data-id="{{ $sizeScale->id }}" switch="success" data-on="Active"

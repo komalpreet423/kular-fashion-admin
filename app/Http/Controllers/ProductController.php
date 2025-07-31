@@ -565,9 +565,17 @@ class ProductController extends Controller
 
     public function getProducts(Request $request)
     {
-        $query = Product::with(['brand', 'department', 'quantities', 'productType', 'colors.colorDetail', 'sizes.sizeDetail','webInfo']);
+        $query = Product::with(['brand', 'department', 'quantities', 'productType', 'sizeScale','colors.colorDetail', 'sizes.sizeDetail','webInfo']);
 
-
+        if($request->has('related_type') && $request->related_type_id){
+            $query->whereHas($request->related_type, function ($q) use ($request) {
+                if($request->related_type == 'colors'){
+                    $q->where('color_id', $request->related_type_id);
+                }else{
+                    $q->where('id', $request->related_type_id);
+                }        
+            });
+        }
 
         if ($request->has('brand_id') && $request->brand_id) {
             $query->whereHas('brand', function ($q) use ($request) {
@@ -1540,5 +1548,33 @@ class ProductController extends Controller
             DB::rollBack();
             return 'Error occurred: ' . $e->getMessage();
         }
+    }
+    public function getRelatedProducts($type,$id){
+        if (!Gate::allows('view products')) {
+            abort(403);
+        }
+
+        $brands = Brand::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
+        $departments = Department::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
+        $productTypes = ProductType::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
+        $tags = Tag::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
+
+        return view('related-products.index', compact('brands', 'productTypes', 'departments', 'tags'));
+    }
+    public function bulkVisibility(Request $request){
+        foreach ($request->selected_products as $productId) {
+            ProductWebInfo::updateOrCreate(
+                ['product_id' => $productId], // condition
+                [
+                    'product_id' => $productId,
+                    'status' => $request->visibility,
+                ]
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Visibility updated successfully.',
+        ]);
     }
 }

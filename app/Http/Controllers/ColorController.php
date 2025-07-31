@@ -13,8 +13,7 @@ class ColorController extends Controller
         if (!Gate::allows('view colors')) {
             abort(403);
         }
-        $colors = Color::latest()->get();
-
+        $colors = Color::withCount('productColor')->latest()->get();
         return view('colors.index', compact('colors'));
     }
 
@@ -60,7 +59,6 @@ class ColorController extends Controller
             abort(403);
         }
         $color = Color::where('id', $id)->first();
-
         return view('colors.edit', compact('color'));
     }
 
