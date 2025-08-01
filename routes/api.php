@@ -46,7 +46,7 @@ Route::get('brand-products', [BrandController::class, 'getBrandProducts']);
 Route::get('/departments', [DepartmentController::class, 'departments'])->name('department.index');
 Route::get('/product-types', [ProductTypeController::class, 'producTypes'])->name('productType.index');
 Route::get('/collections', [CollectionApiController::class, 'collections']);
-Route::get('/collection/{id}', [CollectionApiController::class, 'showCollection']);
+Route::get('/collection/{slug}', [CollectionApiController::class, 'showCollection']);
 Route::post('/apply-coupon', [CouponController::class, 'applyCoupon']);
 
 Route::post('/gift-cards/create', [GiftCardController::class, 'createGiftCard']);
