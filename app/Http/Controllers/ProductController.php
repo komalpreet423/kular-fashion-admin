@@ -614,7 +614,10 @@ class ProductController extends Controller
             });
         }
         if ($request->new_products_only) {
-            $query->where('are_barcodes_printed', 0)->orWhere('barcodes_printed_for_all', 0);
+            $query->where(function ($q) {
+                $q->where('are_barcodes_printed', 0)
+                ->orWhere('barcodes_printed_for_all', 0);
+            });
         }
         
         // Sorting logic

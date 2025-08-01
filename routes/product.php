@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
 Route::get('/get-products', [ProductController::class, 'getProducts'])->name('get.products');
-Route::get('/products/{type?}/{id?}', [ProductController::class, 'index'])->name('index.products');
+
 Route::post('/products/colors/delete-image', [ProductController::class, 'deleteColorImage'])->name('products.colors.delete-image');
 
 Route::middleware(['auth', 'auth.session'])->group(function () {
@@ -34,5 +34,6 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     // Generate product barcodes
     Route::get('/products/print-barcodes', [ProductBarcodeController::class, 'index'])->name('products.print-barcodes');
     Route::get('/export/csv', [ProductController::class, 'downloadExcel'])->name('export.csv');
-
+    
+    Route::get('/products/{type?}/{id?}', [ProductController::class, 'index'])->name('index.products');
 });
