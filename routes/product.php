@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
 Route::get('/get-products', [ProductController::class, 'getProducts'])->name('get.products');
+
 Route::post('/products/colors/delete-image', [ProductController::class, 'deleteColorImage'])->name('products.colors.delete-image');
 
 Route::middleware(['auth', 'auth.session'])->group(function () {
@@ -21,6 +22,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::put('products/update/step-2/{product}', [ProductController::class, 'updateStep2'])->name('products.update-step-2');
 
     // Bulk Edit Product
+    Route::post('products/bulk-visibility', [ProductController::class, 'bulkVisibility'])->name('products.bulk-visibility');
+    
     Route::post('products/bulk-edit', [ProductController::class, 'bulkUpdate'])->name('products.bulk-edit');
     
     Route::get('products/check-mfg-code/{mfgCode?}', [ProductController::class, 'checkMfgCode'])->name('products.check-mfgcode');
@@ -31,5 +34,6 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     // Generate product barcodes
     Route::get('/products/print-barcodes', [ProductBarcodeController::class, 'index'])->name('products.print-barcodes');
     Route::get('/export/csv', [ProductController::class, 'downloadExcel'])->name('export.csv');
-
+    
+    Route::get('/products/{type?}/{id?}', [ProductController::class, 'index'])->name('index.products');
 });

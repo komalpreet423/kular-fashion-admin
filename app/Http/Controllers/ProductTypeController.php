@@ -17,7 +17,7 @@ class ProductTypeController extends Controller
         if(!Gate::allows('view product types')) {
             abort(403);
         }
-        $productTypes = ProductType::with('productTypeDepartments')->get();
+        $productTypes = ProductType::withCount('product')->with('productTypeDepartments')->get();  
         return view('product-types.index', compact('productTypes'));
     }
 

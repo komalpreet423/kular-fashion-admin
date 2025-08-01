@@ -23,6 +23,7 @@
                                         <th>#</th>
                                         <th>Color Name</th>
                                         <th>Color Short Code</th>
+                                        <th>Products</th>
                                         <th>Status</th>
                                         @canany(['edit colors', 'delete colors'])
                                             <th>Action</th>
@@ -35,6 +36,7 @@
                                             <td>{{ ++$key }}</td>
                                             <td>{{ ucwords($color->name) }}</td>
                                             <td>{{ $color->code }}</td>
+                                            <th><a href=" {{  route('index.products',['colors', $color->id]) }}">{{ $color->product_color_count }}</a></th>
                                             <td>
                                                 <input type="checkbox" id="{{ $color->id }}" class="update-status"
                                                     data-id="{{ $color->id }}" switch="success" data-on="Active"

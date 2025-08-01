@@ -24,6 +24,7 @@
                                         <th>#</th>
                                         <th>Name</th>
                                         <th>Image</th>
+                                        <th>Products</th>
                                         <th>Status</th>
                                         @canany(['edit departments', 'delete departments'])
                                             <th>Action</th>
@@ -38,6 +39,7 @@
                                             <td><img src="{{ asset($department->image) }}" width="50" height="30"
                                                     onerror="this.onerror=null; this.src='{{ asset(setting('default_department_image')) }}';">
                                             </td>
+                                            <td><a href="{{ route('get-related-products',['department',$department->id]) }}">{{ $department->products_count }}</a></td>
                                             <td>
                                                 <input type="checkbox" id="{{ $department->id }}" class="update-status"
                                                     data-id="{{ $department->id }}" switch="success" data-on="Active"

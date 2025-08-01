@@ -33,74 +33,44 @@
             <div class="col-12">
                 <x-error-message :message="$errors->first('message')" />
                 <x-success-message :message="session('success')" />
-
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="form-group col-2 mb-2">
-                                <!--label for="brandFilter" class="mb-0">Brand Name:</label-->
-                                <select id="brandFilter" class="form-control select2">
-                                    <option value="">All Brands</option>
-                                    @foreach ($brands as $brand)
-                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="form-group col-2 mb-2">
-                                <!--label for="typeFilter" class="mb-0">Product Type:</label-->
-                                <select id="typeFilter" class="form-control select2">
-                                    <option value="">All Products Types</option>
-                                    @foreach ($productTypes as $productType)
-                                    <option value="{{ $productType->id }}">{{ $productType->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="form-group col-3 mb-2">
-                                <!--label for="departmentFilter" class="mb-0">Department:</label-->
-                                <select id="departmentFilter" class="form-control select2">
-                                    <option value="">All Department</option>
-                                    @foreach ($departments as $department)
-                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group col-2 mb-2">
-                                <select id="bulkEditVisible" class="form-control">
-                                    <option disabled selected>Select Visibilty</option>
-                                    <option value="0">In-Active</option>
-                                    <option value="1">Active</option>
-                                    <option value="2">Hide When Out of Stock</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-3 mb-2">
-                                <!--label for="departmentFilter" class="mb-0">Department:</label-->
-                                <input type="text" id="custom-search-input" class="form-control w-100" placeholder="Search Products">
-                            </div>
-                        </div>
-                        <table id="product-table" data-selected-products="" data-unselected-products=""
-                            class="table table-bordered dt-responsive nowrap w-100 table-striped">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <input type="checkbox" id="select-all-checkbox" class="form-check-input">
-                                    </th>
-                                    <th>#</th>
-                                    <th>Article Code</th>
-                                    <th>Product Type</th>
-                                    <th>Brand</th>
-                                    <th>Department</th>
-                                    <th>Description</th>
-                                    <th>Manufacture Code</th>
-                                    <th>Price</th>
-                                    <th>Visible</th>
-                                </tr>
-                            </thead>
-
-                        </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group col-3 mb-2">
+                        <!--label for="departmentFilter" class="mb-0">Department:</label-->
+                        <input type="text" id="custom-search-input" class="form-control w-100" placeholder="Search Products">
+                    </div>
+                    <div class="form-group col-2 mb-2">
+                        <select id="bulkEditVisible" class="form-control">
+                            <option selected disabled>Select Visibilty</option>
+                            <option value="0">In-Active</option>
+                            <option value="1">Active</option>
+                            <option value="2">Hide When Out of Stock</option>
+                        </select>
                     </div>
                 </div>
+                <table id="product-table" data-selected-products="" data-unselected-products=""
+                    class="table table-bordered dt-responsive nowrap w-100 table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="select-all-checkbox" class="form-check-input">
+                            </th>
+                            <th>#</th>
+                            <th>Article Code</th>
+                            <th>Product Type</th>
+                            <th>Brand</th>
+                            <th>Department</th>
+                            <th>Description</th>
+                            <th>Manufacture Code</th>
+                            <th>Price</th>
+                            <th>Visible</th>
+                        </tr>
+                    </thead>
+
+                </table>
             </div>
         </div>
     </div>
@@ -109,8 +79,9 @@
 <x-include-plugins :plugins="['dataTable', 'update-status', 'select2']"></x-include-plugins>
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#brandFilter, #typeFilter, #departmentFilter').select2({
+        $('#bulkEditVisible').select2({
             width: '100%',
+            placeholder : 'Select Visibilty'
         });
 
         var selectedProducts = [];
@@ -132,9 +103,9 @@
                     d.brand_id = $('#brandFilter').val();
                     d.product_type_id = $('#typeFilter').val();
                     d.department_id = $('#departmentFilter').val();
-                    d.order = d.order; // Pass sorting parameters
+                    d.order = d.order;
                     d.related_type = "{{ request()->route('type') }}";
-                    d.related_type_id = "{{ request()->route('id') }}";
+                    d.related_type_id = "{{ request()->route('id') }}"; // Pass sorting parameters
                 }
             },
             columns: [{
@@ -189,7 +160,7 @@
                 },
                 {
                     title: "Visible",
-                    data: null, // Don't expect data from server
+                    data: 'visible',
                     render: function (data, type, row) {
                         if (type === 'display') {
                             if (row.web_info && row.web_info.status == 1) {
@@ -198,7 +169,7 @@
                                 return '<i class="fa fa-circle" aria-hidden="true" style="color:red;"></i>';
                             }
                         }
-                        return '';
+                        return data;
                     }
                 },
                 {
@@ -439,9 +410,7 @@
                         });
                         
                         // Refresh the table
-                        $('#product-table').DataTable().ajax.reload(function() {
-                            $('input.product-checkbox').prop('checked', false);
-                        }, false);
+                        $('#product-table').DataTable().ajax.reload();
                     } else {
                         let message = response.message || `Something went wrong!`;
                         

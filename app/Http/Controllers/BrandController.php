@@ -17,8 +17,7 @@ class BrandController extends Controller
         if(!Gate::allows('view brands')) {
             abort(403);
         }
-        $brands = Brand::latest()->get();
-
+        $brands = Brand::withCount('product')->latest()->get();
         return view('brands.index', compact('brands'));
     }
 

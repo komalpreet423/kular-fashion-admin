@@ -24,6 +24,7 @@
                                         <th>Product Type</th>
                                         <th>Department</th>
                                         <th>Image</th>
+                                        <th>Products</th>
                                         <th>Status</th>
                                         @canany(['edit product types', 'delete product types'])
                                             <th>Action</th>
@@ -48,6 +49,7 @@
                                             <td><img src="{{ asset($productType->image) }}" width="50" height="30"
                                                     onerror="this.onerror=null; this.src='{{ asset(setting('default_product_type_image')) }}';">
                                             </td>
+                                            <td><a href="{{ route('index.products',['productType',$productType->id]) }}">{{$productType->product_count}}</a></td>
                                             <td>
                                                 <input type="checkbox" id="{{ $productType->id }}" class="update-status"
                                                     data-id="{{ $productType->id }}" switch="success" data-on="Active"

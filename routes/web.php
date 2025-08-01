@@ -88,6 +88,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
 
     ]);
 
+    Route::get('products/{type}/{id}',[ProductController::class,'getRelatedProducts'])->name('get-related-products');
+
     Route::resource('footer-links', FooterLinkController::class)->parameters([
         'footer-links' => 'block'
     ]);
