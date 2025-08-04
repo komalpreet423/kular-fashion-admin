@@ -35,5 +35,5 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/products/print-barcodes', [ProductBarcodeController::class, 'index'])->name('products.print-barcodes');
     Route::get('/export/csv', [ProductController::class, 'downloadExcel'])->name('export.csv');
     
-    Route::get('/products/{type?}/{id?}', [ProductController::class, 'index'])->name('index.products');
+    Route::get('/related-products/{type?}/{id?}', [ProductController::class, 'index'])->name('index.related-products');
 });

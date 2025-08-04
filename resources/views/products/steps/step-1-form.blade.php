@@ -387,7 +387,10 @@
             });
 
             var departmentId = $('#department_id').val();
+
             refreshProductTypeDropdown(departmentId);
+
+            
         });
     </script>
 @endpush
