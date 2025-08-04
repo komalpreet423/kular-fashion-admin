@@ -23,10 +23,10 @@ class Product extends Model
     protected static function boot()
     {
         parent::boot();
-        /*static::creating(function ($product) {
+        static::creating(function ($product) {
             $lastProduct = self::orderBy('id', 'desc')->first();
             $product->article_code = $lastProduct ? $lastProduct->article_code + 1 : 300001;
-        });*/
+        });
 
         static::saving(function ($product) {
             $product->slug = $product->generateSlug();
