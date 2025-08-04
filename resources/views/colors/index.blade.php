@@ -36,7 +36,7 @@
                                             <td>{{ ++$key }}</td>
                                             <td>{{ ucwords($color->name) }}</td>
                                             <td>{{ $color->code }}</td>
-                                            <th><a href=" {{  route('index.products',['colors', $color->id]) }}">{{ $color->product_color_count }}</a></th>
+                                            <th><a href=" {{  route('index.related-products',['colors', $color->id]) }}">{{ $color->product_color_count }}</a></th>
                                             <td>
                                                 <input type="checkbox" id="{{ $color->id }}" class="update-status"
                                                     data-id="{{ $color->id }}" switch="success" data-on="Active"
