@@ -24,8 +24,9 @@ class Product extends Model
     {
         parent::boot();
         static::creating(function ($product) {
-            $lastProduct = self::orderBy('id', 'desc')->first();
-            $product->article_code = $lastProduct ? $lastProduct->article_code + 1 : 300001;
+            $lastProduct = self::orderBy('article_code', 'desc')->first();
+            $nextNumber = $lastProduct ? $lastProduct->id + 1 : 300001;
+            $product->article_code = str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
         });
 
         static::saving(function ($product) {

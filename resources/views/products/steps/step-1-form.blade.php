@@ -186,7 +186,7 @@
                 'is-invalid' => $errors->has('department_id'),
             ])>
                 @foreach ($departments as $department)
-                    <option value="{{ $department->id }}" @selected(($product->department_id ?? '') == $department->id)>
+                    <option value="{{ $department->id }}" @selected(($product->department_id ?? '1') == $department->id)>
                         {{ $department->name }}
                     </option>
                 @endforeach
@@ -368,7 +368,6 @@
             $('#brand_id').change(function() {
                 var selectedBrand = $(this).find('option:selected');
                 var margin = selectedBrand.data('margin');
-
                 $('#brand_margin').val(margin);
                 updateSupplierPrice();
             });
@@ -388,9 +387,7 @@
 
             var departmentId = $('#department_id').val();
 
-            refreshProductTypeDropdown(departmentId);
-
-            
+            refreshProductTypeDropdown(departmentId);  
         });
     </script>
 @endpush
