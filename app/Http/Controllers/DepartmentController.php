@@ -15,7 +15,7 @@ class DepartmentController extends Controller
         if(!Gate::allows('view departments')) {
             abort(403);
         }
-        $departments = Department::latest()->get();
+        $departments = Department::withCount('products')->latest()->get();
 
         return view('departments.index', compact('departments'));
     }

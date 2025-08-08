@@ -14,4 +14,8 @@ class SizeScale extends Model
     {
         return $this->hasMany(Size::class);
     }
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'size_scale_id');
+    }
 }

@@ -24,6 +24,10 @@ class Brand extends Model
     {
         return $this->hasMany(Product::class, 'color_id');
     }
+    public function product()
+    {
+        return $this->hasMany(Product::class, 'brand_id');
+    }
 
     public function orderItems()
     {

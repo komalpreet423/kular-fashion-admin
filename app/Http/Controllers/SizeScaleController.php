@@ -13,8 +13,7 @@ class SizeScaleController extends Controller
         if (!Gate::allows('view size scales')) {
             abort(403);
         }
-        $sizeScales = SizeScale::withCount('sizes')->latest()->get();
-
+        $sizeScales = SizeScale::withCount('products')->withCount('sizes')->latest()->get();
         return view('size-scales.index', compact('sizeScales'));
     }
 

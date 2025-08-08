@@ -90,6 +90,10 @@ class Product extends Model
     {
         return $this->hasMany(ProductSize::class);
     }
+    public function sizeScale()
+    {
+        return $this->hasMany(SizeScale::class,'id','size_scale_id');
+    }
 
     public function quantities()
     {
