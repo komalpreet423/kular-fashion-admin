@@ -249,8 +249,9 @@
         </div>
     </div>
 </div>
-
+<div class="sticky-submit">
 <button type="submit" class="btn btn-primary w-md">Submit</button>
+</div>
 
 <x-include-plugins :plugins="['select2', 'image', 'imagePreview', 'datePicker', 'contentEditor']"></x-include-plugins>
 
