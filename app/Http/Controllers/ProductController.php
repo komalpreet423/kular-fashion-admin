@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Category;
 use App\Models\ProductColor;
 use App\Models\ProductSize;
 use App\Models\ProductQuantity;
@@ -17,11 +18,13 @@ use App\Models\ProductWebImage;
 use App\Models\ProductWebInfo;
 use App\Models\ProductWebSpecification;
 use App\Models\ProductTypeDepartment;
+use App\Models\ProductCategory;
 use App\Models\Size;
 use App\Models\SizeScale;
 use App\Models\StoreInventory;
 use App\Models\Tax;
 use App\Models\Tag;
+use Illuminate\Support\Str;
 use DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Session;
@@ -45,7 +48,6 @@ class ProductController extends Controller
         $departments = Department::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
         $productTypes = ProductType::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
         $tags = Tag::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
-
         return view('products.index', compact('brands', 'productTypes', 'departments', 'tags'));
     }
 
@@ -62,8 +64,8 @@ class ProductController extends Controller
         $taxes = Tax::where('status', '1')->orderBy('tax', 'ASC')->get();
         $tags = Tag::where('status', 'Active')->orderBy('name', 'ASC')->get();
         $sizeScales = SizeScale::select('id', 'name', 'is_default')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->with('sizes')->get();
-
-        return view('products.create', compact('latestNewCode', 'brands', 'departments', 'taxes', 'tags', 'sizeScales'));
+        $categories = Category::whereNull('parent_id')->with('childrenRecursive')->get();
+        return view('products.create', compact('latestNewCode', 'brands', 'departments', 'taxes', 'tags', 'sizeScales','categories'));
     }
 
     public function saveStep1(Request $request)
@@ -90,7 +92,6 @@ class ProductController extends Controller
         ]);
 
         $productData = $request->all();
-
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = $request->article_code . '.' . $image->getClientOriginalExtension();
@@ -182,6 +183,27 @@ class ProductController extends Controller
                     ]
                 );
             }
+        }
+
+        $currentCategories = ProductCategory::where('product_id', $product->id)->pluck('category_id')->toArray();
+        $selectedCategories = $request->input('category_parent_id', []);
+        foreach ($selectedCategories as $categoryId) {
+            ProductCategory::updateOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'category_id' => $categoryId
+                ],
+                [
+                    'product_id' => $product->id,
+                    'category_id' => $categoryId
+                ]
+            );
+        }
+        $removedCategories = array_diff($currentCategories, $selectedCategories);
+        foreach ($removedCategories as $categoryId) {
+            ProductCategory::where('product_id', $product->id)
+                ->where('category_id', $categoryId)
+                ->delete();
         }
 
         return redirect()->route('products.edit.step-2', $product->id);
@@ -398,6 +420,14 @@ class ProductController extends Controller
                 ]);
             }
         }
+        if (isset($productData['category_parent_id'])) {
+            foreach ($productData['category_parent_id'] as $categoryId) {
+                ProductCategory::create([
+                    "product_id" => $product->id,
+                    "category_id" => $categoryId
+                ]);
+            }
+        }
 
         foreach ($productData['variantData']['mrp'] as $sizeId => $mrp) {
             ProductSize::create([
@@ -472,8 +502,11 @@ class ProductController extends Controller
         $sizeScales = SizeScale::where('status', 'Active')->orderBy('name', 'ASC')->get();
         $sizes = Size::where('status', 'Active')->orderBy('size', 'ASC')->get();
         $productTags = ProductTag::where('product_id', $product->id)->pluck('tag_id')->toArray();
-
-        return view('products.edit', compact('brands', 'productTypes', 'departments', 'product', 'taxes', 'tags', 'sizes', 'sizeScales', 'productTags'));
+        $productCategories = ProductCategory::where('product_id', $product->id)->pluck('category_id')->toArray();
+        $categories = Category::whereNull('parent_id')
+    ->with('childrenRecursive')
+    ->get();
+        return view('products.edit', compact('brands', 'productTypes', 'departments', 'product', 'taxes', 'tags', 'sizes', 'sizeScales', 'productTags','productCategories','categories'));
     }
 
     public function update(Request $request, Product $product)
@@ -1190,7 +1223,11 @@ class ProductController extends Controller
     public function editWebConfigration(Product $product)
     {
         $tags = Tag::where('status', 'Active')->orderBy('name', 'ASC')->get();
-        return view('products.web-configuration.edit', compact('product', 'tags'));
+        $categories = Category::whereNull('parent_id')
+    ->with('childrenRecursive')
+    ->get();
+        $productCategories = ProductCategory::where('product_id', $product->id)->pluck('category_id')->toArray();
+        return view('products.web-configuration.edit', compact('product', 'tags', 'productCategories','categories'));
     }
 
     protected function syncSpecifications($productId, $specifications)
@@ -1314,6 +1351,10 @@ class ProductController extends Controller
 
         $request->validate([
             'name' => 'required',
+            'slug' => [
+                'required',
+                Rule::unique('products', 'slug')->ignore($product->id),
+            ],
             'price' => 'required|numeric',
             'sale_price' => 'nullable|numeric',
             'sale_start' => 'nullable|date',
@@ -1328,9 +1369,9 @@ class ProductController extends Controller
             'images' => 'nullable|array',
             'images.*' => 'nullable|image|max:10240',
         ]);
-
         $product->update([
             'name' => $request->name,
+            'slug' => Str::slug($request->slug),
             'price' => $request->price,
             'sale_price' => $request->sale_price,
             'sale_start' => isset($request->sale_start) ? Carbon::parse($request->sale_start)->toDateString() : null,
@@ -1370,6 +1411,28 @@ class ProductController extends Controller
         foreach ($removedTags as $tagId) {
             ProductTag::where('product_id', $product->id)
                 ->where('tag_id', $tagId)
+                ->delete();
+        }
+
+        // Get current categories attached to product
+        $currentCategories = ProductCategory::where('product_id', $product->id)->pluck('category_id')->toArray();
+        $selectedCategories = $request->input('category_parent_id', []);
+        foreach ($selectedCategories as $categoryId) {
+            ProductCategory::updateOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'category_id' => $categoryId
+                ],
+                [
+                    'product_id' => $product->id,
+                    'category_id' => $categoryId
+                ]
+            );
+        }
+        $removedCategories = array_diff($currentCategories, $selectedCategories);
+        foreach ($removedCategories as $categoryId) {
+            ProductCategory::where('product_id', $product->id)
+                ->where('category_id', $categoryId)
                 ->delete();
         }
 

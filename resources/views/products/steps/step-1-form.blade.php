@@ -197,6 +197,24 @@
         </div>
     </div>
     @php
+        $selectedCategories = old('category_parent_id', $productCategories ?? []);
+    @endphp
+
+    <div class="col-sm-6 col-md-2">
+        <div class="mb-3">
+            <label for="category">Category</label>
+            <select class="form-control" id="category" name="category_parent_id[]" multiple>
+                <option value="" disabled>Select Category</option>
+                @include('products.partials.category-dropdown', [
+                    'categories' => $categories,
+                    'prefix' => '',
+                    'selectedCategories' => $selectedCategories
+                ])
+            </select>
+        </div>
+    </div>
+
+    @php
         $selectedTags = old('tags', $productTags ?? []);
     @endphp
     <div class="col-sm-6 col-md-2">
@@ -338,10 +356,14 @@
         }
 
         $(document).ready(function() {
-            $('#product_type, #department_id, #season, #brand_id, #tags, #size_scale_id').select2({
+            $('#product_type, #department_id, #season, #brand_id, #tags, #size_scale_id, #category_id').select2({
                 width: '100%',
             });
-
+            $('#category').select2({
+                placeholder: "Select Category",
+                allowClear: true,
+                width: '100%'
+            });
             @if (empty($product->article_code))
                 let lastCode = parseInt("{{ $latestNewCode ?? '300000' }}");
                 let articleCode = lastCode + 1;

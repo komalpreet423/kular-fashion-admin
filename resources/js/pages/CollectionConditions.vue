@@ -13,6 +13,15 @@
                     </div>
                 </div>
                 <div class="col-sm-6 col-md-4">
+                    <div class="form-group">
+                        <label for="collection_slug">Slug<span class="text-danger">*</span></label>
+                        <input class="form-control" v-model="collection.slug" name="slug"
+                            placeholder="Enter Collection Slug" v-bind:class="{ 'is-invalid': errors.slug }" />
+
+                        <span v-if="errors.slug" class="invalid-feedback">{{ errors.slug }}</span>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4">
                     <label for="collection-status" class="form-label">Status</label>
                     <select name="status" id="collection-status" class="form-control" v-model="savedCollection.status">
                         <option value="1" v-bind:value="1">Active</option>
@@ -269,10 +278,12 @@ export default {
                 'exclude': []
             },
             collection: {
-                name: this.savedCollection.name || ''
+                name: this.savedCollection.name || '',
+                slug: this.savedCollection.slug || ''
             },
             errors: {
-                name: ''
+                name: '',
+                slug: '',
             },
             imagePreviewUrl: this.savedCollection.image
                 ? `${window.location.origin}/${this.savedCollection.image}`

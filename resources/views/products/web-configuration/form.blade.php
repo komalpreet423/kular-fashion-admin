@@ -8,6 +8,10 @@
                 <x-form-input name="name" value='{{ $product->name ?? "" }}' label="Product Name"
                     placeholder="Enter Product Name" required="true" />
             </div>
+            <div class="col-md-4 mb-2">
+                <x-form-input name="slug" value='{{ $product->slug ?? "" }}' label="Slug"
+                    placeholder="Enter Product Name" />
+            </div>
             <div class="col-md-2 mb-2">
                 <x-form-input name="price" type="number" step="0.01" value="{{ $product->price ?? '' }}" label="Price"
                     placeholder="Enter Price" required="true" />
@@ -37,6 +41,21 @@
                         {{ $tag->name }}
                     </option>
                     @endforeach
+                </select>
+            </div>
+            @php
+                $selectedCategories = old('category_parent_id', $productCategories ?? []);
+            @endphp
+
+            <div class="col-md-4 mb-2">
+                <label for="category">Category</label>
+                <select class="form-control" id="category" name="category_parent_id[]" multiple>
+                    <option value="" disabled>Select Category</option>
+                    @include('products.partials.category-dropdown', [
+                        'categories' => $categories,
+                        'prefix' => '',
+                        'selectedCategories' => $selectedCategories
+                    ])
                 </select>
             </div>
         </div>

@@ -68,6 +68,7 @@ class CollectionController extends Controller
 
         $collection = Collection::create([
             'name' => $request->collection_name,
+            'slug' => Str::slug($request->slug),
             'include_conditions' => json_encode($request->include),
             'exclude_conditions' => json_encode($request->exclude),
             'summary' => $request->summary,
@@ -152,6 +153,7 @@ class CollectionController extends Controller
 
         $collection->update([
             'name' => $request->collection_name,
+            'slug' => Str::slug($request->slug),
             'include_conditions' => json_encode($request->include),
             'exclude_conditions' => json_encode($request->exclude),
             'summary' => $request->summary,
