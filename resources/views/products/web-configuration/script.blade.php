@@ -1,6 +1,10 @@
 <script>
     $(function() {
-
+        $('#category').select2({
+            placeholder: "Select Category",
+            allowClear: true,
+            width: '100%'
+        });
         $('.search-image-modal').click(function() {
             $('#googleImagesModal').modal('show');
             initialize();

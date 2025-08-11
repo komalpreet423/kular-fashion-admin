@@ -25,12 +25,14 @@ class Product extends Model
         parent::boot();
         static::creating(function ($product) {
             $lastProduct = self::orderBy('article_code', 'desc')->first();
-            $nextNumber = $lastProduct ? $lastProduct->id + 1 : 300001;
+            $nextNumber = $lastProduct ? $lastProduct->article_code + 1 : 300001;
             $product->article_code = str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
         });
 
         static::saving(function ($product) {
-            $product->slug = $product->generateSlug();
+            if (empty($product->slug)) {
+                $product->slug = $product->generateSlug();
+            }
         });
     }
     public function scopeWithAvailableSizes($query)
@@ -43,14 +45,16 @@ class Product extends Model
     {
         return [
             'slug' => [
-                'source' => 'name'
-            ]
+                'source' => 'name',
+                'onUpdate' => false, // 👈 this disables regeneration on update
+            ],
         ];
     }
 
-    protected function generateSlug()
+    protected function generateSlug($base = null)
     {
-        $slug = Str::slug($this->name);
+        $base = $base ?? $this->name;
+        $slug = Str::slug($base);
         $originalSlug = $slug;
 
         $counter = 1;
@@ -58,7 +62,6 @@ class Product extends Model
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         }
-
         return $slug;
     }
 

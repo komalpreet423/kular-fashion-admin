@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('slug')->nullable();
             $table->string('name');
+            $table->unsignedBigInteger('parent_id')->nullable()->index(); // for subcategories
             $table->string('image')->nullable();
             $table->text('summary')->nullable();
             $table->longText('description')->nullable();
@@ -25,6 +26,8 @@ return new class extends Migration
             $table->enum('status', ['Active', 'Inactive'])->default('Active')->index();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 
