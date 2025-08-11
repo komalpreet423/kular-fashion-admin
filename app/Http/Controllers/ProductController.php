@@ -1223,11 +1223,10 @@ class ProductController extends Controller
     public function editWebConfigration(Product $product)
     {
         $tags = Tag::where('status', 'Active')->orderBy('name', 'ASC')->get();
-        $categories = Category::whereNull('parent_id')
-    ->with('childrenRecursive')
-    ->get();
+        $categories = Category::whereNull('parent_id')->with('childrenRecursive')->get();
+        $quantity = ProductQuantity::where('product_id', $product->id)->sum('quantity');
         $productCategories = ProductCategory::where('product_id', $product->id)->pluck('category_id')->toArray();
-        return view('products.web-configuration.edit', compact('product', 'tags', 'productCategories','categories'));
+        return view('products.web-configuration.edit', compact('product', 'quantity','tags', 'productCategories','categories'));
     }
 
     protected function syncSpecifications($productId, $specifications)

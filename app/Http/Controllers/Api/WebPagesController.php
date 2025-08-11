@@ -98,14 +98,14 @@ class WebPagesController extends Controller
             $query->whereHas('webInfo', function ($q) {
                 $q->where('status', 1);
             })
-            ->orWhereHas('webInfo', function ($q) {
-                $q->where('status', 2);
-            })->whereHas('quantities', function ($q) {
-                $q->select('product_id')
-                  ->groupBy('product_id')
-                  ->havingRaw('SUM(quantity) > 0');
-            })
-            ->orWhereDoesntHave('webInfo');
+                ->orWhereHas('webInfo', function ($q) {
+                    $q->where('status', 2);
+                })->whereHas('quantities', function ($q) {
+                    $q->select('product_id')
+                        ->groupBy('product_id')
+                        ->havingRaw('SUM(quantity) > 0');
+                })
+                ->orWhereDoesntHave('webInfo');
         });
     }
 
@@ -114,7 +114,30 @@ class WebPagesController extends Controller
         foreach ($rules as $rule) {
             if (!is_array($rule)) continue;
 
-            switch ($rule['type'] ?? null) {
+            $type = $rule['type'] ?? null;
+            $condition = $rule['condition'] ?? null;
+
+            if ($type === 'must' && $condition === 'has_tags' && !empty($rule['tag_ids'])) {
+                $query->whereHas('tags', function ($q) use ($rule) {
+                    $q->whereIn('tag_id', $rule['tag_ids']);
+                });
+            }
+
+            if ($type === 'must_not' && $condition === 'has_tags' && !empty($rule['tag_ids'])) {
+                $query->whereDoesntHave('tags', function ($q) use ($rule) {
+                    $q->whereIn('tag_id', $rule['tag_ids']);
+                });
+            }
+
+            if ($type === 'must' && $condition === 'has_all_tags' && !empty($rule['tag_ids'])) {
+                foreach ($rule['tag_ids'] as $tagId) {
+                    $query->whereHas('tags', function ($q) use ($tagId) {
+                        $q->where('tag_id', $tagId);
+                    });
+                }
+            }
+
+            switch ($type) {
                 case 'department':
                     if (isset($rule['value'])) {
                         $query->whereHas('department', function ($q) use ($rule) {
@@ -266,7 +289,8 @@ class WebPagesController extends Controller
             'published_at' => $webPage->published_at,
             'hide_categories' => $webPage->hide_categories,
             'hide_all_filters' => $webPage->hide_all_filters,
-            'show_all_filters' => $webPage->show_all_filters
+            'show_all_filters' => $webPage->show_all_filters,
+            'rules' => is_array($webPage->rules) ? $webPage->rules : json_decode($webPage->rules, true)
         ];
     }
 }

@@ -46,7 +46,7 @@ Route::get('brand-products', [BrandController::class, 'getBrandProducts']);
 Route::get('/departments', [DepartmentController::class, 'departments'])->name('department.index');
 Route::get('/product-types', [ProductTypeController::class, 'producTypes'])->name('productType.index');
 Route::get('/collections', [CollectionApiController::class, 'collections']);
-Route::get('/collection/{id}', [CollectionApiController::class, 'showCollection']);
+Route::get('/collection/{slug}', [CollectionApiController::class, 'showCollection']);
 Route::post('/apply-coupon', [CouponController::class, 'applyCoupon']);
 
 Route::post('/gift-cards/create', [GiftCardController::class, 'createGiftCard']);
@@ -55,7 +55,6 @@ Route::post('/gift-cards/get', [GiftCardController::class, 'getGiftCard']);
 Route::post('/gift-cards/redeem', [GiftCardController::class, 'redeemGiftCard']);
 Route::post('/gift-cards/delete', [GiftCardController::class, 'deleteGiftCard']);
 Route::get('/menus', [MenuController::class, 'index']);
-Route::get('/home-images', [MenuController::class, 'getImages']);
 Route::get('/submenu-options', [SubmenuOptionController::class, 'index']); 
 Route::get('/blocks', [BlockController::class, 'index']);
 Route::get('/blocks/{id}', [BlockController::class, 'show']);
