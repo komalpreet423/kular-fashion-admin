@@ -9,7 +9,7 @@ use App\Models\ProductType;
 use App\Models\ListingOption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-
+use Illuminate\Support\Str;
 class CollectionController extends Controller
 {
     /**
