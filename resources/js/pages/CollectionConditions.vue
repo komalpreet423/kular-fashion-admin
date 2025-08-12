@@ -240,8 +240,8 @@
      .sticky-submit {
     position: fixed;
    bottom: 0;
-   left: 19.5% ;      
-   right: 30px;      
+   left:17.5% ;      
+   right: 33px;      
    padding: 12px 0;
    background: #fff;
    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
