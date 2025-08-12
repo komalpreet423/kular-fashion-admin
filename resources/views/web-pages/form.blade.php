@@ -226,6 +226,8 @@
         </div>
     </div>
     <div class="sticky-submit">
+        <button class="btn btn-primary w-md"><a style="color:white;" href="{{ config('app.frontend_url') }}/pages/webpages/{{ $webPage->slug }}"
+         target="_blank" aria-label="View page">View</a></button>
         <button type="submit" class="btn btn-primary w-md">Submit</button>
     </div>
 </div>

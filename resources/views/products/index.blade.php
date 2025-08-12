@@ -37,7 +37,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="form-group col-2 mb-2">
+                            <div class="form-group col-3 mb-2">
                                 <!--label for="brandFilter" class="mb-0">Brand Name:</label-->
                                 <select id="brandFilter" class="form-control select2">
                                     <option value="">All Brands</option>
@@ -47,7 +47,7 @@
                                 </select>
                             </div>
 
-                            <div class="form-group col-2 mb-2">
+                            <div class="form-group col-3 mb-2">
                                 <!--label for="typeFilter" class="mb-0">Product Type:</label-->
                                 <select id="typeFilter" class="form-control select2">
                                     <option value="">All Products Types</option>
@@ -66,17 +66,42 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group col-2 mb-2">
+
+                            <div class="form-group col-3 mb-2">
+                                <!--label for="departmentFilter" class="mb-0">Department:</label-->
+                                <input type="text" id="custom-search-input" class="form-control w-100" placeholder="Search Products">
+                            </div>
+                        </div>
+                        <div class="row action-section mt-1 d-none" id="action-section">
+                            <h6>Action for selected products</h6>
+                            <div class="form-group col-3 mb-2">
                                 <select id="bulkEditVisible" class="form-control">
-                                    <option disabled selected>Select Visibilty</option>
+                                    <option disabled selected>Assign Visibilty</option>
                                     <option value="0">In-Active</option>
                                     <option value="1">Active</option>
                                     <option value="2">Hide When Out of Stock</option>
                                 </select>
                             </div>
+                            @php
+                                $selectedCategories = old('category_parent_id', $productCategories ?? []);
+                            @endphp
                             <div class="form-group col-3 mb-2">
-                                <!--label for="departmentFilter" class="mb-0">Department:</label-->
-                                <input type="text" id="custom-search-input" class="form-control w-100" placeholder="Search Products">
+                                <select class="form-control" id="category" name="as_parent_id" multiple>
+                                    @include('products.partials.category-dropdown', [
+                                        'categories' => $categories,
+                                        'prefix' => '',
+                                        'selectedCategories' => $selectedCategories
+                                    ])
+                                </select>
+                            </div>
+                            <div class="form-group col-3 mb-2">
+                                <select class="form-control" id="un-category" name="un_parent_id" multiple>
+                                    @include('products.partials.category-dropdown', [
+                                        'categories' => $categories,
+                                        'prefix' => '',
+                                        'selectedCategories' => $selectedCategories
+                                    ])
+                                </select>
                             </div>
                         </div>
                         <table id="product-table" data-selected-products="" data-unselected-products=""
@@ -97,7 +122,6 @@
                                     <th>Visible</th>
                                 </tr>
                             </thead>
-
                         </table>
                     </div>
                 </div>
@@ -107,366 +131,10 @@
 </div>
 
 <x-include-plugins :plugins="['dataTable', 'update-status', 'select2']"></x-include-plugins>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#brandFilter, #typeFilter, #departmentFilter').select2({
-            width: '100%',
-        });
 
-        var selectedProducts = [];
-        var unselectedProducts = [];
-
-        var table = $('#product-table').DataTable({
-            processing: true,
-            lengthMenu: [ 
-                [10, 25, 50, 100, 250, 350, 500, -1], 
-                [10, 25, 50, 100, 250, 350, 500] 
-            ],
-            serverSide: true,
-            dom: 'rt<"d-flex justify-content-between align-items-center "<"dt-info-left"i><"d-flex align-items-center gap-2"l p>><"clear">',
-            
-            ajax: {
-                url: "{{ route('get.products') }}",
-                data: function(d) {
-                    d.page = Math.floor(d.start / d.length) + 1;
-                    d.brand_id = $('#brandFilter').val();
-                    d.product_type_id = $('#typeFilter').val();
-                    d.department_id = $('#departmentFilter').val();
-                    d.order = d.order; // Pass sorting parameters
-                    d.related_type = "{{ request()->route('type') }}";
-                    d.related_type_id = "{{ request()->route('id') }}";
-                }
-            },
-            columns: [{
-                    title: '<input type="checkbox" class="form-check-input" id="select-all-checkbox">',
-                    data: null,
-                    render: function(data, type, row) {
-                        let selectedProducts = $('[data-selected-products]').attr('data-selected-products');
-                        selectedProducts = selectedProducts.split(',');
-
-                        let checked = selectedProducts.includes(String(row.id)) ? 'checked' : '';
-
-                        if (selectedProducts.includes('-1')) {
-                            checked = 'checked';
-                            selectedProducts.push(row.id);
-                        }
-
-                        if (unselectedProducts.includes(String(row.id))) {
-                            checked = '';
-                        }
-
-                        return `<input type="checkbox" class="product-checkbox form-check-input" value="${row.id}" ${checked}>`;
-                    },
-                    orderable: false
-                },
-                {
-                    title: "Article Code",
-                    data: 'article_code'
-                },
-                {
-                    title: "Brand",
-                    data: 'brand.name'
-                },
-                {
-                    title: "Product Type",
-                    data: 'product_type.name'
-                },
-                {
-                    title: "Department",
-                    data: 'department.name'
-                },
-                {
-                    title: "Short Description",
-                    data: 'short_description'
-                },
-                {
-                    title: "Manufacture Code",
-                    data: 'manufacture_code'
-                },
-                {
-                    title: "Price",
-                    data: 'price'
-                },
-                {
-                    title: "Visible",
-                    data: null, // Don't expect data from server
-                    render: function (data, type, row) {
-                        if (type === 'display') {
-                            if (row.web_info && row.web_info.status == 1) {
-                                return '<i class="fa fa-circle" aria-hidden="true" style="color:green;"></i>';
-                            } else {
-                                return '<i class="fa fa-circle" aria-hidden="true" style="color:red;"></i>';
-                            }
-                        }
-                        return '';
-                    }
-                },
-                {
-                    title: "Actions",
-                    data: null,
-                    render: function(data, type, row) {
-                        var actions = '<div class="action-buttons">';
-                        @can('view products')
-                        actions += `<a href="{{ route('products.show', ':id') }}" class="btn btn-secondary btn-sm py-0 px-1">`
-                            .replace(/:id/, row.id);
-                        actions += `<i class="fas fa-eye"></i>`;
-                        actions += `</a>`;
-                        @endcan
-
-                        @can('edit products')
-                        actions += `<a href="{{ route('products.edit.web-configuration', ':id') }}" class="btn btn-success btn-sm edit py-0 px-1">`
-                            .replace(/:id/, row.id);
-                        actions += `<i class="fas fa-image"></i>`;
-                        actions += `</a>`;
-
-                        actions += `<a href="{{ route('products.edit', ':id') }}" class="btn btn-primary btn-sm edit py-0 px-1">`
-                            .replace(/:id/, row.id);
-                        actions += `<i class="fas fa-pencil-alt"></i>`;
-                        actions += `</a>`;
-                        @endcan
-
-                        @can('delete products')
-                        actions += `<button data-source="product" data-endpoint="{{ route('products.destroy', ':id') }}" class="delete-btn btn btn-danger btn-sm py-0 px-1">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>`
-                            .replace(/:id/, row.id);
-                        @endcan
-
-                        return actions;
-                    }
-                }
-            ],
-            order: [
-                [3, 'asc']
-            ], // Default sorting on Manufacture Code (3rd column)
-            drawCallback: function(settings) {
-                let api = this.api();
-                $('#product-table th, #product-table td').addClass('p-1');
-
-                let rows = api.rows({
-                    page: 'current'
-                }).data().length;
-
-                let searchValue = $('#custom-search-input').val();
-                if (rows === 0 && searchValue) {
-                    $('#add-product-link').attr('href', `{{ route('products.create') }}?mfg_code=${searchValue}`)
-                } else {
-                    $('#add-product-link').attr('href', `{{ route('products.create') }}`)
-                }
-                updateSelectedCount();
-            }
-        });
-
-        function updateSelectedCount() {
-            // let selectedCount = $('.product-checkbox:checked').length;
-
-            // // Remove existing count display
-            // $('#selected-count-display').remove();
-
-            // // Show only if at least one checkbox is selected
-            // if (selectedCount > 0) {
-            //     let paginateContainer = $('.dataTables_paginate');
-            //     if (paginateContainer.length) {
-            //         $('#product-table_previous').before('<li style="display:flex; align-items:center;"><span id="selected-count-display" class="me-3 text-primary fw-bold">Selected: ' + selectedCount + '</span></li>');
-            //     }
-            // }
-        }
-
-        $(document).on('change', '.product-checkbox', function() {
-            updateSelectedCount();
-        });
-
-
-        $(document).on('change', '#select-all-checkbox', function() {
-            $('.product-checkbox').prop('checked', this.checked).trigger('change');
-        });
-
-
-
-        $('#brandFilter, #typeFilter, #departmentFilter').on('change', function() {
-            table.ajax.reload();
-        });
-
-        $('#product-table_filter').prepend(
-            `<input type="text" id="custom-search-input" class="form-control" placeholder="Search Products">`
-        );
-
-        $('#custom-search-input').on('keyup', function() {
-            table.search(this.value).draw();
-        });
-
-        function updateSelectedProducts() {
-            $('#product-table').attr('data-selected-products', selectedProducts.join(','));
-            $('#product-table').attr('data-unselected-products', unselectedProducts.join(','));
-
-            if (!$('.product-checkbox:checked').length) {
-                $('#bulk-edit-button').addClass('d-none');
-            } else {
-                $('#bulk-edit-button').removeClass('d-none');
-            }
-        }
-
-        // Select all checkboxes
-        $('#select-all-checkbox').on('change', function() {
-            if ($(this).is(':checked')) {
-                selectedProducts = ['-1'];
-            } else {
-                selectedProducts = [];
-            }
-
-            var checked = this.checked;
-            $('.product-checkbox').each(function() {
-                if (!unselectedProducts.includes($(this).val())) {
-                    this.checked = checked;
-                }
-            });
-
-            updateSelectedProducts();
-        });
-
-        // Individual checkbox selection
-        $('#product-table').on('change', '.product-checkbox', function() {
-            if ($(this).is(':checked')) {
-                selectedProducts.push($(this).val());
-            } else {
-                let selectedProductIndex = selectedProducts.indexOf($(this).val());
-                if (selectedProductIndex !== -1) {
-                    selectedProducts.splice(selectedProductIndex, 1);
-                }
-            }
-
-            if (!$(this).is(':checked') && $('#select-all-checkbox:checked').length) {
-                unselectedProducts.push($(this).val());
-            } else {
-                let unselectedProductIndex = unselectedProducts.indexOf($(this).val());
-                if (unselectedProductIndex !== -1) {
-                    unselectedProducts.splice(unselectedProductIndex, 1);
-                }
-            }
-            updateSelectedProducts();
-        });
-
-        $('.apply-bulk-edit-action').on('click', function() {
-            $.ajax({
-                url: "{{ route('products.bulk-edit') }}",
-                method: 'POST',
-                data: {
-                    selected_products: selectedProducts,
-                    unselected_products: unselectedProducts,
-                    '_token': '{{ csrf_token() }}',
-                    action: $('#bulkEditAction').val(),
-                    tags: $('#bulkEditTags').val()
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#bulkEditTags').val(null).trigger('change');
-                        $('#bulkEditTagsModal').modal('hide');
-
-                        swal({
-                            title: "Success!",
-                            text: response.message,
-                            type: "success",
-                            showConfirmButton: false,
-                            timer: 2000
-                        })
-                    } else {
-                        let message = response.message || `Something went wrong!`;
-
-                        swal({
-                            title: "Oops!",
-                            text: message,
-                            type: "error",
-                            confirmButtonText: 'Okay'
-                        })
-                    }
-                }
-            })
-        });
-        $('#bulkEditVisible').on('change', function() {
-            var selectedVisibility = $(this).val();
-            if (!selectedVisibility || selectedVisibility.length === 0) return;
-            
-            // Check if any products are selected
-            if (selectedProducts.length === 0 || (selectedProducts.length === 1 && selectedProducts[0] === '-1' && unselectedProducts.length === $('.product-checkbox').length)) {
-                swal({
-                    title: "No Products Selected",
-                    text: "Please select at least one product to update visibility.",
-                    type: "warning",
-                    confirmButtonText: 'Okay'
-                });
-                $(this).val(null).trigger('change');
-                return;
-            }
-            
-            // Confirm before applying changes
-            swal({
-                title: "Are you sure?",
-                text: "You are about to update visibility for " + (selectedProducts[0] === '-1' ? "all filtered products" : selectedProducts.length + " selected products"),
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Yes, update it!",
-                cancelButtonText: "No, cancel",
-                closeOnConfirm: false,
-                closeOnCancel: true
-            }, function(isConfirm) {
-                if (isConfirm) {
-                    updateBulkVisibility(selectedVisibility);
-                } else {
-                    $('#bulkEditVisible').val(null).trigger('change');
-                }
-            });
-        });
-        function updateBulkVisibility(visibility) {
-            $.ajax({
-                url: "{{ route('products.bulk-visibility') }}",
-                method: 'POST',
-                data: {
-                    selected_products: selectedProducts,
-                    unselected_products: unselectedProducts,
-                    '_token': '{{ csrf_token() }}',
-                    visibility: visibility
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $('#bulkEditVisible').val(null).trigger('change');
-                        
-                        swal({
-                            title: "Success!",
-                            text: response.message,
-                            type: "success",
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                        
-                        // Refresh the table
-                        $('#product-table').DataTable().ajax.reload(function() {
-                            $('input.product-checkbox').prop('checked', false);
-                        }, false);
-                    } else {
-                        let message = response.message || `Something went wrong!`;
-                        
-                        swal({
-                            title: "Oops!",
-                            text: message,
-                            type: "error",
-                            confirmButtonText: 'Okay'
-                        });
-                    }
-                },
-                error: function(xhr) {
-                    swal({
-                        title: "Error!",
-                        text: xhr.responseJSON.message || "An error occurred",
-                        type: "error",
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            });
-        }
-    });
-</script>
 
 @include('products.partials.bulk-edit')
+@include('products.script')
 
 @push('styles')
 <style>

@@ -48,7 +48,8 @@ class ProductController extends Controller
         $departments = Department::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
         $productTypes = ProductType::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
         $tags = Tag::select('id', 'name')->where('status', 'Active')->orderBy('name', 'ASC')->latest()->get();
-        return view('products.index', compact('brands', 'productTypes', 'departments', 'tags'));
+        $categories = Category::whereNull('parent_id')->with('childrenRecursive')->get();
+        return view('products.index', compact('brands', 'productTypes', 'departments', 'tags', 'categories'));
     }
 
     public function create()
@@ -1640,6 +1641,38 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Visibility updated successfully.',
+        ]);
+    }
+
+    public function categoryBulkUpdate(Request $request){
+        $type = $request->input('type'); // assign or unassign
+        $categoryIds = $request->input('categories', []);
+        $productIds = $request->input('products', []);
+
+        if (!in_array($type, ['assign', 'unassign'])) {
+            return response()->json(['error' => 'Invalid type provided.'], 400);
+        }
+
+        foreach ($categoryIds as $categoryId) {
+            foreach ($productIds as $productId) {
+                if ($type === 'assign') {
+                    // Insert if not exists
+                    ProductCategory::firstOrCreate([
+                        'product_id' => $productId,
+                        'category_id' => $categoryId,
+                    ]);
+                } elseif ($type === 'unassign') {
+                    // Delete if exists
+                    ProductCategory::where('product_id', $productId)
+                        ->where('category_id', $categoryId)
+                        ->delete();
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $type === 'assign' ? 'Categories assigned successfully.' : 'Categories unassigned successfully.'
         ]);
     }
 }
