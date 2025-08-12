@@ -10,15 +10,15 @@
             @endphp
             <div class="col-sm-6 col-md-4">
                 <div class="mb-3">
-            <label for="category">Category</label>
-            <select class="form-control" id="category" name="parent_id">
-                <option value="" disabled>Select Category</option>
-                @include('products.partials.category-dropdown', [
-                    'categories' => $categories,
-                    'prefix' => '',
-                    'selectedCategories' => $selectedCategories
-                ])
-            </select>
+                    <label for="category">Category</label>
+                    <select class="form-control" id="category" name="parent_id">
+                        <option value="" disabled>Select Category</option>
+                        @include('products.partials.category-dropdown', [
+                            'categories' => $categories,
+                            'prefix' => '',
+                            'selectedCategories' => $selectedCategories
+                        ])
+                    </select>
                 </div>
             </div>
 
