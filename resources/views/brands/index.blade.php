@@ -58,7 +58,9 @@
                                             <td><img src="{{ asset($brand->image) }}" width="50" height="30"
                                                     onerror="this.onerror=null; this.src='{{ asset(setting('default_brand_image')) }}';">
                                             </td>
-                                            <td><a href="{{ route('index.related-products',['brand',$brand->id]) }}">{{$brand->product_count}}</a></td>
+                                            <td><a
+                                                    href="{{ route('index.related-products', ['brand', $brand->id]) }}">{{ $brand->product_count }}</a>
+                                            </td>
                                             <td>
                                                 <input type="checkbox" id="{{ $brand->id }}" class="update-status"
                                                     data-id="{{ $brand->id }}" switch="success" data-on="Active"
@@ -69,6 +71,11 @@
                                             </td>
                                             @canany(['edit brands', 'delete brands'])
                                                 <td>
+                                                    <a href="{{ config('app.frontend_url') }}/brand/{{ $brand->slug }}"
+                                                        class="btn btn-info btn-sm py-0 px-1" title="View page" target="_blank"
+                                                        aria-label="View page">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
                                                     @if (Auth::user()->can('edit brands'))
                                                         <a href="{{ route('brands.edit', $brand->id) }}"
                                                             class="btn btn-primary btn-sm edit py-0 px-1"><i
