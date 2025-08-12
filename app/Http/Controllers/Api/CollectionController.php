@@ -48,7 +48,7 @@ class CollectionController extends Controller
         $this->applyConditions($productQuery, json_decode($collection->include_conditions, true) ?? [], 'include');
         $this->applyConditions($productQuery, json_decode($collection->exclude_conditions, true) ?? [], 'exclude');
         $this->applyRequestFilters($productQuery, $request);
-        
+
         $sortOptions = json_decode($collection->listingOption->sort_options, true) ?? [];
         $productQuery = $this->sortingFilter($productQuery, $sortOptions);
 
@@ -397,6 +397,7 @@ class CollectionController extends Controller
             'name' => $collection->name,
             'slug' => $collection->slug,
             'description' => $collection->description,
+            'summary' => $collection->summary,
             'heading' => $collection->heading,
             'image' => $collection->image ? url($collection->image) : null,
             'listing_options' => $collection->listingOption ? [
@@ -411,9 +412,7 @@ class CollectionController extends Controller
                 'show_all_filters' => false,
                 'visible_filters' => [],
                 'show_per_page' => 12,
-                'sort_options' => [
-                   
-                ],
+                'sort_options' => [],
                 'default_sort' => 'newest'
             ],
             'include_conditions' => json_decode($collection->include_conditions, true) ?: [],
