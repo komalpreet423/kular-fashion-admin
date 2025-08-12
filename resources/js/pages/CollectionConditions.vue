@@ -227,15 +227,39 @@
         </div>
     </div>
 
-    <div class="row mb-2">
-        <div class="col-lg-6 mb-2">
+    <div class="row  sticky-submit">
+        <div class=" mb-2">
             <button type="submit" class="btn btn-primary w-md" :disabled="!collection.name">Submit</button>
         </div>
     </div>
 
     <AddConditionModal :conditionType="conditionType" :addedConditions="conditions[conditionType]"
         @addCondition="addCondition" :conditionMap="conditionMap"></AddConditionModal>
-</template>
+   </template>
+    <style scoped>
+     .sticky-submit {
+    position: fixed;
+   bottom: 0;
+   left: 19.5% ;      
+   right: 30px;      
+   padding: 12px 0;
+   background: #fff;
+   box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+   z-index: 1000;
+}
+
+@media (max-width: 992px) {
+  .sticky-submit { left: 60px; }  
+}
+
+@media (max-width: 768px) {
+  .sticky-submit {
+    left: 0;
+    right: 0;
+    padding: 10px 15px;
+  }
+}
+</style>
 
 <script>
 import axios from 'axios';
