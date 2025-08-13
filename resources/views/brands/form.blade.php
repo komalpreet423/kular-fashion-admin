@@ -115,8 +115,9 @@
         </div>
     </div>
 </div>
-
+<div class="sticky-submit">
 <button type="submit" class="btn btn-primary w-md">Submit</button>
+</div>
 
 <x-include-plugins :plugins="['image', 'contentEditor']"></x-include-plugins>
 <script>

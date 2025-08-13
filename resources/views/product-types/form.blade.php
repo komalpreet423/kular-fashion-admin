@@ -114,11 +114,11 @@
     </div>
 </div>
 
-<div class="row mb-2">
-    <div class="col-lg-6 mb-2">
+
+    <div class=" sticky-submit ">
         <button type="submit" class="btn btn-primary w-md">Submit</button>
     </div>
-</div>
+
 <x-include-plugins :plugins="['select2', 'image', 'contentEditor']"></x-include-plugins>
 <script>
     $(function() {
