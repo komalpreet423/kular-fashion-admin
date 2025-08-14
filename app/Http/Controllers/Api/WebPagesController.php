@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WebPages;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Str;
 
 class WebPagesController extends Controller
 {
@@ -54,12 +55,18 @@ class WebPagesController extends Controller
 
             $perPage = $request->input('per_page', 12);
             $products = $productsQuery->paginate($perPage);
+            $availableFilters = $this->buildProductFilters(
+                $products->items(),
+                $visibleFilters ?? [],
+                $webPage->collection
+            );
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'page' => $this->formatWebPageData($webPage),
                     'products' => $products->items(),
+                    'filters' => $availableFilters,
                     'pagination' => [
                         'current_page' => $products->currentPage(),
                         'per_page' => $products->perPage(),
@@ -109,6 +116,82 @@ class WebPagesController extends Controller
         });
     }
 
+    protected function buildProductFilters($products, $visibleFilters = [], $collection = null)
+    {
+        $allFilters = [
+            'price' => ['min' => PHP_FLOAT_MAX, 'max' => 0],
+            'brands' => [],
+            'sizes' => [],
+            'colors' => [],
+            'product_types' => [],
+            'tags' => []
+        ];
+
+        foreach ($products as $product) {
+            $price = $product->sale_price ?? $product->price;
+            $allFilters['price']['min'] = min($allFilters['price']['min'], $price);
+            $allFilters['price']['max'] = max($allFilters['price']['max'], $price);
+
+            if ($product->brand) {
+                $allFilters['brands'][$product->brand->id] = [
+                    'id' => $product->brand->id,
+                    'name' => $product->brand->name,
+                    'slug' => $product->brand->slug ?? Str::slug($product->brand->name)
+                ];
+            }
+
+            if ($product->productType) {
+                $allFilters['product_types'][$product->productType->id] = [
+                    'id' => $product->productType->id,
+                    'name' => $product->productType->name,
+                    'slug' => $product->productType->slug ?? Str::slug($product->productType->name)
+                ];
+            }
+
+            foreach ($product->sizes ?? [] as $size) {
+                if ($size->sizeDetail) {
+                    $sizeName = $size->sizeDetail->size ?? $size->sizeDetail->new_code ?? $size->sizeDetail->old_code ?? "Size {$size->sizeDetail->id}";
+                    $allFilters['sizes'][$size->sizeDetail->id] = [
+                        'id' => $size->sizeDetail->id,
+                        'size' => $sizeName,
+                        'name' => $sizeName
+                    ];
+                }
+            }
+
+            foreach ($product->colors ?? [] as $color) {
+                if ($color->colorDetail) {
+                    $allFilters['colors'][$color->colorDetail->id] = [
+                        'id' => $color->colorDetail->id,
+                        'name' => $color->colorDetail->name,
+                        'hex' => $color->colorDetail->ui_color_code ?? $color->colorDetail->hex ?? '#000000'
+                    ];
+                }
+            }
+
+            foreach ($product->tags ?? [] as $tag) {
+                $allFilters['tags'][$tag->id] = [
+                    'id' => $tag->id,
+                    'name' => $tag->name,
+                    'slug' => $tag->slug
+                ];
+            }
+        }
+
+        $allFilters['price'] = [
+            'min' => $allFilters['price']['min'] === PHP_FLOAT_MAX ? 0 : (float)number_format($allFilters['price']['min'], 2, '.', ''),
+            'max' => $allFilters['price']['min'] === $allFilters['price']['max']
+                ? $allFilters['price']['min'] + 100
+                : (float)number_format($allFilters['price']['max'], 2, '.', '')
+        ];
+
+        if ($collection?->listingOption?->hide_filters) {
+            return [];
+        }
+
+        return $allFilters;
+    }
+
     protected function applyRules($query, array $rules)
     {
         foreach ($rules as $rule) {
@@ -130,11 +213,9 @@ class WebPagesController extends Controller
             }
 
             if ($type === 'must' && $condition === 'has_all_tags' && !empty($rule['tag_ids'])) {
-                foreach ($rule['tag_ids'] as $tagId) {
-                    $query->whereHas('tags', function ($q) use ($tagId) {
-                        $q->where('tag_id', $tagId);
-                    });
-                }
+                $query->whereHas('tags', function ($q) use ($rule) {
+                    $q->whereIn('tag_id', $rule['tag_ids']);
+                });
             }
 
             switch ($type) {
