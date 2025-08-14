@@ -111,7 +111,12 @@ class ProductController extends Controller
             }
 
             // Get all products (without pagination)
-            $products = $query->get();
+            if ($request->has('onlyFilter') && $request->onlyFilter) {
+                $products = $query->paginate(10);
+            } else {
+                $products = $query->get();
+            }
+            
 
             // Transform products to handle `is_splitted_with_colors`
             $transformedProducts = $this->transformProducts($products);

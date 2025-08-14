@@ -303,6 +303,15 @@ li.collaps-list {
     padding: 10px 10px;
 }
 
+
+div#action-section {
+    background: antiquewhite;
+    padding: 10px 0px 0px;
+    border-radius: 10px;
+    margin-right: 1px;
+    margin-left: 1px;
+}
+
  .sticky-submit {
     position: fixed;
    bottom: 0;
@@ -326,3 +335,4 @@ li.collaps-list {
     padding: 10px 15px;
   }
 }
+

@@ -138,6 +138,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/tag-status', [TagController::class, 'tagStatus'])->name('tag-status');
     Route::post('/categories/update-status', [CategoryController::class, 'updateStatus'])->name('categories.updateStatus');
 
+    Route::post('product-category-status-bulk', [ProductController::class, 'categoryBulkUpdate'])->name('category.bulkUpdate');
+
     Route::get('/get-states/{countryId}', [SupplierController::class, 'getStates']);
     Route::get('/get-product-type/{departmentId}', [ProductController::class, 'getDepartment']);
 
