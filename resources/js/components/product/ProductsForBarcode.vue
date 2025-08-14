@@ -41,16 +41,16 @@ export default {
             columns: [
                 {
                     title: `<div class="form-check form-check-primary">
-                            <input class="form-check-input" type="checkbox" id="select-all" checked>
+                            <input class="form-check-input" type="checkbox" id="select-all">
                         </div>`,
                     orderable: false,
                     render: function (data, type, row) {
                         let selectedArticles = $('#product-table').attr('data-selected-articles').split(',');
-                        let checked = selectedArticles.includes(String(row.id)) ? 'checked' : '';
+                        let checked = selectedArticles.includes(String(row.id)) ? '' : '';
 
-                        if (!checked && !row.barcodes_printed_for_all) {
+                        /*if (!checked && !row.barcodes_printed_for_all) {
                             checked = 'checked';
-                        }
+                        }*/
 
                         return `<div class="form-check form-check-primary">
                             <input class="form-check-input select-row" type="checkbox" value="${row.id}" ${checked}>
