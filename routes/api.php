@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ContactUsController;
 use App\Http\Controllers\Api\WebPagesController;
 use App\Http\Controllers\Api\SubmenuOptionController;
 use App\Http\Controllers\Api\BlockController;
+use App\Http\Controllers\Api\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,7 +48,10 @@ Route::get('/departments', [DepartmentController::class, 'departments'])->name('
 Route::get('/product-types', [ProductTypeController::class, 'producTypes'])->name('productType.index');
 Route::get('/collections', [CollectionApiController::class, 'collections']);
 Route::get('/collection/{slug}', [CollectionApiController::class, 'showCollection']);
+Route::get('/categories', [CategoryController::class, 'Index']);
+Route::get('/category/{slug}', [CategoryController::class, 'GetBySlug']);
 Route::post('/apply-coupon', [CouponController::class, 'applyCoupon']);
+
 
 Route::post('/gift-cards/create', [GiftCardController::class, 'createGiftCard']);
 Route::get('/gift-cards', [GiftCardController::class, 'getGiftCards']);
