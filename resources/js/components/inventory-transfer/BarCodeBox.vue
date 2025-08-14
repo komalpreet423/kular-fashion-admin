@@ -3,14 +3,15 @@
         <div class="position-relative">
             <input
                 type="text"
-                v-model="query"
+                :value="query"
                 class="form-control"
                 placeholder="Enter barcode"
                 autofocus
+                @input="sanitizeInput"
                 @keyup="addToCart"
                 @paste="handlePaste"
                 ref="barcodeInput"
-            >
+            />
             <i class="bx bx-barcode search-icon"></i>
         </div>
     </div>
@@ -74,8 +75,9 @@ export default {
 
         handlePaste(event) {
             event.preventDefault();
-            const pastedValue = event.clipboardData.getData('text').trim();
-            this.query = pastedValue;
+            const pastedValue = event.clipboardData.getData('text');
+            const cleaned = pastedValue.replace(/\D/g, '');
+            this.query = cleaned;
         },
 
         focusOnInput() {
