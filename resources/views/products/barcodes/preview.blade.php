@@ -126,7 +126,7 @@
                         ]) data-index="{{ $index }}">
                             <h6 class="brand-name">{{ Str::limit($item['brand_name'], 14) }}</h6>
                             <div class="description-container">
-                                <p>{{ Str::limit(strtoupper($item['short_description']), 17) }}</p>
+                                <p>{{ Str::limit(strtoupper($item['short_description']), 14) }}</p>
                                 <p>{{ $item['random_digits'] }}</p>
                             </div>
                             <div class="variant-info">

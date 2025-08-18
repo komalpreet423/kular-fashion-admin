@@ -838,44 +838,41 @@ class ProductController extends Controller
 
         $barcodes = [];
         $generator = new BarcodeGeneratorPNG();
-
+    
         foreach ($barcodesQty->barcodesToBePrinted as $key => $data) {
             $skip = false;
-
             if (!isset($data['product'])) {
-                $defaultProductsToBePrinted = Product::where('are_barcodes_printed', 0)->orWhere('barcodes_printed_for_all', 0)->with('quantities')->get();
+                
+                $product = Product::where('are_barcodes_printed', 0)->orWhere('barcodes_printed_for_all', 0)->with('quantities')->where('id',$data['productId'])->first();
 
-                foreach ($defaultProductsToBePrinted as $product) {
-                    $quantities = $product->quantities;
+                $quantities = $product->quantities;
 
-                    $totalQuantitySum = $quantities->sum(function ($quantity) {
-                        return $quantity->total_quantity;
-                    });
+                $totalQuantitySum = $quantities->sum(function ($quantity) {
+                    return $quantity->total_quantity;
+                });
 
-                    // If the sum of total_quantity is 0, skip this product
-                    if ($totalQuantitySum == 0) {
-                        $skip = true;
-                        continue;
-                    }
-
-                    $filteredQuantities = $quantities->filter(function ($quantity) {
-                        return ($quantity->total_quantity - $quantity->original_printed_barcodes) > 0;
-                    });
-
-                    if (count($filteredQuantities) === 0) {
-                        $skip = true;
-                        continue;
-                    }
-
-                    foreach ($filteredQuantities as $filteredQuantity) {
-                        $data['product'][] = [
-                            'id' => $filteredQuantity->id,
-                            'orignalQty' => $filteredQuantity->total_quantity - $filteredQuantity->original_printed_barcodes,
-                            'printQty' => $filteredQuantity->total_quantity - $filteredQuantity->original_printed_barcodes
-                        ];
-                    }
+                // If the sum of total_quantity is 0, skip this product
+                if ($totalQuantitySum == 0) {
+                    $skip = true;
+                    continue;
                 }
 
+                $filteredQuantities = $quantities->filter(function ($quantity) {
+                    return ($quantity->total_quantity - $quantity->original_printed_barcodes) > 0;
+                });
+
+                if (count($filteredQuantities) === 0) {
+                    $skip = true;
+                    continue;
+                }
+
+                foreach ($filteredQuantities as $filteredQuantity) {
+                    $data['product'][] = [
+                        'id' => $filteredQuantity->id,
+                        'orignalQty' => $filteredQuantity->total_quantity - $filteredQuantity->original_printed_barcodes,
+                        'printQty' => $filteredQuantity->total_quantity - $filteredQuantity->original_printed_barcodes
+                    ];
+                }
 
                 $barcodesQty->barcodesToBePrinted[$key] = $data;
                 Session::put('barcodesToBePrinted', (array) $barcodesQty);
@@ -897,41 +894,37 @@ class ProductController extends Controller
             if (isset($data['product'])) {
                 foreach ($data['product'] as $quantityDetail) {
 
-                    $products = ProductQuantity::with('product.department', 'product.brand', 'sizes.sizeDetail', 'colors.colorDetail')->where('id', $quantityDetail['id'])->get();
+                    $productDetail = ProductQuantity::with('product.department', 'product.brand', 'sizes.sizeDetail', 'colors.colorDetail')->where('id', $quantityDetail['id'])->first();
 
-                    foreach ($products as $productDetail) {
-                        $article_code = $productDetail->product->article_code;
-                        $color_code = $productDetail->colors->colorDetail->code;
-                        $new_code = $productDetail->sizes->sizeDetail->new_code;
-                        $article_code = $article_code . $color_code . $new_code;
+                    $article_code = substr($productDetail->barcode, 0, -1);
 
-                        $checkCode = $this->generateCheckDigit($article_code);
-
-                        for ($i = 0; $i < $quantityDetail['printQty']; $i++) {
-                            $barcode = base64_encode($generator->getBarcode($article_code, $generator::TYPE_EAN_13, 1, 25, [0, 0, 0]));
-                            $randomDigit = $this->generateRandomProductCode($productDetail->product->id);
-
-                            $date = Carbon::parse($productDetail->first_barcode_printed_date);
-                            $yearMonth = substr($date->format('ym'), 1);
-
-                            $barcodes[] = [
-                                'barcode' => $barcode,
-                                'product_code' => $article_code . $checkCode,
-                                'random_digits' => $randomDigit . $yearMonth,
-                                'department' => $productDetail->product->department->name,
-                                'type' => $productDetail->product->productType->name,
-                                'product_type_short_name' => $productDetail->product->productType->short_name,
-                                'manufacture_code' => $productDetail->product->manufacture_code,
-                                'size' => $productDetail->sizes->sizeDetail->size,
-                                'mrp' => $productDetail->sizes->mrp,
-                                'article_code' => $productDetail->product->article_code,
-                                'short_description' => $productDetail->product->short_description,
-                                'color' => $productDetail->colors->colorDetail->name,
-                                'color_short_name' => $productDetail->colors->colorDetail->short_name,
-                                'brand_short_name' => $productDetail->product->brand->short_name ?? $productDetail->product->brand->name,
-                                'brand_name' => $productDetail->product->brand->name,
-                            ];
+                    for ($i = 0; $i < $quantityDetail['printQty']; $i++) {
+                        if (collect($barcodes)->contains('product_code', $productDetail->barcode)) {
+                            continue;
                         }
+
+                        $barcode = base64_encode($generator->getBarcode($article_code, $generator::TYPE_EAN_13, 1, 25, [0, 0, 0]));
+                        $randomDigit = $this->generateRandomProductCode($productDetail->product->id);
+                        $date = Carbon::parse($productDetail->first_barcode_printed_date);
+                        $yearMonth = substr($date->format('ym'), 1);
+
+                        $barcodes[] = [
+                            'barcode' => $barcode,
+                            'product_code' => $productDetail->barcode,
+                            'random_digits' => $randomDigit . $yearMonth,
+                            'department' => $productDetail->product->department->name,
+                            'type' => $productDetail->product->productType->name,
+                            'product_type_short_name' => $productDetail->product->productType->short_name,
+                            'manufacture_code' => $productDetail->product->manufacture_code,
+                            'size' => $productDetail->sizes->sizeDetail->size,
+                            'mrp' => $productDetail->sizes->mrp,
+                            'article_code' => $productDetail->product->article_code,
+                            'short_description' => $productDetail->product->short_description,
+                            'color' => $productDetail->colors->colorDetail->name,
+                            'color_short_name' => $productDetail->colors->colorDetail->short_name,
+                            'brand_short_name' => $productDetail->product->brand->short_name ?? $productDetail->product->brand->name,
+                            'brand_name' => $productDetail->product->brand->name,
+                        ];
                     }
                 }
             }
@@ -940,7 +933,6 @@ class ProductController extends Controller
         if (count($barcodes) === 0) {
             return redirect()->route('products.print-barcodes');
         }
-
         return view('products.barcodes.preview', ['barcodes' => $barcodes]);
     }
 
@@ -1154,7 +1146,8 @@ class ProductController extends Controller
     public function productValidate(Request $request, $barcode)
     {
         $fromStoreId = (int) ($request->from ?? 1);
-        $products = ProductQuantity::with('product', 'product.brand', 'product.department', 'product.productType', 'sizes.sizeDetail', 'colors.colorDetail')->get();
+        $products = ProductQuantity::with('product', 'product.brand', 'product.department', 'product.productType', 'sizes.sizeDetail', 'colors.colorDetail')
+        ->where('barcode',$barcode)->get();
 
         foreach ($products as $product) {
             if (is_null($product->product)) {
@@ -1168,48 +1161,44 @@ class ProductController extends Controller
             $checkCode = $this->generateCheckDigit($article_code);
 
             $generated_code = $article_code . $checkCode;
+            $availableQuantity = $product->quantity;
 
+            if ($fromStoreId > 1) {
+                $fromStoreInventory = StoreInventory::where('store_id', $fromStoreId)->where('product_quantity_id', $product->id)->first();
 
-            if ($generated_code == $barcode) {
-                $availableQuantity = $product->quantity;
-
-                if ($fromStoreId > 1) {
-                    $fromStoreInventory = StoreInventory::where('store_id', $fromStoreId)->where('product_quantity_id', $product->id)->first();
-
-                    if ($fromStoreInventory) {
-                        $availableQuantity = $fromStoreInventory->quantity;
-                    } else {
-                        $availableQuantity = 0;
-                    }
+                if ($fromStoreInventory) {
+                    $availableQuantity = $fromStoreInventory->quantity;
+                } else {
+                    $availableQuantity = 0;
                 }
-
-                $item = [
-                    'id' => $product->id,
-                    'product_id' => $product->product->id,
-                    'code' => $product->product->article_code,
-                    'description' => $product->product->short_description,
-                    'type' => $product->product->productType->name,
-                    'product_quantity_id' => $product->id,
-                    'color' => $product->colors->colorDetail->name,
-                    'color_id' => $product->colors->colorDetail->id,
-                    'size' => $product->sizes->sizeDetail->size,
-                    'size_id' => $product->sizes->sizeDetail->id,
-                    'brand' => $product->product->brand->name,
-                    'brand_id' => $product->product->brand->id,
-                    'price' => (float) $product->sizes->mrp,
-                    'available_quantity' => $availableQuantity,
-                    'manufacture_barcode' => $product->manufacture_barcode,
-                    'manufacture_code' => $product->product->manufacture_code,
-                    'department' => $product->product->department->name,
-                    'barcode' => $barcode,
-                ];
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Product barcode is valid.',
-                    'product' => $item
-                ], 200);
             }
+
+            $item = [
+                'id' => $product->id,
+                'product_id' => $product->product->id,
+                'code' => $product->product->article_code,
+                'description' => $product->product->short_description,
+                'type' => $product->product->productType->name,
+                'product_quantity_id' => $product->id,
+                'color' => $product->colors->colorDetail->name,
+                'color_id' => $product->colors->colorDetail->id,
+                'size' => $product->sizes->sizeDetail->size,
+                'size_id' => $product->sizes->sizeDetail->id,
+                'brand' => $product->product->brand->name,
+                'brand_id' => $product->product->brand->id,
+                'price' => (float) $product->sizes->mrp,
+                'available_quantity' => $availableQuantity,
+                'manufacture_barcode' => $product->manufacture_barcode,
+                'manufacture_code' => $product->product->manufacture_code,
+                'department' => $product->product->department->name,
+                'barcode' => $barcode,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product barcode is valid.',
+                'product' => $item
+            ], 200);
         }
 
         return response()->json(['success' => false, 'message' => 'Product barcode is invalid.']);
