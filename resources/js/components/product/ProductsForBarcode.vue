@@ -45,16 +45,9 @@ export default {
                         </div>`,
                     orderable: false,
                     render: function (data, type, row) {
-                        let selectedArticles = $('#product-table').attr('data-selected-articles').split(',');
-                        let checked = selectedArticles.includes(String(row.id)) ? '' : '';
-
-                        /*if (!checked && !row.barcodes_printed_for_all) {
-                            checked = 'checked';
-                        }*/
-
                         return `<div class="form-check form-check-primary">
-                            <input class="form-check-input select-row" type="checkbox" value="${row.id}" ${checked}>
-                        </div>`
+                            <input class="form-check-input select-row" type="checkbox" value="${row.id}">
+                        </div>`;
                     }
                 },
                 { title: "Article Code", data: 'article_code' },
@@ -124,16 +117,10 @@ export default {
             if (e.target.tagName !== 'TD') return;
             const row = $(e.currentTarget);
             const rowData = table.row(row).data();
-            const nextRow = row.next('.expanded-row');
-
             const checkbox = row.find('.select-row');
-            checkbox.prop('checked', 'checked');
 
-            if (nextRow.length) {
-                nextRow.remove();
-            } else {
-                expandRow(row, rowData);
-            }
+            // Toggle checkbox instead of forcing checked
+            checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
         });
     },
 };
