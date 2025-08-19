@@ -331,7 +331,7 @@ class ProductController extends Controller
         }
     }
 
-    public function searchProduct($searchValue)
+    public function searchProduct($searchValue = null)
     {
         $query = Product::with(['brand', 'colors']);
 
