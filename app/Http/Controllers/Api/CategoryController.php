@@ -44,7 +44,7 @@ class CategoryController extends Controller
 
     public function GetBySlug($slug, Request $request)
     {
-          $category = Category::where('slug', $slug)
+        $category = Category::where('slug', $slug)
             ->with(['categoriesProduct.products' => function ($query) {
                 $query->with(['brand', 'productType', 'sizes.sizeDetail', 'colors.colorDetail', 'tags']);
             }])
@@ -60,7 +60,11 @@ class CategoryController extends Controller
             ->with(['brand', 'productType', 'sizes.sizeDetail', 'colors.colorDetail', 'tags']);
 
         $productsQuery = $this->applyRequestFilters($productsQuery, $request);
-        $products = $productsQuery->paginate($request->get('per_page', 15));
+
+        $perPage = $request->get('per_page', 12);
+        $page = $request->get('page', 1);
+
+        $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
         $allProducts = $category->products()
             ->with(['brand', 'productType', 'sizes.sizeDetail', 'colors.colorDetail', 'tags'])
             ->get();

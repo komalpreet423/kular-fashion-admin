@@ -3,7 +3,7 @@
         style="border:1px solid #00000030; border-radius:6px; background:#f6f6f9; margin:5px 0; padding:8px; display:flex; justify-content:space-between; align-items:center;">
         <span>: : {{ $category->name }}</span>
         <span>
-            <a href="{{ config('app.frontend_url') }}/Category/{{ $category->slug }}"
+            <a href="{{ config('app.frontend_url') }}/category/{{ $category->slug }}"
                 class="btn btn-info btn-sm py-0 px-1" title="View category" target="_blank" aria-label="View category">
                 <i class="fas fa-eye"></i>
             </a>
