@@ -12,15 +12,21 @@ class Category extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
-    public function categoriesProduct(){
+    public function categoriesProduct()
+    {
         return $this->hasMany(ProductCategory::class, 'category_id');
+    }
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'product_categories', 'category_id', 'product_id')
+            ->withTimestamps();
     }
 
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
-    
+
     public function childrenRecursive()
     {
         return $this->children()->with('childrenRecursive');

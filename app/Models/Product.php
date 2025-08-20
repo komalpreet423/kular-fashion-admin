@@ -37,7 +37,7 @@ class Product extends Model
     }
     public function scopeWithAvailableSizes($query)
     {
-        return $query->whereHas('sizes.quantities', function($q) {
+        return $query->whereHas('sizes.quantities', function ($q) {
             $q->where('total_quantity', '>', 0);
         });
     }
@@ -96,7 +96,7 @@ class Product extends Model
     }
     public function sizeScale()
     {
-        return $this->hasMany(SizeScale::class,'id','size_scale_id');
+        return $this->hasMany(SizeScale::class, 'id', 'size_scale_id');
     }
 
     public function quantities()
@@ -111,7 +111,7 @@ class Product extends Model
 
     public function webImage()
     {
-        return $this->hasMany(ProductWebImage::class,'product_id');
+        return $this->hasMany(ProductWebImage::class, 'product_id');
     }
 
     public function webInfo()
@@ -132,5 +132,13 @@ class Product extends Model
     public function wishlist()
     {
         return $this->hasOne(Wishlist::class, 'product_id');
+    }
+    public function productCategories()
+    {
+        return $this->hasMany(ProductCategory::class, 'product_id');
+    }
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'product_categories', 'product_id', 'category_id');
     }
 }
