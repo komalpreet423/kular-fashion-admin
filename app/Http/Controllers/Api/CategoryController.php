@@ -1,10 +1,14 @@
 <?php
+
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CategoryController extends Controller
 {
@@ -16,25 +20,20 @@ class CategoryController extends Controller
                     'id',
                     'slug',
                     'name',
-                    'parent_id',
                     'image',
                     'summary',
                     'description',
-
                 ]);
             }])
             ->select([
                 'id',
                 'slug',
                 'name',
-                'parent_id',
                 'image',
                 'summary',
                 'description',
-
             ])
             ->get();
-
 
         return response()->json([
             'success' => true,
@@ -43,9 +42,13 @@ class CategoryController extends Controller
         ]);
     }
 
-    public function GetBySlug($slug)
+    public function GetBySlug($slug, Request $request)
     {
-        $category = Category::where('slug', $slug)->with('categoriesProduct.products')->first();
+          $category = Category::where('slug', $slug)
+            ->with(['categoriesProduct.products' => function ($query) {
+                $query->with(['brand', 'productType', 'sizes.sizeDetail', 'colors.colorDetail', 'tags']);
+            }])
+            ->first();
 
         if (!$category) {
             return response()->json([
@@ -53,16 +56,27 @@ class CategoryController extends Controller
                 'message' => 'Category not found.'
             ], 404);
         }
-        $products = $category->categoriesProduct->pluck('products')->filter();
-        $filters = $this->buildProductFilters($products);
+        $productsQuery = $category->products()
+            ->with(['brand', 'productType', 'sizes.sizeDetail', 'colors.colorDetail', 'tags']);
+
+        $productsQuery = $this->applyRequestFilters($productsQuery, $request);
+        $products = $productsQuery->paginate($request->get('per_page', 15));
+        $allProducts = $category->products()
+            ->with(['brand', 'productType', 'sizes.sizeDetail', 'colors.colorDetail', 'tags'])
+            ->get();
+
+        $availableFilters = $this->buildProductFilters($allProducts);
+
         return response()->json([
             'success' => true,
-            'data' => $category,
-            'filters' => $filters,
+            'data' => [
+                'category' => $category,
+                'products' => $products,
+                'filters' => $availableFilters
+            ],
             'message' => 'Category retrieved successfully.'
         ]);
     }
-
 
     protected function buildProductFilters($products, $visibleFilters = [], $collection = null)
     {
@@ -132,42 +146,46 @@ class CategoryController extends Controller
                 ? $allFilters['price']['min'] + 100
                 : (float)number_format($allFilters['price']['max'], 2, '.', '')
         ];
-
-        if ($collection?->listingOption?->hide_filters) {
-            return [];
+        foreach (['brands', 'sizes', 'colors', 'product_types', 'tags'] as $filterType) {
+            $allFilters[$filterType] = array_values($allFilters[$filterType]);
         }
 
         return $allFilters;
     }
-    public function GetCategoryProducts($slug, Request $request)
+
+    protected function applyRequestFilters($query, $request)
     {
-        $category = Category::where('slug', $slug)->firstOrFail();
-        $categoryIds = $category->childrenRecursive->pluck('id')->push($category->id);
+        $filters = [
+            'tags' => ['relation' => 'tags', 'field' => 'id'],
+            'product_types' => ['relation' => 'productType', 'field' => 'id'],
+            'sizes' => ['relation' => 'sizes.sizeDetail', 'field' => 'id'],
+            'brands' => ['relation' => 'brand', 'field' => 'id'],
+            'colors' => ['relation' => 'colors.colorDetail', 'field' => 'id'],
+        ];
 
-        $products = Product::whereHas('categories', function ($query) use ($categoryIds) {
-            $query->whereIn('id', $categoryIds);
-        })
-            ->with([
-                'brand',
-                'department',
-                'productType',
-                'webImage',
-                'quantities',
-                'colors.colorDetail',
-                'sizes.sizeDetail',
-                'webInfo',
-                'wishlist'
-            ])
-            ->filter($request->all())
-            ->paginate($request->get('per_page', 20));
+        foreach ($filters as $key => $config) {
+            if ($request->has($key)) {
+                $values = is_array($request->$key) ? $request->$key : explode(',', $request->$key);
+                $query->whereHas($config['relation'], fn($q) => $q->whereIn($config['field'], array_map('intval', $values)));
+            }
+        }
 
-        return response()->json([
-            'success' => true,
-            'data' => $products,
-            'message' => 'Products for category retrieved successfully.'
-        ]);
+        if ($request->has('min_price')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('sale_price', '>=', (float)$request->min_price)
+                    ->orWhere('price', '>=', (float)$request->min_price);
+            });
+        }
+
+        if ($request->has('max_price')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('sale_price', '<=', (float)$request->max_price)
+                    ->orWhere('price', '<=', (float)$request->max_price);
+            });
+        }
+
+        return $query;
     }
-
     private function formatCategories($categories)
     {
         return $categories;
@@ -179,18 +197,9 @@ class CategoryController extends Controller
             'id' => $category->id,
             'slug' => $category->slug,
             'name' => $category->name,
-            'parent_id' => $category->parent_id,
             'image' => $category->image ? url($category->image) : null,
             'summary' => $category->summary,
-            'description' => $category->description,
-            'heading' => $category->heading,
-            'meta_title' => $category->meta_title,
-            'meta_keywords' => $category->meta_keywords,
-            'meta_description' => $category->meta_description,
-            'status' => $category->status,
-            'children' => $this->formatCategories($category->childrenRecursive),
-            'created_at' => $category->created_at,
-            'updated_at' => $category->updated_at
+            'description' => $category->description
         ];
     }
 }
