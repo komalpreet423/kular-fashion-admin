@@ -7,6 +7,9 @@ use App\Http\Resources\ProductListCollection;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Brand;
+use App\Models\Color;
+use App\Models\Size;
 use App\Models\Wishlist;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -326,5 +329,39 @@ class ProductController extends Controller
         } catch (Exception  $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage(), 'data' => (object)[]]);
         }
+    }
+
+    public function searchProduct($searchValue = null)
+    {
+        $query = Product::with(['brand', 'colors']);
+
+        if ($searchValue) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhereHas('brand', function ($q) use ($searchValue) {
+                    $q->where('name', 'LIKE', '%' . $searchValue . '%');
+                })
+                ->orWhereHas('colors', function ($q) use ($searchValue) {
+                    $q->where('name', 'LIKE', '%' . $searchValue . '%');
+                });
+            });
+        }
+
+        $products = $query->where('are_barcodes_printed', '>', 0)
+                        ->where('status', 'Active')
+                        ->latest()
+                        ->take(50)
+                        ->get();
+
+        $brands = Brand::where('status', 'Active')->whereNull('deleted_at')->get();
+        $colors = Color::where('status', 'Active')->whereNull('deleted_at')->get();
+        $sizes  = Size::where('status', 'Active')->whereNull('deleted_at')->get();
+
+        return response()->json([
+            'products' => $products,
+            'brands'   => $brands,
+            'colors'   => $colors,
+            'sizes'    => $sizes,
+        ]);
     }
 }

@@ -30,6 +30,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/search-product/{searchValue?}', [ProductController::class, 'searchProduct']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/brands/products', [BrandController::class, 'getProductByBrandId']);
 

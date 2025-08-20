@@ -143,52 +143,52 @@ export default {
             localStorage.setItem('transferItems', JSON.stringify(updatedItems));
             this.items = updatedItems;
         },
-transferItem(item, forceAdd = false) {
-    let products = [];
-    if (localStorage.getItem('transferItems')) {
-        products = JSON.parse(localStorage.getItem('transferItems'));
-    }
-
-    const totalQuantity = products
-        .filter(product => product.barcode === item.barcode)
-        .reduce((sum, product) => sum + product.quantity, 0);
-
-    // Show warning if stock is exceeded
-    if (totalQuantity + 1 > item.available_quantity && !forceAdd) {
-        Swal.fire({
-            title: 'Warning!',
-            text: 'Product is out of stock. Do you still want to add this product?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Add Product',
-            cancelButtonText: 'No, Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Add forceAdd = true to bypass stock check
-                this.transferItem(item, true);
+        transferItem(item, forceAdd = false) {
+            let products = [];
+            if (localStorage.getItem('transferItems')) {
+                products = JSON.parse(localStorage.getItem('transferItems'));
             }
-        });
-        return;
-    }
 
-    this.prevBarcode = item.barcode;
+            const totalQuantity = products
+                .filter(product => product.barcode === item.barcode)
+                .reduce((sum, product) => sum + product.quantity, 0);
 
-    let highestSno = products.length > 0 ? Math.max(...products.map(product => product.sno)) : 0;
+            // Show warning if stock is exceeded
+            if (totalQuantity + 1 > item.available_quantity && !forceAdd) {
+                Swal.fire({
+                    title: 'Warning!',
+                    text: 'Product is out of stock. Do you still want to add this product?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Add Product',
+                    cancelButtonText: 'No, Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Add forceAdd = true to bypass stock check
+                        this.transferItem(item, true);
+                    }
+                });
+                return;
+            }
 
-    const existingProduct = products.find(product => product.barcode === item.barcode);
-    if (existingProduct) {
-        existingProduct.quantity += 1;
-    } else {
-        item.quantity = 1;
-        item.scanned_barcode = item.barcode || item.manufacture_barcode;
-        item.sno = highestSno + 1;
-        products.push(item);
-    }
+            this.prevBarcode = item.barcode;
 
-    products.sort((a, b) => b.sno - a.sno);
-    localStorage.setItem('transferItems', JSON.stringify(products));
-    this.items = products;
-}
+            let highestSno = products.length > 0 ? Math.max(...products.map(product => product.sno)) : 0;
+
+            const existingProduct = products.find(product => product.barcode === item.barcode);
+            if (existingProduct) {
+                existingProduct.quantity += 1;
+            } else {
+                item.quantity = 1;
+                item.scanned_barcode = item.barcode || item.manufacture_barcode;
+                item.sno = highestSno + 1;
+                products.push(item);
+            }
+
+            products.sort((a, b) => b.sno - a.sno);
+            localStorage.setItem('transferItems', JSON.stringify(products));
+            this.items = products;
+        }
 
 
 ,

@@ -49,21 +49,17 @@ export default {
         }
     },
     mounted() {
-        this.selectedArticles = this.defaultProductsToBePrinted.map(String);
-
+        this.selectedArticles = [];
         $('table').on('change', '#select-all', (event) => {
-            var checkboxes = $('#product-table .select-row');
-
+            const checkboxes = $('#product-table .select-row');
             if (event.target.checked) {
-                checkboxes.prop('checked', true);
                 this.selectedArticles = checkboxes.map((_, checkbox) => $(checkbox).val()).get();
             } else {
-                checkboxes.prop('checked', false);
                 this.selectedArticles = [];
             }
         });
 
-        $('#product-table').on('click', 'tbody tr', (event) => {
+      /*  $('#product-table').on('click', 'tbody tr', (event) => {
             if (event.target.tagName !== 'TD') return;
             const row = $(event.currentTarget);
             const productId = row.find('.select-row').val();
@@ -72,11 +68,11 @@ export default {
             if (index === -1) {
                 this.selectedArticles.push(productId);
             }
-        });
+        });*/
 
         $('#product-table').on('change', '.select-row', (event) => {
             this.toggleSelection($(event.target).val());
-            var allChecked = $('#product-table .select-row').length === $('#product-table .select-row:checked').length;
+            const allChecked = $('#product-table .select-row').length === $('#product-table .select-row:checked').length;
             $('#select-all').prop('checked', allChecked);
         });
     },
