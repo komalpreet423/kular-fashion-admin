@@ -899,9 +899,9 @@ class ProductController extends Controller
                     $article_code = substr($productDetail->barcode, 0, -1);
 
                     for ($i = 0; $i < $quantityDetail['printQty']; $i++) {
-                        if (collect($barcodes)->contains('product_code', $productDetail->barcode)) {
+                        /*if (collect($barcodes)->contains('product_code', $productDetail->barcode)) {
                             continue;
-                        }
+                        }*/
 
                         $barcode = base64_encode($generator->getBarcode($article_code, $generator::TYPE_EAN_13, 1, 25, [0, 0, 0]));
                         $randomDigit = $this->generateRandomProductCode($productDetail->product->id);
@@ -1646,15 +1646,20 @@ class ProductController extends Controller
             foreach ($productIds as $productId) {
                 if ($type === 'assign') {
                     // Insert if not exists
-                    ProductCategory::firstOrCreate([
-                        'product_id' => $productId,
-                        'category_id' => $categoryId,
-                    ]);
+                    if($productId>0){
+                        ProductCategory::firstOrCreate([
+                            'product_id' => $productId,
+                            'category_id' => $categoryId,
+                        ]);
+                    }
                 } elseif ($type === 'unassign') {
                     // Delete if exists
-                    ProductCategory::where('product_id', $productId)
-                        ->where('category_id', $categoryId)
-                        ->delete();
+                    if($productId>0){
+                        ProductCategory::where('product_id', $productId)
+                            ->where('category_id', $categoryId)
+                            ->delete();
+                    }
+
                 }
             }
         }

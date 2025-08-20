@@ -392,6 +392,7 @@
                     categories : selected,
                     products : selectedProducts
                 },success : function(resp){
+                   // $('#un-category,#category').val(null).trigger('change');
                     swal({
                         title: "Success!",
                         text: resp.message,
@@ -399,6 +400,7 @@
                         showConfirmButton: false,
                         timer: 2000
                     });
+                    $('#select-all-checkbox').trigger('click');
                 },error : function(err){
                     console.log(err);
                 }
