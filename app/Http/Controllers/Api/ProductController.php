@@ -331,9 +331,14 @@ class ProductController extends Controller
         }
     }
 
-    public function searchProduct($searchValue = null)
+    public function searchProduct(Request $request)
     {
-        $query = Product::with(['brand', 'colors']);
+        $searchValue = $request->get('searchValue');
+        $brandId     = $request->get('brand_id');
+        $colorId     = $request->get('color_id');
+        $sizeId      = $request->get('size_id');
+
+        $query = Product::with(['brand', 'colors', 'sizes']);
 
         if ($searchValue) {
             $query->where(function ($q) use ($searchValue) {
@@ -343,7 +348,26 @@ class ProductController extends Controller
                 })
                 ->orWhereHas('colors', function ($q) use ($searchValue) {
                     $q->where('name', 'LIKE', '%' . $searchValue . '%');
+                })
+                ->orWhereHas('sizes', function ($q) use ($searchValue) {
+                    $q->where('name', 'LIKE', '%' . $searchValue . '%');
                 });
+            });
+        }
+
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
+        }
+
+        if ($colorId) {
+            $query->whereHas('colors', function ($q) use ($colorId) {
+                $q->where('id', $colorId);
+            });
+        }
+
+        if ($sizeId) {
+            $query->whereHas('sizes', function ($q) use ($sizeId) {
+                $q->where('id', $sizeId);
             });
         }
 
@@ -364,4 +388,5 @@ class ProductController extends Controller
             'sizes'    => $sizes,
         ]);
     }
+
 }
