@@ -53,8 +53,9 @@ class WebPagesController extends Controller
 
             $this->applyRequestFilters($productsQuery, $request);
 
-            $perPage = $request->input('per_page', 12);
-            $products = $productsQuery->paginate($perPage);
+            $perPage = $request->input('per_page', $webPage->listingOption->show_per_page ?? 12);
+        $products = $productsQuery->paginate($perPage, ['*'], 'page', $request->input('page',1));
+               
             $availableFilters = $this->buildProductFilters(
                 $products->items(),
                 $visibleFilters ?? [],
