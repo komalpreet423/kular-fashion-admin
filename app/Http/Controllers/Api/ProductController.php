@@ -19,155 +19,177 @@ use Auth;
 class ProductController extends Controller
 {
     public function index(Request $request)
-{
-    try {
-        $query = Product::with([
-            'brand',
-            'department',
-            'productType',
-            'webImage',
-            'quantities',
-            'colors.colorDetail',
-            'sizes.sizeDetail',
-            'webInfo',
-            'wishlist',
-            'tags'
-        ]);
-
-
-        $query->where(function ($q) {
-            $q->whereHas('webInfo', fn($q) => $q->where('status', 1))
-                ->orWhere(function ($q) {
-                    $q->whereHas('webInfo', fn($q) => $q->where('status', 2))
-                        ->whereHas('quantities', function ($q) {
-                            $q->select('product_id')
-                                ->groupBy('product_id')
-                                ->havingRaw('SUM(quantity) > 0');
-                        });
-                })
-                ->orWhereDoesntHave('webInfo');
-        });
-
-
-        if ($request->filled('department_slug')) {
-            $query->whereHas('department', fn($q) => $q->where('slug', $request->department_slug));
-        }
-
-
-        if ($request->filled('product_type_slug')) {
-            $query->whereHas('productType', fn($q) => $q->where('slug', $request->product_type_slug));
-        }
-
-        if ($request->filled('brands')) {
-            $query->whereIn('brand_id', explode(',', $request->brands));
-        }
-
-        if ($request->filled('product_ids')) {
-            $query->whereIn('id', explode(',', $request->product_ids));
-        }
-
-
-        if ($request->filled('product_types')) {
-            $query->whereHas('productType', fn($q) => $q->whereIn('id', explode(',', $request->product_types)));
-        }
-
-
-        if ($request->filled('sizes')) {
-            $query->whereHas('sizes', fn($q) => $q->whereIn('size_id', explode(',', $request->sizes)));
-        }
-
-
-        if ($request->filled('colors')) {
-            $query->whereHas('colors', fn($q) => $q->whereIn('color_id', explode(',', $request->colors)));
-        }
-
-
-        if ($request->filled('min_price') && $request->filled('max_price')) {
-            $query->whereHas('sizes', fn($q) => $q->whereBetween('web_price', [
-                $request->min_price,
-                $request->max_price
-            ]));
-        }
-
-
-        if ($request->filled('sort_by')) {
-            $query->orderBy($request->sort_by, $request->input('sort_dir', 'asc'));
-        } else {
-            $query->orderBy('created_at', 'desc');
-        }
-
-
-        $perPage = $request->input('per_page', 20);
-        $products = $query->paginate($perPage);
-
-
-        $brands = Product::whereIn('id', $products->pluck('id'))
-            ->with('brand')->get()
-            ->pluck('brand')->filter()->unique('id')->values()
-            ->map(fn($brand) => [
-                'id' => $brand->id,
-                'name' => $brand->name,
+    {
+        try {
+            $query = Product::with([
+                'brand',
+                'department',
+                'productType',
+                'webImage',
+                'quantities',
+                'colors.colorDetail',
+                'sizes.sizeDetail',
+                'webInfo',
+                'wishlist',
+                'tags'
             ]);
 
-        $productTypes = Product::whereIn('id', $products->pluck('id'))
-            ->with('productType')->get()
-            ->pluck('productType')->filter()->unique('id')->values()
-            ->map(fn($type) => [
-                'id' => $type->id,
-                'name' => $type->name,
-            ]);
 
-        $colors = Product::whereIn('id', $products->pluck('id'))
-            ->with('colors.colorDetail')->get()
-            ->pluck('colors')->flatten()->unique(fn($c) => $c->colorDetail?->id)
-            ->map(fn($color) => [
-                'id' => $color->color_id,
-                'name' => $color->colorDetail?->name,
-                'color_code' => $color->colorDetail?->ui_color_code,
-            ]);
+            $query->where(function ($q) {
+                $q->whereHas('webInfo', fn($q) => $q->where('status', 1))
+                    ->orWhere(function ($q) {
+                        $q->whereHas('webInfo', fn($q) => $q->where('status', 2))
+                            ->whereHas('quantities', function ($q) {
+                                $q->select('product_id')
+                                    ->groupBy('product_id')
+                                    ->havingRaw('SUM(quantity) > 0');
+                            });
+                    })
+                    ->orWhereDoesntHave('webInfo');
+            });
 
-        $sizes = Product::whereIn('id', $products->pluck('id'))
-            ->with('sizes.sizeDetail')->get()
-            ->pluck('sizes')->flatten()->unique(fn($s) => $s->sizeDetail?->size)
-            ->map(fn($s) => [
-                'id' => $s->size_id,
-                'name' => $s->sizeDetail?->size,
-            ]);
 
-        $minPrice = $products->min(fn($p) => $p->sizes->min('web_sale_price'));
-        $maxPrice = $products->max(fn($p) => $p->sizes->max('web_price'));
+            if ($request->filled('department_slug')) {
+                $query->whereHas('department', fn($q) => $q->where('slug', $request->department_slug));
+            }
 
-        return response()->json([
-            'success' => true,
-            'data' => $products->items(),
-            'pagination' => [
-                'total' => $products->total(),
-                'per_page' => $products->perPage(),
-                'current_page' => $products->currentPage(),
-                'last_page' => $products->lastPage(),
-            ],
-            'filters' => [
-                'brands' => $brands,
-                'product_types' => $productTypes,
-                'colors' => $colors,
-                'sizes' => $sizes,
-                'price' => [
-                    'min' => (float)$minPrice,
-                    'max' => (float)$maxPrice,
+
+            if ($request->filled('product_type_slug')) {
+                $query->whereHas('productType', fn($q) => $q->where('slug', $request->product_type_slug));
+            }
+
+            if ($request->filled('brands')) {
+                $query->whereIn('brand_id', explode(',', $request->brands));
+            }
+
+            if ($request->filled('product_ids')) {
+                $query->whereIn('id', explode(',', $request->product_ids));
+            }
+
+
+            if ($request->filled('product_types')) {
+                $query->whereHas('productType', fn($q) => $q->whereIn('id', explode(',', $request->product_types)));
+            }
+
+
+            if ($request->filled('sizes')) {
+                $query->whereHas('sizes', fn($q) => $q->whereIn('size_id', explode(',', $request->sizes)));
+            }
+
+
+            if ($request->filled('colors')) {
+                $query->whereHas('colors', fn($q) => $q->whereIn('color_id', explode(',', $request->colors)));
+            }
+
+
+            if ($request->filled('min_price') && $request->filled('max_price')) {
+                $query->whereHas('sizes', fn($q) => $q->whereBetween('web_price', [
+                    $request->min_price,
+                    $request->max_price
+                ]));
+            }
+
+            if ($request->filled('sort_by')) {
+                $sortField = 'name';
+                $sortDirection = 'asc';
+
+                switch ($request->sort_by) {
+                    case 'price_low_high':
+                        $query->orderByRaw('(SELECT MIN(web_price) FROM product_sizes WHERE product_sizes.product_id = products.id) ASC');
+                        break;
+                    case 'price_high_low':
+                        $query->orderByRaw('(SELECT MAX(web_price) FROM product_sizes WHERE product_sizes.product_id = products.id) DESC');
+                        break;
+                    case 'name_a_z':
+                        $query->orderBy('name', 'asc');
+                        break;
+                    case 'name_z_a':
+                        $query->orderBy('name', 'desc');
+                        break;
+                    case 'newest':
+                        $query->orderBy('created_at', 'desc');
+                        break;
+                    default:
+                        $query->orderBy('name', 'asc');
+                }
+            } else {
+                $query->orderBy('name', 'asc');
+            }
+
+
+
+            $perPage = $request->input('per_page', 20);
+            $products = $query->paginate($perPage);
+
+
+            $brands = Product::whereIn('id', $products->pluck('id'))
+                ->with('brand')->get()
+                ->pluck('brand')->filter()->unique('id')->values()
+                ->map(fn($brand) => [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                ]);
+
+            $productTypes = Product::whereIn('id', $products->pluck('id'))
+                ->with('productType')->get()
+                ->pluck('productType')->filter()->unique('id')->values()
+                ->map(fn($type) => [
+                    'id' => $type->id,
+                    'name' => $type->name,
+                ]);
+
+            $colors = Product::whereIn('id', $products->pluck('id'))
+                ->with('colors.colorDetail')->get()
+                ->pluck('colors')->flatten()->unique(fn($c) => $c->colorDetail?->id)
+                ->map(fn($color) => [
+                    'id' => $color->color_id,
+                    'name' => $color->colorDetail?->name,
+                    'color_code' => $color->colorDetail?->ui_color_code,
+                ]);
+
+            $sizes = Product::whereIn('id', $products->pluck('id'))
+                ->with('sizes.sizeDetail')->get()
+                ->pluck('sizes')->flatten()->unique(fn($s) => $s->sizeDetail?->size)
+                ->map(fn($s) => [
+                    'id' => $s->size_id,
+                    'name' => $s->sizeDetail?->size,
+                ]);
+
+            $minPrice = $products->min(fn($p) => $p->sizes->min('web_sale_price'));
+            $maxPrice = $products->max(fn($p) => $p->sizes->max('web_price'));
+
+            return response()->json([
+                'success' => true,
+                'data' => $products->items(),
+                'pagination' => [
+                    'total' => $products->total(),
+                    'per_page' => $products->perPage(),
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                ],
+                'filters' => [
+                    'brands' => $brands,
+                    'product_types' => $productTypes,
+                    'colors' => $colors,
+                    'sizes' => $sizes,
+                    'price' => [
+                        'min' => (float)$minPrice,
+                        'max' => (float)$maxPrice,
+                    ]
                 ]
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
     protected function transformProducts($products)
     {
-        $transformed = new Collection();
+        $transformed = new Collection(); 
+        
         foreach ($products as $product) {
             if ($product->webInfo && $product->webInfo->is_splitted_with_colors == 1) {
                 foreach ($product->colors as $color) {
@@ -223,15 +245,15 @@ class ProductController extends Controller
         if ($searchValue) {
             $query->where(function ($q) use ($searchValue) {
                 $q->where('name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhereHas('brand', function ($q) use ($searchValue) {
-                    $q->where('name', 'LIKE', '%' . $searchValue . '%');
-                })
-                ->orWhereHas('colors', function ($q) use ($searchValue) {
-                    $q->where('name', 'LIKE', '%' . $searchValue . '%');
-                })
-                ->orWhereHas('sizes', function ($q) use ($searchValue) {
-                    $q->where('name', 'LIKE', '%' . $searchValue . '%');
-                });
+                    ->orWhereHas('brand', function ($q) use ($searchValue) {
+                        $q->where('name', 'LIKE', '%' . $searchValue . '%');
+                    })
+                    ->orWhereHas('colors', function ($q) use ($searchValue) {
+                        $q->where('name', 'LIKE', '%' . $searchValue . '%');
+                    })
+                    ->orWhereHas('sizes', function ($q) use ($searchValue) {
+                        $q->where('name', 'LIKE', '%' . $searchValue . '%');
+                    });
             });
         }
 
@@ -252,10 +274,10 @@ class ProductController extends Controller
         }
 
         $products = $query->where('are_barcodes_printed', '>', 0)
-                        ->where('status', 'Active')
-                        ->latest()
-                        ->take(50)
-                        ->get();
+            ->where('status', 'Active')
+            ->latest()
+            ->take(50)
+            ->get();
 
         $brands = Brand::where('status', 'Active')->whereNull('deleted_at')->get();
         $colors = Color::where('status', 'Active')->whereNull('deleted_at')->get();
@@ -268,5 +290,4 @@ class ProductController extends Controller
             'sizes'    => $sizes,
         ]);
     }
-
 }
